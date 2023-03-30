@@ -2392,7 +2392,7 @@
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 43518424-475b-4e8c-9aac-6d2f0f6f365d)
   )
-  (text "Power Dissapation" (at 203.835 24.13 0)
+  (text "Power Dissipation" (at 203.835 24.13 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 481db405-9ab9-44f3-8bc6-2528ab9b1404)
   )
