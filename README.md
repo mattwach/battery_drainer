@@ -107,7 +107,7 @@ Q2 is off by default, turned off by R2.  There are two ways to turn it on:
 While the unit is already on, the state of SW5 can be determined by checking the "ON" net, which is connected to an input of the microcontroller.  It's up to the
 firmware to decided what to do (if anything) when the switch is pressed.
 
-## ADC reference
+### ADC reference
 
 ![adc reference](images/adc_reference.png)
 
@@ -115,6 +115,30 @@ When using an ADC, one can typically choose from several different sources for t
 
 This design uses the alternate `ADC_VREF` input with a `LM4040` voltage reference
 to allow for more accurate measurements.
+
+### OLED connection
+
+![oled](images/oled.png)
+
+The design breaks out an I2C connection that is typical for an I2C OLED.  A 128x64 design is the intended unit but anything that supports I2C could be supported with appropriate firmware.
+
+### Fan connection
+
+The LIPO generator effectively converts battery energy to heat, thus you'll need a cooling strategy to avoid overheating and damaging the discharge circuit.  Like cooling other devices such as CPUs and GPUs, a passive solution is sometimes adequate and a active solution is often needed.
+
+The circuitry below supports a PWM-based fan controller.
+
+![fan](images/fan.png)
+
+This controller feeds the full battery voltage into the fan as PWM pulses.  These pulses interact with the natural inductance of the motor to create a basic "buck converter" circuit.  The diode "D1" acts as a flywheel, allowing the motor to power itself when the Q3 is closed and avoiding negative voltage spikes at the drain of Q3.
+
+There are many motor controllers ICs available on the market.  The reason they were not chosen here is because the maximum battery input voltage (30V) exceeds the specifications of most of these controllers.  Also many of these controllers provide an H-bridge solution, which is overkill here (we don't need to run the fan in reverse).
+
+### Optional Buttons
+
+Finally, we have a bank of optional buttons that may be used for various things.  This will be decided by the firmware.
+
+![buttons](images/buttons.png)
 
 ## Calibration
 
