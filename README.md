@@ -11,7 +11,8 @@ https://docs.google.com/spreadsheets/d/1cjAQ268wM6tvXvhV_kM2y3uYFPqvaHXufrr3GAKT
 
 ## Schematic Overview
 
-Note that the images below are a snapshot of the schematic and may not be fully up-tp-date.  See the kicad original for the latest design.
+Note that the images below are a snapshot of the schematic and not fully
+up-tp-date.  See the kicad original for the latest design.
 
 Here is the complete design (click to expand):
 
@@ -38,22 +39,22 @@ datasheet graph below:
 
 ![vgs curve](images/vgs_curve.png)
 
-> Note: The schematic has been update to use an alternate PFET due to the FQP27P06 no longer being produced.
+> Note: The schematic has been updated to use an alternate PFET due to the FQP27P06 no longer being produced.
 
 ### Vgs Control
 
-To achieve the target Vgs for the MOSFETs, we use an capacitor as detailed
+To achieve the target Vgs for the MOSFETs, we use a capacitor as detailed
 below:
 
 ![rc circuit](images/rc_circuit.png)
 
-The main element here is the 10u capacitor on the right side of the image.  This capacitor is filled and emptied with charge to set the Vgs that each MOSFET will see.
+The main element here is the 10u capacitor on the right side of the image.  This capacitor is filled and emptied to set the Vgs that each MOSFET will see.
 
 Filling the capacitor is the 5k resistor, R16.  If only this resistor and the capacitor existed, then the RC constant would be 5000 * 10e-6 = 50ms.  When the
 capacitor is sufficiently charged, the MOSFETs will be turned off.
 
 The two transistor networks are used to drain the capacitor.  The one on the left
-is the "slow" drain and the one on the right is the "fast" drain.  The size of the resistors (R17 and R20) at the collector determines the drain speed.  A microcontroller feeds in a PWM signal with a varying duty cycle to control how
+is a "slow" drain and the one on the right is a "fast" drain.  The size of the resistors (R17 and R20) at the collector determines the drain speed.  A microcontroller feeds in a PWM signal with a varying duty cycle to control how
 much charge they pull from the capacitor thus determining the Vgs value.
 
 In the power-on state, we can assume that SLOW and FAST are not driven at all (high Z).  In this state the two 50k pulldowns (R14, R18) turn off Q6 and Q9
@@ -96,8 +97,10 @@ drop will be amplified in an attempt to get enough ADC resolution.
 
 Because powerloss *is* the goal here, we instead choose power resistors that directly provide a full (3V) drop at around 30V input.  To safely get there, I chose 3 35W 0.4 ohm resistors connected in parallel for a total dissipation capability of ~100W and an equivilent resistance of 0.133 ohm.
 
-A zener diode (U5) is used to protect the ADC of the microcontroller in the event
-that the divided voltage is too high (> 3V).  The micorcontroller firmware may have to know that any measurement above 3V translates to >= 3V and not exactly that.  In normal use, this case should not occur.
+A zener diode (U5) is used to protect the ADC of the microcontroller in the
+event that the divided voltage is too high (> 3V).  The microcontroller firmware
+may have to know that any measurement above 3V translates to >= 3V and not
+exactly that.  In normal use, this case should not occur.
 
 ### Protection Fuse
 
@@ -148,7 +151,10 @@ The design breaks out an I2C connection that is typical for an I2C OLED.  A 128x
 
 ### Fan connection
 
-The LIPO generator effectively converts battery energy to heat, thus you'll need a cooling strategy to avoid overheating and damaging the discharge circuit.  Like cooling other devices such as CPUs and GPUs, a passive solution is sometimes adequate and a active solution is often needed.
+The LIPO generator effectively converts battery energy to heat, thus you'll need
+a cooling strategy to avoid overheating and damaging the discharge circuit.
+Like cooling other devices such as CPUs and GPUs, a passive solution is
+sometimes adequate and an active solution is often needed.
 
 The circuitry below supports a PWM-based fan controller.
 
@@ -160,7 +166,7 @@ There are many motor controllers ICs available on the market.  The reason they w
 
 ### Optional Buttons
 
-Finally, we have a bank of optional buttons that may be used for various things.  This will be decided by the firmware.
+We have a bank of optional buttons that may be used for various things.  This will be decided by the firmware.
 
 ![buttons](images/buttons.png)
 
