@@ -17,6 +17,10 @@ Here is the complete design (click to expand):
 
 ![schematic](images/schematic.png)
 
+Here is an early falstad simulation that gives a basic idea of how the cicuit works:
+
+https://tinyurl.com/2qg4xwyj
+
 There is much going on here.  The sections below break down and explain one subcircuit at a time.
 
 ### Power Dissipation
@@ -34,9 +38,12 @@ datasheet graph below:
 
 ![vgs curve](images/vgs_curve.png)
 
+> Note: The schematic has been update to use an alternate PFET due to the FQP27P06 no longer being produced.
+
 ### Vgs Control
 
-To achieve the target Vgs for the MOSFETs, we use an RC circuit as detailed below:
+To achieve the target Vgs for the MOSFETs, we use an capacitor as detailed
+below:
 
 ![rc circuit](images/rc_circuit.png)
 
@@ -70,8 +77,8 @@ small 10 ohm R13 allows for a rapid fill.  R8 is connected to the
 microcontroller power and is thus grounded on initial power on, turning "on" the
 FET.
 
-When the user powers on the device, there is voltage near-battery going to R8
-which turns off the FET and disables this subcircuit.
+When the user powers on the device (after the battery is plugged in), there is
+voltage near-battery going to R8 which turns off the FET and disables the inrush subcircuit.
 
 ### Current Sense 
 
@@ -94,7 +101,7 @@ that the divided voltage is too high (> 3V).  The micorcontroller firmware may h
 
 ### Protection Fuse
 
-We also have a protection fuse to help protect against software faults or other unexpected problems.  More protection would be offered if the fuse were right at the battery input but this would introduce a further temperature-dependent voltage drop that would throw off the voltage measurement.  The actual fuse location was moved from the image however so please refer to the kicad schematic.  For the fuse type, we choose a 30A polyfuse which is self-resetting.
+We also have a protection fuse to help protect against software faults or other unexpected problems.  More protection would be offered if the fuse were right at the battery input but this would introduce a further temperature-dependent voltage drop that would throw off the voltage measurement.  The actual fuse location was moved from the image in this document however so please refer to the source kicad schematic.  For the fuse type, we choose a 40A polyfuse which is self-resetting.
 
 ### Voltage Sense
 
@@ -117,15 +124,12 @@ This is implemented with the following circuit:
 
 ![power cutoff](images/power_cutoff.png)
 
-The Q2 FET is key.  It determines if the miccontroller gets any power.  If the microcontroller has no power, then the power FETs described earlier naturally enter an "off" state.
+The Q2 FET is key.  It determines if the microcontroller gets any power.  If the microcontroller has no power, then the power FETs described earlier naturally enter an "off" state.
 
 Q2 is off by default, turned off by R2.  There are two ways to turn it on:
 
 1. If the user presses SW5, then the FET will be pulled to ground turning on Q2
-2. If the microntroller activates Q1 via "EN", then the FET will be turned on as well.  The microtroller does this as soon as it can (in a split second) and hold it on until the mocrocontroller decides that it is time to power down.
-
-While the unit is already on, the state of SW5 can be determined by checking the "ON" net, which is connected to an input of the microcontroller.  It's up to the
-firmware to decided what to do (if anything) when the switch is pressed.
+2. If the microcontroller activates Q1 via "EN", then the FET will be turned on as well.  The microcontroller does this as soon as it can (in a split second) and holds it high until the microcontroller decides that it is time to power down.
 
 ### ADC reference
 
