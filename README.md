@@ -1,9 +1,19 @@
 # lipo_battery_drainer
-Hardware to safely discharge LIPO batteries to storage levels
+This project describes hardware to safely discharge LIPO batteries to storage levels
+
+# WARNING
+
+Everything described in this document is preliminary and untested and could be hazardous.  Following anything written in this document is at-your-own risk.
 
 ## Schematic Overview
 
 Note that the images below are a snapshot of the schematic and may not be fully up-tp-date.  See the kicad original for the latest design.
+
+Here is the complete design (click to expand):
+
+![schematic](images/schematic.png)
+
+There is much going on here.  The sections below break down and explain one subcircuit at a time.
 
 ### Power Dissipation
 
@@ -14,7 +24,7 @@ This is a set of 4 P-Channel MOSFETs connected in parallel:
 More or less could also work.  More means more overall current and better heat
 dissipation but also additional cost and board space.
 
-These are intended to be run in the "constant" current region of the FETs which
+These are intended to be run in the "Ohmic" region of the FETs which
 is controlled by the gate-to-source voltage (Vgs) as exampled in the FQP27P06
 datasheet graph below:
 
@@ -22,20 +32,20 @@ datasheet graph below:
 
 ### Vgs Control
 
-To get the proper Vgs for the MOSFETs, we use an RC circuit as detailed below:
+To achieve the target Vgs for the MOSFETs, we use an RC circuit as detailed below:
 
 ![rc circuit](images/rc_circuit.png)
 
 The main element here is the 10u capacitor on the right side of the image.  This capacitor is filled and emptied with charge to set the Vgs that each MOSFET will see.
 
 Filling the capacitor is the 5k resistor, R16.  If only this resistor and the capacitor existed, then the RC constant would be 5000 * 10e-6 = 50ms.  When the
-capacitor is fully charged, the MOSFETs will be turned off.
+capacitor is sufficiently charged, the MOSFETs will be turned off.
 
 The two transistor networks are used to drain the capacitor.  The one on the left
 is the "slow" drain and the one on the right is the "fast" drain.  The size of the resistors (R17 and R20) at the collector determines the drain speed.  A microcontroller feeds in a PWM signal with a varying duty cycle to control how
-much charge they pull from the capacitor thus determines the Vgs value.
+much charge they pull from the capacitor thus determining the Vgs value.
 
-In the steady state, we can assume that SLOW and FAST are not driven at all (high Z).  In this state the two 50k pulldowns (R14, R18) turn off Q6 and Q9
+In the power-on state, we can assume that SLOW and FAST are not driven at all (high Z).  In this state the two 50k pulldowns (R14, R18) turn off Q6 and Q9
 allowing the capacitor to fill up and turn off all MOSFETs.
 
 ## Inrush protection
@@ -59,22 +69,28 @@ FET.
 When the user powers on the device, there is voltage near-battery going to R8
 which turns off the FET and disables this subcircuit.
 
-### Current Sense
+### Current Sense 
 
 ![i sense](images/i_sense.png)
 
 One of the three ways the microcontroller decides where to set Vgs is by
 monitoring the current flowing through the FETs  (the other two are voltage and
-power).  This is done with a low-side shunt which is a resistor that indicates
-the current via a voltage drop.  This voltage drop is measured with an ADC on
-the micorcontroller.  In many cases, minimizing the power loss through this
-shunt is desirable so a small resistance will be chosen and the corresponding
-low voltage drop will be amplified in an attempt to get enough ADC resolution.
+power).  This is done with a low-side sense circuit which is a resistor that
+indicates the current via a voltage drop.  This voltage drop is measured with an
+ADC on the micorcontroller.  
 
-Becuase powerloss is the goal here, we instead choose power resistors that directly provide a full (3V) drop at around 30V input.  To safely get there, I chose 3 35W 0.4 ohm resistors connected in parallel for a total dissipation capability of ~100W and an equivilent resistance of 0.133 ohm.
+In many cases, minimizing the power loss through this sense resistor is
+desirable so a small resistance will be chosen and the corresponding low voltage
+drop will be amplified in an attempt to get enough ADC resolution.
+
+Because powerloss *is* the goal here, we instead choose power resistors that directly provide a full (3V) drop at around 30V input.  To safely get there, I chose 3 35W 0.4 ohm resistors connected in parallel for a total dissipation capability of ~100W and an equivilent resistance of 0.133 ohm.
 
 A zener diode (U5) is used to protect the ADC of the microcontroller in the event
 that the divided voltage is too high (> 3V).  The micorcontroller firmware may have to know that any measurement above 3V translates to >= 3V and not exactly that.  In normal use, this case should not occur.
+
+### Protection Fuse
+
+We also have a protection fuse to help protect against software faults or other unexpected problems.  More protection would be offered if the fuse were right at the battery input but this would introduce a further temperature-dependent voltage drop that would throw off the voltage measurement.  The actual fuse location was moved from the image however so please refer to the kicad schematic.  For the fuse type, we choose a 30A polyfuse which is self-resetting.
 
 ### Voltage Sense
 
@@ -91,7 +107,7 @@ The voltags at R9 is not exactly the battery voltage as it has to pass through a
 
 ### Power cutoff
 
-The circuit is designed to draw nearly zero power (outside of parasitic losses) which it is off, including after the charging has completed.  Thus the user can leave the unit unattended (assuming the needed precautions have been taken) without concern of overdraining.
+The LIPO drainer is designed to draw nearly zero power (outside of parasitic losses) when it is off, including after the discharging has completed.  Thus the user can leave the unit unattended (assuming the needed precautions have been taken) without concern of overdraining.
 
 This is implemented with the following circuit:
 
@@ -140,53 +156,26 @@ Finally, we have a bank of optional buttons that may be used for various things.
 
 ![buttons](images/buttons.png)
 
+### PI Pico Microcontroller
+
+As is typical, a microcontroller orchestrates the effort.  Here I chose a PI Pico because it is inexpensive and quite capable.  It's main downside is the lack of a low-power sleep mode, but the Power cutoff circuit explained above compensates for this shortcoming.
+
+![pico](images/pico.png)
+
+A little bit on the tasks the Pico must attend to:
+
+1. When the unit is powered-up, the Pico must raise the EN pin to keep the power active.  It must lower the EN pin when it is time to shutdown.
+2. It controls the dissapation rate of the main FETs via PWM signals on the SLOW and FAST pins.
+3. It measures current by ADC decoding the voltage at the CUR pin.
+4. It measures the battery voltage via an ADC.
+5. It provides an output display via SDA and SCL
+6. It controls the fan speed (if present) via the FAN pin.
+7. It may monitor the buttons B1, B2, B3, B4 and ON to as a part of user control.
+
+
 ## Calibration
 
-### Voltage sense
+There are a couple of calibration points on the circuit.
 
-#### Path
-
-* say the original battery voltage is 20V
-* It will be reduced passing theough the protection diode, say 0.4V
-* It will take some hit through the PNP FET
-* This voltage will be divided according to the resistor ratio
-* and finally converted into a 12 bit value
-
-We can easily convert the 12 bit value into a voltage from 0-3V
-
-Calibration:
-
-1. Connect a battery but do not connect to a computer.  Do not start discharging.
-2. Measure actual battery voltage
-3. Measure GND to CalV
-
-Calculated constants:
-
-* ADC Scalar: Sadc = CalV / ADC
-* Voltage Delta: Vd = Vb - Calv
-
-Example:
-
-Say resistor values are 9000 top, 1000 bottom.  Voltage ratio in this case would be 1000 / 10000 = 0.1
-Adc range is 0-4096 over a 0-3V range
-
-Say you measure 20V at the battery and 19V at Calv
-Divided voltage is 19 * 0.1 = 1.9
-ADC measures 4096 * 1.9 / 3.0 = 2594
-
-Sadc = 19 / 2594 = 0.007325
-Vd = 1
-
-Say you measure 19V at the battery at 18V at Calv
-Divided voltage is 18 * 0.1 = 1.8
-ADC measures 4096 * 1.8 / 3.0 = 2457
-
-Sadc = 18 / 2457 = 0.007326
-Vd = 1
-
-Now we have a ADC value or 2000, what is the voltage?
-2000 * 0.007325 = 14.65 V
-Plus 1V Vd = 15.64 volts
-
-### Current Sense
-
+1. Vcal is used to determine the voltage at the top of the resistor divider.  If the user measures this and the actual battery voltage, the system can have some idea of what the voltage drop between the two is and compensate for it.  This will not be perfect due to other factors (temperature, current), but it the hope is that the error will be acceptable.
+2. Ical is used to determine the actual current.  The user will measure the resistance across these pins.
