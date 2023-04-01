@@ -5,6 +5,10 @@ This project describes hardware to safely discharge LIPO batteries to storage le
 
 Everything described in this document is preliminary and untested and could be hazardous.  Following anything written in this document is at-your-own risk.
 
+## Parts list
+
+https://docs.google.com/spreadsheets/d/1cjAQ268wM6tvXvhV_kM2y3uYFPqvaHXufrr3GAKTqXQ/edit?usp=sharing
+
 ## Schematic Overview
 
 Note that the images below are a snapshot of the schematic and may not be fully up-tp-date.  See the kicad original for the latest design.
