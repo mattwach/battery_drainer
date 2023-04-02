@@ -3011,7 +3011,7 @@
     (property "Value" "BATT" (at 22.225 30.48 90)
       (effects (font (size 1.27 1.27)) (justify right))
     )
-    (property "Footprint" "Connector_AMASS:AMASS_XT60-M_1x02_P7.20mm_Vertical" (at 24.13 29.845 0)
+    (property "Footprint" "Connector_AMASS:AMASS_XT60PW-M_1x02_P7.20mm_Horizontal" (at 24.13 29.845 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "~" (at 24.13 29.845 0)

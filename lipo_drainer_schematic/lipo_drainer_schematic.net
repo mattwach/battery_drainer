@@ -1,7 +1,7 @@
 (export (version "E")
   (design
     (source "/home/mattwach/git/lipo_battery_drainer/lipo_drainer_schematic/lipo_drainer_schematic.kicad_sch")
-    (date "Sun 02 Apr 2023 11:32:21 AM PDT")
+    (date "Sun 02 Apr 2023 11:48:07 AM PDT")
     (tool "Eeschema 7.0.1")
     (sheet (number "1") (name "/") (tstamps "/")
       (title_block
@@ -83,7 +83,7 @@
       (tstamps "a240fcc1-e50a-4576-a4ea-a9a99420814c"))
     (comp (ref "J1")
       (value "BATT")
-      (footprint "Connector_AMASS:AMASS_XT60-M_1x02_P7.20mm_Vertical")
+      (footprint "Connector_AMASS:AMASS_XT60PW-M_1x02_P7.20mm_Horizontal")
       (libsource (lib "Connector") (part "Conn_01x02_Socket") (description "Generic connector, single row, 01x02, script generated"))
       (property (name "Sheetname") (value ""))
       (property (name "Sheetfile") (value "lipo_drainer_schematic.kicad_sch"))
