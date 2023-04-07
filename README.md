@@ -26,6 +26,8 @@ There is much going on here.  The sections below break down and explain one subc
 
 ### Power Dissipation
 
+[falstad model](https://tinyurl.com/28p9fv3n)
+
 This is a set of 4 P-Channel MOSFETs connected in parallel:
 
 ![power fets](images/power_fets.png)
@@ -42,6 +44,8 @@ datasheet graph below:
 > Note: The schematic has been updated to use an alternate PFET due to the FQP27P06 no longer being produced.
 
 ### Vgs Control
+
+[falstad model](https://tinyurl.com/2cw9exa5)
 
 To achieve the target Vgs for the MOSFETs, we use a capacitor as detailed
 below:
@@ -60,7 +64,15 @@ much charge they pull from the capacitor thus determining the Vgs value.
 In the power-on state, we can assume that SLOW and FAST are not driven at all (high Z).  In this state the two 50k pulldowns (R14, R18) turn off Q6 and Q9
 allowing the capacitor to fill up and turn off all MOSFETs.
 
+The 100K pull down resistor slowly drains the capacitor so that it is in a known
+state (0V) when the unit is unplugged and idle.  Omitting can create a situation
+where Vgs is temporarily higher than the plugged in battery, which could lead to
+some side effects such as temporary Vgs oscillation as the firmware searches for
+the correct duty cycles for SLOW and FAST.
+
 ## Inrush protection
+
+[falstad model](https://tinyurl.com/2y8c54c8)
 
 There is inrush current potential on initial plugin as the 100ms or so it takes
 the capacitor (C4) to charge via R16 could allow a high current to pass through
@@ -70,11 +82,11 @@ protection circuitry:
 ![inrush](images/inrush.png)
 
 Fully understanding this block will require studying the full schematic.  A
-partial understand can be gained from the image above.  We basically have
-another way to fill the capacitor C4 which is "enabled" when the battery is
-plugged in but the user has not pressed the power button yet.  The way this
-works is that the source of the MOSFET (2) is connected to the battery and the
-small 10 ohm R13 allows for a rapid fill.  R8 is connected to the
+partial understand can be gained from the image above and the falstad model.  We
+basically have another way to fill the capacitor C4 which is "enabled" when the
+battery is plugged in but the user has not pressed the power button yet.  The
+way this works is that the source of the MOSFET (2) is connected to the battery
+and the small 10 ohm R13 allows for a rapid fill.  R8 is connected to the
 microcontroller power and is thus grounded on initial power on, turning "on" the
 FET.
 
@@ -83,13 +95,15 @@ voltage near-battery going to R8 which turns off the FET and disables the inrush
 
 ### Current Sense 
 
+[falstad model](https://tinyurl.com/253e6aln)
+
 ![i sense](images/i_sense.png)
 
-One of the three ways the microcontroller decides where to set Vgs is by
-monitoring the current flowing through the FETs  (the other two are voltage and
-power).  This is done with a low-side sense circuit which is a resistor that
-indicates the current via a voltage drop.  This voltage drop is measured with an
-ADC on the micorcontroller.  
+One of the four ways the microcontroller decides where to set Vgs is by
+monitoring the current flowing through the FETs  (the other three are voltage,
+power, and temperature).  This is done with a low-side sense circuit which is a
+resistor that indicates the current via a voltage drop.  This voltage drop is
+measured with an ADC on the micorcontroller.  
 
 In many cases, minimizing the power loss through this sense resistor is
 desirable so a small resistance will be chosen and the corresponding low voltage
@@ -104,9 +118,14 @@ exactly that.  In normal use, this case should not occur.
 
 ### Protection Fuse
 
-We also have a protection fuse to help protect against software faults or other unexpected problems.  More protection would be offered if the fuse were right at the battery input but this would introduce a further temperature-dependent voltage drop that would throw off the voltage measurement.  The actual fuse location was moved from the image in this document however so please refer to the source kicad schematic.  For the fuse type, we choose a 40A polyfuse which is self-resetting.
+![fuse](images/fuse.png)
+
+We also have a protection fuse to help protect against software faults or other unexpected problems.  More protection would be offered if the fuse were right at the battery input but this would introduce a further temperature-dependent voltage drop that would throw off the voltage measurement.  The "unprotected" components
+are the digital logic which should be low current draw barring a physical issue with the board (< 100 mA)
 
 ### Voltage Sense
+
+[falstad model](https://tinyurl.com/2aavu5hb)
 
 ![v sense](images/v_sense.png)
 
@@ -119,13 +138,25 @@ used a reference value to determine the sag.
 
 The voltags at R9 is not exactly the battery voltage as it has to pass through a a diode and FET.  The micorcontroller calculations will attempt to compensate for the drop.
 
+### Temperature Sense
+
+![temperature](images/temperature.png)
+
+A temperature sensor will be placed against the heatsink to get an idea of of
+overall temperature of the FETs and power resistors.  This feedback can be used
+to control a cooling fan (described below) and, if this is inadequate, reduce
+the power dissipation via FAST and SLOW PWM signals (as described earlier).
+
 ### Power cutoff
+
+[falstad model](https://tinyurl.com/22wuu5mp)
 
 The LIPO drainer is designed to draw nearly zero power (outside of parasitic losses) when it is off, including after the discharging has completed.  Thus the user can leave the unit unattended (assuming the needed precautions have been taken) without concern of overdraining.
 
 This is implemented with the following circuit:
 
 ![power cutoff](images/power_cutoff.png)
+
 
 The Q2 FET is key.  It determines if the microcontroller gets any power.  If the microcontroller has no power, then the power FETs described earlier naturally enter an "off" state.
 
@@ -151,6 +182,8 @@ The design breaks out an I2C connection that is typical for an I2C OLED.  A 128x
 
 ### Fan connection
 
+[falstad model](https://tinyurl.com/256h26ew)
+
 The LIPO generator effectively converts battery energy to heat, thus you'll need
 a cooling strategy to avoid overheating and damaging the discharge circuit.
 Like cooling other devices such as CPUs and GPUs, a passive solution is
@@ -164,9 +197,17 @@ This controller feeds the full battery voltage into the fan as PWM pulses.  Thes
 
 There are many motor controllers ICs available on the market.  The reason they were not chosen here is because the maximum battery input voltage (30V) exceeds the specifications of most of these controllers.  Also many of these controllers provide an H-bridge solution, which is overkill here (we don't need to run the fan in reverse).
 
-### Optional Buttons
+### Control Buttons
 
-We have a bank of optional buttons that may be used for various things.  This will be decided by the firmware.
+Besides the ON and "reset" buttons, we have an OFF, Next and OK button.
+
+OFF is directly connected to the poweron circuit, described above.  It
+cuts power to the microcontroller without any negotiation.
+
+NEXT and OK are used by the microcontroller to implement a simple UI.
+More complex UI functions (mostly setup, calibration, and preferences) can
+be configured using the USB interface of the Pico with associated firmware
+support.
 
 ![buttons](images/buttons.png)
 
