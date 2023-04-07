@@ -45,7 +45,7 @@ datasheet graph below:
 
 ### Vgs Control
 
-[falstad model](https://tinyurl.com/2cw9exa5)
+[falstad model](https://tinyurl.com/2bj46fut)
 
 To achieve the target Vgs for the MOSFETs, we use a capacitor as detailed
 below:
@@ -182,7 +182,7 @@ The design breaks out an I2C connection that is typical for an I2C OLED.  A 128x
 
 ### Fan connection
 
-[falstad model](https://tinyurl.com/256h26ew)
+[falstad model](https://tinyurl.com/26cncr9p)
 
 The LIPO generator effectively converts battery energy to heat, thus you'll need
 a cooling strategy to avoid overheating and damaging the discharge circuit.
