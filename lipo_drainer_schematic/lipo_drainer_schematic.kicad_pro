@@ -56,6 +56,7 @@
         }
       ],
       "drc_exclusions": [
+        "silk_overlap|100314486|101500000|7196535b-4e88-4ae3-912a-eed68427b3d9|137daf1e-e0e7-4b73-9e6a-f74b0176abd0",
         "silk_overlap|100370446|101388081|7196535b-4e88-4ae3-912a-eed68427b3d9|137daf1e-e0e7-4b73-9e6a-f74b0176abd0",
         "silk_overlap|101102806|101500000|137daf1e-e0e7-4b73-9e6a-f74b0176abd0|7196535b-4e88-4ae3-912a-eed68427b3d9",
         "silk_overlap|112673733|102500000|be97f367-8766-48d6-ad7e-d07143dd8a71|17a1d855-a40a-4001-93d1-2f8e4aea8113",
@@ -186,11 +187,10 @@
       ],
       "track_widths": [
         0.0,
-        0.0,
-        0.0,
         0.4,
         1.0,
         2.0,
+        7.0,
         8.0
       ],
       "via_dimensions": [
