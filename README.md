@@ -280,6 +280,22 @@ Here is an image of the board from the KiCAD image viewer.  Top and bottom:
 
 Note that the KiCAD rendering has a number of missing components and imperfections due to my not taking the time to address them.  But you should get the basic idea.
 
+## Daughterboard
+
+You could plug a single battery into the unit or use a parallel adapter.  Safer than
+a parallel adapter would be a board with integrated diodes.  This will allow batteries of different charge levels to be plugged in without the concern of large
+current flows due to unequal discharge levels.  The firmware can account for the
+drop across the diodes after the user calibrates the board.  
+
+A bundled example provides connection for 6 XT-60 packs.  Changing the number of
+packs or the connector type is of course doable:
+
+![daughter schematic](images/daughter_schematic.png)
+
+![daughter pcb](images/daughter_pcb.png)
+
+![daughter 3d](images/daughter_3d.png)
+
 ## Calibration
 
 There are a couple of calibration points on the circuit.

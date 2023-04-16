@@ -1,4 +1,4 @@
-21658081364071228
+36945808965592
 Audio_Module
 Reverb_BTDR-1H
 Digital Reverberation Unit, http://www.belton.co.kr/inc/downfile.php?seq=17&file=pdf (footprint from http://www.uk-electronic.de/PDF/BTDR-1.pdf)
@@ -60791,6 +60791,13 @@ Matt
 Joule_Thief_Torroid_SMD
 
 
+0
+4
+4
+Matt
+OLED_128_64_1.3in
+Through hole straight socket strip, 1x04, 2.54mm pitch, single row (from Kicad 4.0.7), script generated
+Through hole socket strip THT 1x04 2.54mm single row
 0
 4
 4
