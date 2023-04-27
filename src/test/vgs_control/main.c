@@ -53,7 +53,7 @@ static uint8_t get_num(const char* name, const char* vstr, int min, int max, uin
     return 0;
   }
 
-  *val = (uint16_t)v;
+  *val = (uint32_t)v;
   return 1;
 }
 
