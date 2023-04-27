@@ -6,7 +6,9 @@ add_executable(test_vgs_control
 target_link_libraries(
     test_vgs_control
     UART_CONSOLE
-    pico_stdlib)
+    pico_stdlib
+    hardware_gpio
+    hardware_pwm)
 
 # enable usb output, disable uart output
 pico_enable_stdio_usb(test_vgs_control 1)
