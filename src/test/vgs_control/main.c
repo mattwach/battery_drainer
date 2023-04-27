@@ -96,8 +96,8 @@ static void update_status() {
 }
 
 struct ConsoleCallback callbacks[] = {
-    {"duty_cycle", "Sets duty_cycle slow and fast, <0-10000> <0-10000>", 0, duty_cycle_cmd},
-    {"freq", "Sets frequency in hz, <100-100000>", 0, freq_cmd},
+    {"duty_cycle", "Sets duty_cycle slow and fast, <0-10000> <0-10000>", 2, duty_cycle_cmd},
+    {"freq", "Sets frequency in hz, <100-100000>", 1, freq_cmd},
 };
 
 // program entry point
