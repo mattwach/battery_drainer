@@ -11,15 +11,15 @@
 
 #define POLL_MS 1000
 
-uint16_t vdrop_mv = 0;
-uint16_t vmax_mv = 3300;
+int16_t vdrop_mv = 0;
+int16_t vmax_mv = 3300;
 uint8_t started = 1;
 
 static inline uint32_t uptime_ms() {
   return to_ms_since_boot(get_absolute_time());
 }
 
-static uint8_t get_num(const char* name, const char* vstr, int min, int max, uint16_t* val) {
+static uint8_t get_num(const char* name, const char* vstr, int min, int max, int16_t* val) {
   const int v = atoi(vstr);
   if (v == 0 && strcmp(vstr, "0")) {
     printf("Syntax error parsing %s\n", name);
@@ -50,7 +50,7 @@ static void vmax_mv_cmd(uint8_t argc, char* argv[]) {
 }
 
 static void vdrop_mv_cmd(uint8_t argc, char* argv[]) {
-  get_num("vdrop_mv", argv[0], 0, 5000, &vmax_mv);
+  get_num("vdrop_mv", argv[0], -1000, 5000, &vdrop_mv);
 }
 
 struct ConsoleCallback callbacks[] = {
@@ -75,7 +75,7 @@ static void read_adc(void) {
 // program entry point
 int main() {
   struct ConsoleConfig cc;
-  uart_console_init(&cc, callbacks, 1, CONSOLE_VT102);
+  uart_console_init(&cc, callbacks, 3, CONSOLE_VT102);
   init_adc();
 
   uint32_t next_read_ms = 0;
