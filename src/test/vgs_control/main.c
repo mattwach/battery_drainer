@@ -7,6 +7,13 @@
 
 #define FAST_GPIO 16
 #define SLOW_GPIO 17
+// These map to FAST_GPIO and SLOW_GPIO via the hardware spec.
+// there are also pwm_gpio_to_PWM_SLICE and pwm_gpio_to_channel
+// functions available but that create uneeded runtime variables
+// for values that are static
+#define PWM_SLICE 0
+#define FAST_CHAN 0
+#define SLOW_CHAN 1
 
 #define DIVIDER 10
 #define MAX_FREQ 125000000
@@ -17,22 +24,17 @@ uint32_t freq = 4096;
 uint16_t fast_duty_cycle = 5000;
 uint16_t slow_duty_cycle = 5000;
 
-uint8_t slice_num = 0;
-uint8_t fast_channel = 0;
-uint8_t slow_channel = 0;
-
-
 static uint16_t calc_level(uint16_t duty_cycle, uint16_t wrap) {
   return ((uint32_t)(wrap) * (uint32_t)duty_cycle) / 10000;
 }
 
 static void update_pwm(void) {
-  pwm_set_enabled(slice_num, 0);
+  pwm_set_enabled(PWM_SLICE, 0);
   const uint16_t wrap = MAX_PWM_FREQ / freq;
-  pwm_set_wrap(slice_num, wrap);
-  pwm_set_chan_level(slice_num, fast_channel, calc_level(fast_duty_cycle, wrap));
-  pwm_set_chan_level(slice_num, slow_channel, calc_level(slow_duty_cycle, wrap));
-  pwm_set_enabled(slice_num, 1);
+  pwm_set_wrap(PWM_SLICE, wrap);
+  pwm_set_chan_level(PWM_SLICE, FAST_CHAN, calc_level(fast_duty_cycle, wrap));
+  pwm_set_chan_level(PWM_SLICE, SLOW_CHAN, calc_level(slow_duty_cycle, wrap));
+  pwm_set_enabled(PWM_SLICE, 1);
   update_status_flag = 1;
 }
 
@@ -49,7 +51,7 @@ static uint8_t get_num(const char* name, const char* vstr, int min, int max, uin
   }
 
   if (v > max) {
-    printf("%s is above the maximum of %d\n", name, min);
+    printf("%s is above the maximum of %d\n", name, max);
     return 0;
   }
 
@@ -63,7 +65,7 @@ static void duty_cycle_cmd(uint8_t argc, char* argv[]) {
     return;
   }
   uint32_t slow = 0;
-  if (!get_num("slow_duty_cycle", argv[0], 0, 10000, &slow)) {
+  if (!get_num("slow_duty_cycle", argv[1], 0, 10000, &slow)) {
     return;
   }
   fast_duty_cycle = fast;
@@ -72,7 +74,7 @@ static void duty_cycle_cmd(uint8_t argc, char* argv[]) {
 }
 
 static void freq_cmd(uint8_t argc, char* argv[]) {
-  if (!get_num("frequency", argv[0], 0, 10000, &freq)) {
+  if (!get_num("frequency", argv[0], 0, 100000, &freq)) {
     return;
   }
   update_pwm();
@@ -82,10 +84,7 @@ static void freq_cmd(uint8_t argc, char* argv[]) {
 static void init_pwm(void) {
   gpio_set_function(FAST_GPIO, GPIO_FUNC_PWM);
   gpio_set_function(SLOW_GPIO, GPIO_FUNC_PWM);
-  slice_num = pwm_gpio_to_slice_num(fast_duty_cycle);
-  fast_channel = pwm_gpio_to_channel(FAST_GPIO);
-  slow_channel = pwm_gpio_to_channel(SLOW_GPIO);
-  pwm_set_clkdiv_int_frac(slice_num, DIVIDER, 0);
+  pwm_set_clkdiv_int_frac(PWM_SLICE, DIVIDER, 0);
   update_pwm();
 }
 
@@ -103,7 +102,7 @@ struct ConsoleCallback callbacks[] = {
 // program entry point
 int main() {
   struct ConsoleConfig cc;
-  uart_console_init(&cc, callbacks, 1, CONSOLE_VT102);
+  uart_console_init(&cc, callbacks, 2, CONSOLE_VT102);
   init_pwm();
 
   while (1) {
