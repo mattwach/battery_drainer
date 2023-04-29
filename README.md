@@ -6,9 +6,261 @@ This project describes hardware to safely discharge LIPO batteries to storage le
 Everything described in this document is preliminary and untested and could be
 hazardous.  Following anything written in this document is at-your-own risk.
 
+## Usage
+
+The unit has four UI buttons: On, Off, Select and Start.  Basic usage is
+to use select to pick a discharge profile and start to execute it.  The
+unit will automatically turn off when it has completed its objective.
+
+## Configuration
+
+Profiles can be edited by connecting a compter to the unit via USB and starting
+a termnial program.  On my Linux laptop, I used:
+
+    minicom -b 115200 -P /dev/ttyUSB0
+
+There are two types of configuration: global and profile.
+
+### Global Configuration
+
+Some settings are always used, no matter what profile is selected.
+
+#### Current calibration
+
+The `ical` command is used to calibrate the current measurements.  It's
+deault value is 133 milliOhms.  You can measure the resistance across the "Ical"
+test point to find a more accurate value.  Alternately, you can tweak the
+resistance value based on reported vs measured current values with a higher
+resistance leading to a lower reported current value (e.g. I = V/R).  Example
+usage:
+
+    ical 0.130
+
+Would set the resistance to 130 milliOhms 
+
+#### Voltage calibration
+
+With a battery connected, measure the voltage at the vcal test point and enter
+it with the `vcal` command.  For example:
+
+    vcal 25.4
+
+Note there is a related `vdrop` parameter but this parameter is  per-profile to
+accommodate different breakout boards (e.g. whether they have protection diodes).
+
+#### Voltage sag measurements
+
+You can control how often to take voltage sag measurements.
+
+First is `vsag_interval_seconds` which determines how often to take a baseline
+measurement.  For example:
+
+    vsag_interval_seconds 15
+
+Next is `vsag_settle_ms` which determines how long to allow the battery to recover before taking a measurement.  For example:
+
+    vsag_settle_ms 1000
+
+#### Fan Settings
+
+Use `fan <min_percent> <min_celsius> <max_celsius>` to control any connected fan(s)
+At `min_celsius`, the fan(s) will run at `min_percent` and smoothly ramp to
+100% speed at and beyond `max_celsius`. Example:
+
+    fan 20 40 80 
+
+Note that on may fans, using too low of a percent leads to no rotation.
+
+### Responsiveness
+
+The system looks to open up the FETs as much as possible while keeping under
+the current limits of:
+
+* Max voltage sag
+* Max current
+* Max power
+* Max temperature
+
+Thus the goal is to reach one of these maximums while staying under the maximum
+for all others.  Which maximum is reached will vary by battery, fan settings, room
+temperature, etc.
+
+Coming up with and tuning an optimal PID algorithm that meets the above requirements would be daunting due to the large number of free variables.  For example we would need to combine all four terms above to define an "error" as
+a starting point, then would still need to determine the PID constants.
+
+Fortunately, we do not need to system to converge in minimum time.  By relaxing
+this requirement, we can get away with less complex calculations.  Thus we have
+
+    fet_slew_volt_seconds <seconds>
+    fet_slew_amps_seconds <seconds>
+    fet_slew_celsius_seconds <seconds>
+
+Which represents the amount of time the FETs will take to go from 0-100% or reverse.
+For example:
+
+    fet_slew_volt_seconds 5.0
+
+Will set the number to 5 seconds for voltage changes, meaning the fets would take 5 seconds to change from 0% to 100% open (or vis versa) if voltage is the controlling property.
+
+Similar for current, and temperature.
+
+So how are all of these combined?  Using the following:
+
+* The initial "open" and "close" seconds are set to the lowest value.
+* If any parameter exceeds its value then the FETs close at it's close seconds and the new open seconds may be raised to that parameters seconds.
+
+Example:
+
+
+    fet_slew_volt_seconds 10
+    fet_slew_amps_seconds 5
+    fet_slew_celsius_seconds 50
+
+Say the updates are happening every 50ms or 20 updates/second.
+
+* The initial `open_seconds` and `close_seconds` are both 5 seconds because this is the minimum value (set by `fet_slew_amps_seconds`).
+* On initial power on, all parameters are OK, thus the FETs will fully open within
+5 seconds.  This equates to a 1% change per update (100 * 0.050 / 5)
+* If the voltage sag becomes too high, the FETs will close at a 0.5% change per
+update (100 * 0.050 / 10).  This will become the new `open_seconds`, even
+when every parameter is met.
+* Likewise, if the temperature becomes too high, the FETs will close at 0.1% per
+update (100 * 0.050 / 50).  This will become the new `open_seconds`, even
+when every parameter is met.
+* Now lets say the sag is again exceeded, the FETs will close at 0.5% per update
+as before but will reopen at 0.1% per seconds as this `open_seconds` was already
+clamped in by the fan exceeding earlier.
+
+### Profile Management
+
+#### Create a profile
+
+You can create a profile with the `new` command and a name.  For example:
+
+    new
+
+Profiles are named "New" as a starting point.  Alternately you can duplicate an
+existing profile under a new name to use it's settings as a starting point:
+
+    duplicate 0
+
+would take whatever profile is at index zero and copy it under the next
+available index.   This will be named "Copy of [old name]" by default,
+for example: `Copy of New`
+
+#### Rename a profile
+
+Change the name of a profile with the `name` command.  e.g.
+
+    name 0 "LIPO 3.8 percell"
+
+#### Delete a profile
+
+Use the delete command with the profile index.  e.g.
+
+    delete 1
+
+#### Move a profile
+
+Move a profile from one index to a different one via `move <source_idx> <dest_idx>`.  e.g.
+
+    move 3 0
+
+#### View profiles
+
+Use the `list` command to view profile names and indexes:
+
+    list
+
+Use the `show` command to view settings for particular indexes or to dump all indexes:
+
+    show
+    show 0 2
+    show 1 2 3
+
+### Profile Configuration
+
+#### Voltage drop configuration
+
+Use `vdrop <profile_index> <voltage>` to set the voltage difference between the connected
+battery and the vcal test point.  This will take into consideration various FETs and
+diodes that exist between the two points. Example:
+
+    vdrop 1 0.75
+
+#### Cell count
+
+Use `cell_count <profile_index> <count>` to adjust the number of cells.  If set at zero,
+the number of cells will be automatically calculated at start by dividing the voltage
+by the `target_voltage` (see below).  If the automatic calcualtion would lead to incorrect
+results in your situation, you'll need to fix the value.
+
+Note that you can also use a value of `1` if you don't want to think in terms of cells
+but only the full voltage.  Examples:
+
+    cell_count 1 0
+    cell_count 1 1
+    cell_count 1 6
+
+#### Target voltage
+
+Sets the per-cell target voltage.  When the target voltage is reached, the unit
+will shut off.  For example:
+
+    target_voltage 1 3.8
+
+Would set the target voltage to 3.8 if `cell_count` is 1, 7.6 if `cell_count` is 2,
+etc.
+
+    target_voltage 1 0.0
+
+Will run the drainer until it can no longer power itself, regardless of the cell count.
+
+#### Damage voltage warning
+
+If the target voltage is set below the `damage_voltage`, the user will be told that
+they are about to destroy the connected batteries and will ask for confirmation.
+The default settings is for LOPI batteries and is set to 3.5 volts.  Change it
+with the `damage_voltage` command:
+
+    damage_voltage 1 3.0
+
+#### Max current
+
+Use `max_amps <profile_index> <current>` to set the maximum allowed current.  Example
+
+    max_amps 1 10.0
+
+#### Max per-cell voltage sag
+
+Use `per_cell_max_vsag <profile_index> <sag>` to determine the maximum amount of 
+per-cell voltage sag that is allowed.  For example:
+
+    per_cell_max_vsag 1 0.4
+
+Would allow up to 0.4 * 4 = 1.6V of sag on a 4 cell pack.
+
+#### Max temperature
+
+Use `max_celsius <profile_index> <temp>` to change the maximum allowed heatsink termerature.  Example:
+
+    max_celsius 1 80.0
+
+#### Max Power
+
+Use `max_watts <profile_indx> <watts>` to change the maximum allowed wattage (voltage * current).  Example:
+
+    max_watts 1 150
+
+
 ## Parts list
 
-https://docs.google.com/spreadsheets/d/1cjAQ268wM6tvXvhV_kM2y3uYFPqvaHXufrr3GAKTqXQ/edit?usp=sharing
+To see the parts list, open up the schematic in KiCad and look at the "Symbol
+Fields Table".  It looks like a spreadsheet icon in the UI.  Here you will find
+a list of parts and links for building an order.  Here is a snapshot of what
+the list looked like at some point:
+
+![parts list](images/parts_list.png)
 
 ## Schematic Overview
 
@@ -296,9 +548,3 @@ packs or the connector type is of course doable:
 
 ![daughter 3d](images/daughter_3d.png)
 
-## Calibration
-
-There are a couple of calibration points on the circuit.
-
-1. Vcal is used to determine the voltage at the top of the resistor divider.  If the user measures this and the actual battery voltage, the system can have some idea of what the voltage drop between the two is and compensate for it.  This will not be perfect due to other factors (temperature, current), but it the hope is that the error will be acceptable.
-2. Ical is used to determine the actual current.  The user will measure the resistance across these pins.
