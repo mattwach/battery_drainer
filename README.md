@@ -6,11 +6,77 @@ This project describes hardware to safely discharge LIPO batteries to storage le
 Everything described in this document is preliminary and untested and could be
 hazardous.  Following anything written in this document is at-your-own risk.
 
-## Usage
+## User Interface
 
 The unit has four UI buttons: On, Off, Select and Start.  Basic usage is
 to use select to pick a discharge profile and start to execute it.  The
 unit will automatically turn off when it has completed its objective.
+
+The display in use is a 128x64 pixel display.  We will be using a 8x16 pixel
+font which allows for a text resolution of 16x4
+
+When the device is initially powered up, it will display the current voltage,
+cell count and the target voltage.  There will also be a scrollable list of
+profiles to choose from.  Here is a basic example:
+
+```
+|6S 25.1V > 22.8V|
+|LIPO XT60 x 6   |
+|LIPO Single     |
+|Settings        |
+```
+
+The lower part of the display will be scrollable and allow the user to choose
+between different profiles.  Not shown above are separation lines and inverse
+text, due to the limitations of "what is easy" in Markdown.
+
+If the user chooses "settings", then an information message will appear:
+
+```
+|Disconnect      |
+|battery and     |
+|connect USB at  |
+|115200 baud     |
+```
+
+During discharge, the following status information will be displayed:
+
+```
+|00:05:32   0.5Ah|
+|6S 25.1V > 22.8V|
+|15.7A       394W|
+|55C  P100%  F25%|
+```
+
+Information shown includes:
+
+* Time running
+* Number of aH discharged so far
+* Battery voltage and cell count
+* Target voltage
+* Discharge Current
+* Power
+* Temperature
+* FET power level
+* Fan power level
+
+If the FET power level is limited < 100%, then the parameter that is limiting
+the power is highlighted as inverse text. 
+
+When the discharge is complete, the unit will show some stats for a configurable
+amount of time before shutting down.  Here is an example:
+
+```
+|00:05:32   0.5Ah|
+|6S 22.8V    496s|
+|15.7A       394W|
+|55C  P100% F100%|
+```
+
+During this time, the display time (2nd row, 2nd column) will be displayed in
+inverse and will decrement to zero, after which the unit will shut down.  All
+values shown will represent the maximum value reached during the discharge
+cycle.
 
 ## Configuration
 
@@ -29,10 +95,7 @@ Some settings are always used, no matter what profile is selected.
 
 The `ical` command is used to calibrate the current measurements.  It's
 deault value is 133 milliOhms.  You can measure the resistance across the "Ical"
-test point to find a more accurate value.  Alternately, you can tweak the
-resistance value based on reported vs measured current values with a higher
-resistance leading to a lower reported current value (e.g. I = V/R).  Example
-usage:
+test point to find a more accurate value.  Example usage:
 
     ical 0.130
 
@@ -70,6 +133,16 @@ At `min_celsius`, the fan(s) will run at `min_percent` and smoothly ramp to
     fan 20 40 80 
 
 Note that on may fans, using too low of a percent leads to no rotation.
+
+#### Finish Display Time
+
+Use `finish_display <mah_ratio>` to configure the number of seconds
+that the finish stats are shown before the unit shuts down.  Example:
+
+    finish_display_seconds 0.5
+
+In the example above, if 1000 mAh were pulled from the battery then the display would be active for 1000 * 0.5 = 500 seconds.  If 100 mAh were pulled, then
+the display would be active for 100 * 0.5 = 50 seconds.
 
 ### Responsiveness
 
@@ -251,7 +324,6 @@ Use `max_celsius <profile_index> <temp>` to change the maximum allowed heatsink 
 Use `max_watts <profile_indx> <watts>` to change the maximum allowed wattage (voltage * current).  Example:
 
     max_watts 1 150
-
 
 ## Parts list
 
