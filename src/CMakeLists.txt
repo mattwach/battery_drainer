@@ -23,6 +23,7 @@ add_compile_options(-Wall
         )
 
 
+add_subdirectory(firmware)
 add_subdirectory(lib)
 add_subdirectory(test)
 

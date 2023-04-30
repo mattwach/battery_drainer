@@ -12,13 +12,13 @@ struct FanSettings {
 struct VSagSettings {
   uint8_t interval_seconds;
   uint16_t settle_ms;
-}
+};
 
 struct SlewSettings {
-  float volt;
+  float volts;
   float amps;
   float celsius;
-}
+};
 
 struct GlobalSettings {
   uint16_t ical_mohms;
@@ -49,6 +49,7 @@ struct ProfileSettings {
 
 struct Settings {
   uint16_t checksum;
+  char eyecatcher[4];  // set to BATD
   uint8_t profile_count;
   struct GlobalSettings global;
   struct ProfileSettings profile[MAX_PROFILE_COUNT];
@@ -61,6 +62,8 @@ void settings_load(struct Settings* settings);
 
 // checksum will be updated before save
 void settings_save(struct Settings* settings);
+
+void settings_try_add_profile(struct Settings* settings);
 
 #endif
 
