@@ -75,12 +75,15 @@ void settings_default(struct Settings* settings) {
   settings->profile_count = 0;
   global_settings_default(&(settings->global));
   settings_try_add_profile(settings);
+  printf("Settings set to default values\n");
 }
 
 void settings_load(struct Settings* settings) {
   memcpy(settings, FLASH_ADDRESS, sizeof(struct Settings));
   const uint16_t checksum = calc_checksum(settings);
-  if (checksum != settings->checksum) {
+  if (checksum == settings->checksum) {
+    printf("Settings loaded from flash\n");
+  } else {
     settings_default(settings);
   }
 }
@@ -101,5 +104,6 @@ void settings_save(struct Settings* settings) {
   settings->checksum = calc_checksum(settings);
   flash_range_erase(FLASH_OFFSET, calc_sector_size());
   flash_range_program(FLASH_OFFSET, (const uint8_t*)settings, calc_page_size());
+  printf("Settings saved to flash.\n");
 }
 

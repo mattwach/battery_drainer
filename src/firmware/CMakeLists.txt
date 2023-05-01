@@ -1,6 +1,7 @@
 add_executable(
     lipo_battery_drainer
     main.c
+    console.c
     settings.c
 )
 
