@@ -13,11 +13,15 @@ enum State {
   FINISHED,
 };
 
+#define NEXT_PRESSED 0x01
+#define OK_PRESSED 0x02
+
 struct SharedState {
   enum State state;
-  uint8_t active_profile_index;  // if == the profile count, then we are on the Settings option
   struct OLEDM display;
   struct Text text;
+  uint8_t active_profile_index;  // if == the profile count, then we are on the Settings option
+  uint8_t button;  // SELECT_PRESSED | OK_PRESSED
 };
 
 void state_init(struct SharedState* ss);

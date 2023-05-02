@@ -2,6 +2,7 @@
 //
 // C 2023: Matt Wachowski
 
+#include "buttons.h"
 #include "console.h"
 #include "settings.h"
 #include "state.h"
@@ -16,9 +17,11 @@ static void init(void) {
   settings_load(&settings);
   console_init(&settings);
   state_init(&state);
+  buttons_init();
 }
 
 static void loop(void) {
+  buttons_update(&state);
   if (state.state != DRAINING_BATTERY) {
     console_poll();
   }
