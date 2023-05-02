@@ -4,19 +4,24 @@
 
 #include "console.h"
 #include "settings.h"
+#include "state.h"
 #include "pico/stdlib.h"
 
 #define LOOP_SLEEP_TIME 20
 
 struct Settings settings;
+struct SharedState state;
 
 static void init(void) {
   settings_load(&settings);
   console_init(&settings);
+  state_init(&state);
 }
 
 static void loop(void) {
-  console_poll();
+  if (state.state != DRAINING_BATTERY) {
+    console_poll();
+  }
 }
 
 int main() {

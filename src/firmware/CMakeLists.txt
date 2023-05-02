@@ -3,6 +3,7 @@ add_executable(
     main.c
     console.c
     settings.c
+    state.c
 )
 
 target_link_libraries(
