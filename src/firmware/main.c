@@ -22,6 +22,14 @@ static void loop(void) {
   if (state.state != DRAINING_BATTERY) {
     console_poll();
   }
+  switch (state.state) {
+    case PROFILE_SELECTION:
+      //profile_selection(&settings, &state);
+      break;
+    default:
+      // if we are here, then the state is not yet implemented
+      break;
+  }
 }
 
 int main() {

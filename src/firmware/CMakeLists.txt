@@ -1,3 +1,5 @@
+add_compile_options( -DI2C_WRITE_BUFFER_SIZE=2048 )
+
 add_executable(
     lipo_battery_drainer
     main.c
@@ -8,8 +10,12 @@ add_executable(
 
 target_link_libraries(
     lipo_battery_drainer
-    pico_stdlib
+    FIXED_TEXT_TERMINUS8X16
     hardware_flash
+    OLEDM_FIXED_TEXT
+    OLEDM_I2C
+    OLEDM_SH1106
+    pico_stdlib
     UART_CONSOLE
 )
 
