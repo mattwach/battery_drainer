@@ -65,5 +65,20 @@ void settings_save(struct Settings* settings);
 
 void settings_try_add_profile(struct Settings* settings);
 
+// calculate the cell count and target voltage for a given
+// input voltage
+//
+// If the numbers can not be determined, then both
+// slots ar set to zero.
+//
+// Giving too high a profile index is acceptable, but
+// both results will be set to zero.
+void settings_calc_voltage_and_cell_count(
+    const struct Settings* settings,
+    int profile_index,
+    uint16_t current_mv,
+    uint8_t* cell_count,
+    uint16_t* target_mv);
+
 #endif
 

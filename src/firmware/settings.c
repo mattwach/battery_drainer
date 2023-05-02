@@ -107,3 +107,27 @@ void settings_save(struct Settings* settings) {
   printf("Settings saved to flash.\n");
 }
 
+void settings_calc_voltage_and_cell_count(
+    const struct Settings* settings,
+    int profile_index,
+    uint16_t current_mv,
+    uint8_t* cell_count,
+    uint16_t* target_mv) {
+  *cell_count = 0;
+  *target_mv = 0;
+  if (profile_index >= settings->profile_count) {
+    return;
+  }
+  const struct ProfileSettings* ps = settings->profile + profile_index;
+  if (ps->cell.target_mv == 0) {
+    return;
+  }
+  uint32_t cells = ps->cell_count > 0 ? ps->cell_count : current_mv / ps->cell.target_mv;
+  if (cells > 6) {
+      // Target_mv must be too low for the calculation to work
+    return;
+  }
+  *cell_count = (uint8_t)cells;
+  *target_mv = (uint16_t)(cells * ps->cell.target_mv);
+}
+

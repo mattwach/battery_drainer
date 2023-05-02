@@ -3,8 +3,9 @@ add_compile_options( -DI2C_WRITE_BUFFER_SIZE=2048 )
 add_executable(
     lipo_battery_drainer
     buttons.c
-    main.c
     console.c
+    main.c
+    profile_selection.c
     settings.c
     state.c
 )

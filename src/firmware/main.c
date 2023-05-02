@@ -4,6 +4,7 @@
 
 #include "buttons.h"
 #include "console.h"
+#include "profile_selection.h"
 #include "settings.h"
 #include "state.h"
 #include "pico/stdlib.h"
@@ -27,7 +28,7 @@ static void loop(void) {
   }
   switch (state.state) {
     case PROFILE_SELECTION:
-      //profile_selection(&settings, &state);
+      profile_selection(&settings, &state);
       break;
     default:
       // if we are here, then the state is not yet implemented
