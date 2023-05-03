@@ -33,8 +33,8 @@ text, due to the limitations of "what is easy" in Markdown.
 If the user chooses "settings", then an information message will appear:
 
 ```
-|Disconnect      |
-|battery and     |
+|                |
+|Please          |
 |connect USB at  |
 |115200 baud     |
 ```
