@@ -8,6 +8,7 @@
 enum State {
   PROFILE_SELECTION,
   SETTINGS_MESSAGE,
+  BAD_SETUP_MESSAGE,
   DETROY_BATTERY_CONFIRMATION,
   DRAINING_BATTERY,
   FINISHED,
@@ -21,7 +22,7 @@ struct SharedState {
   struct OLEDM display;
   struct Text text;
   uint8_t active_profile_index;  // if == the profile count, then we are on the Settings option
-  uint8_t button;  // SELECT_PRESSED | OK_PRESSED
+  uint8_t button;  // NEXT_PRESSED | OK_PRESSED
 };
 
 void state_init(struct SharedState* ss);

@@ -64,20 +64,20 @@ static void dump_profile(int i) {
   const struct ProfileSettings* p = settings->profile + i;
   printf("\n");
   printf("Profile %d:\n", i);
-  printf("  name:           %s\n", p->name);
-  printf("  vdrop:          %d mV\n", p->drop_mv);
-  printf("  max current:    %f A\n", (float)p->max_ma * 1000.0);
-  printf("  max temp:       %d C\n", p->max_celsius);
-  printf("  max power:      %d Watts\n", p->max_watts);
+  printf("  name:             %s\n", p->name);
+  printf("  vdrop:            %d mV\n", p->drop_mv);
+  printf("  max current:      %f A\n", (float)p->max_ma * 1000.0);
+  printf("  max temp:         %d C\n", p->max_celsius);
+  printf("  max power:        %d Watts\n", p->max_watts);
   if (p->cell_count) {
-    printf("  cell_count:     %d\n", p->cell_count);
+    printf("  cell_count:       %d\n", p->cell_count);
   } else {
-    printf("  cell_count:     AUTO\n");
+    printf("  cell_count:       AUTO\n");
   }
   printf("  per_cell:\n");
-  printf("    target volts: %d mV\n", p->cell.target_mv);
-  printf("    damage volts: %d mV\n", p->cell.damage_mv);
-  printf("    max sag:      %d mV\n", p->cell.max_vsag_mv);
+  printf("    target volts:   %d mV\n", p->cell.target_mv);
+  printf("    damage warning: %d mV\n", p->cell.damage_warning);
+  printf("    max sag:        %d mV\n", p->cell.max_vsag_mv);
 }
 
 static void show_cmd(uint8_t argc, char* argv[]) {

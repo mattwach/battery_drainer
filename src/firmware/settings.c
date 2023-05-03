@@ -45,7 +45,7 @@ static void init_profile(struct ProfileSettings* ps) {
   ps->cell_count = 0;
 
   ps->cell.target_mv = 3800;
-  ps->cell.damage_mv = 3300;
+  ps->cell.damage_warning = 0;
   ps->cell.max_vsag_mv = 300;
 
   ps->max_ma = 25000;

@@ -3,11 +3,52 @@
 #include <stdio.h>
 #include <string.h>
 
+static void check_buttons(
+    const struct Settings* settings,
+    struct SharedState* state,
+    uint16_t current_mv) {
+  if (!state->button) {
+    return;
+  }
+
+  if (state->button & NEXT_PRESSED) {
+    ++state->active_profile_index;
+    // Not >= so that "Settings..." can be selected
+    if (state->active_profile_index > settings->profile_count) {
+      state->active_profile_index = 0;
+    }
+  }
+
+  if (state->button & OK_PRESSED) {
+    if (state->active_profile_index >= settings->profile_count) {
+      state->state = SETTINGS_MESSAGE;
+      return;
+    }
+
+    const struct ProfileSettings* ps = settings->profile + state->active_profile_index;
+    uint8_t cell_count = 0;
+    uint16_t target_mv = 0;
+    settings_calc_voltage_and_cell_count(
+        settings,
+        state->active_profile_index,
+        current_mv,
+        &cell_count,
+        &target_mv);
+    if (cell_count == 0) {
+      state->state = BAD_SETUP_MESSAGE;
+    } else if (ps->cell.damage_warning) {
+      state->state = DETROY_BATTERY_CONFIRMATION;
+    } else {
+      state->state = DRAINING_BATTERY;
+    }
+  }
+}
+
 static void status_line(
-    const struct Settings* settings, struct SharedState* state) {
+    const struct Settings* settings,
+    struct SharedState* state,
+    uint16_t current_mv) {
   char line[32];
-  // TODO: read this from the hardware later
-  const uint16_t current_mv = 25100;
   uint8_t cell_count;
   uint16_t target_mv;
   settings_calc_voltage_and_cell_count(
@@ -70,7 +111,10 @@ static void current_profile(
 
 void profile_selection(
     const struct Settings* settings, struct SharedState* state) {
-  status_line(settings, state);
+  // TODO: read this from the hardware later
+  const uint16_t current_mv = 25100;
+  check_buttons(settings, state, current_mv);
+  status_line(settings, state, current_mv);
   current_profile(settings, state);
 }
 

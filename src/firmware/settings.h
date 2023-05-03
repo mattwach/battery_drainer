@@ -31,8 +31,8 @@ struct GlobalSettings {
 
 struct PerCellSettings {
   uint16_t target_mv;
-  uint16_t damage_mv;
   uint16_t max_vsag_mv;
+  uint8_t damage_warning;
 };
 
 struct ProfileSettings {
