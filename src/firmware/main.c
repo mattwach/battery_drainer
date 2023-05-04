@@ -26,11 +26,12 @@ static void init(void) {
 }
 
 static void loop(void) {
-  // TODO: read this from the hardware later
+  // TODO: read these from the hardware later
+  const uint16_t vcal_adc_reading = 3426;
   const uint16_t current_mv = 25100;
   buttons_update(&state);
   if (state.state != DRAINING_BATTERY) {
-    console_poll(current_mv);
+    console_poll(vcal_adc_reading);
   }
   switch (state.state) {
     case PROFILE_SELECTION:

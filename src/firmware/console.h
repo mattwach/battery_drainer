@@ -5,7 +5,7 @@
 
 void console_init(struct Settings* s);
 
-void console_poll(uint16_t current_mv);
+void console_poll(uint16_t vcal_adc_reading);
 
 #endif
 

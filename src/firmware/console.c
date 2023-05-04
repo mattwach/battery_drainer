@@ -7,7 +7,7 @@
 
 static struct ConsoleConfig cc;
 static struct Settings* settings;
-static uint16_t current_mv;
+static uint16_t vcal_adc_reading;
 
 static uint8_t parse_int(const char* name, const char* vstr, int min, int max, int* val) {
   const int v = atoi(vstr);
@@ -87,8 +87,8 @@ static void dump_global_settings(void) {
   const struct GlobalSettings* g = &(settings->global);
   printf("Global settings:\n");
   printf("  ical:                 %d milliOhms\n", g->ical_mohms);
-  printf("  vcal ratio:           %.2f\n", g->vcal_ratio);
-  printf("  finish display ratio: %.2f\n", g->finish_display_ratio);
+  printf("  vcal ratio:           %.4f\n", g->vcal_ratio);
+  printf("  finish display ratio: %.1f\n", g->finish_display_ratio);
   printf("  voltage sag:\n");
   printf("    interval:           %d seconds\n", g->vsag.interval_seconds);
   printf("    settle time:        %d ms\n", g->vsag.settle_ms);
@@ -148,12 +148,32 @@ static void ical_cmd(uint8_t argc, char* argv[]) {
   printf("ical changed to %d milliohms (not saved)\n", settings->global.ical_mohms);
 }
 
+static void vcal_cmd(uint8_t argc, char* argv[]) {
+  if (vcal_adc_reading < 100) {
+    printf("vcal_adc_reading is too low for calibration: %d\n", vcal_adc_reading);
+    return;
+  }
+  float v = 0.0;
+  if (!parse_float("vcal", argv[0], 4.0, 29.0, &v)) {
+    return;
+  }
+  // We want to current vcal_adc_reading to equate to the measured voltage
+  // vcal_adc_reading * vcal_ratio = (v * 1000)
+  settings->global.vcal_ratio = ((v * 1000.0) / (float)vcal_adc_reading);
+  printf("vcal_ratio changed to %.4f (%d * %.4f = %.1f mv) (not saved)\n",
+      settings->global.vcal_ratio,
+      vcal_adc_reading,
+      settings->global.vcal_ratio,
+      v * 1000.0);
+}
+
 struct ConsoleCallback callbacks[] = {
     {"discard", "Discard changes / reload flash", 0, discard_cmd},
     {"ical", "Sets the current shunt resistance (ohms)", 1, ical_cmd},
     {"reset", "resets settings without saving.", 0, reset_cmd},
     {"save", "Write configuration to flash memory", 0, save_cmd},
     {"show", "Display settings", -1, show_cmd},
+    {"vcal", "Calibrates the voltage ratio", 1, vcal_cmd},
 };
 
 void console_init(struct Settings* s) {
@@ -165,8 +185,8 @@ void console_init(struct Settings* s) {
       CONSOLE_VT102);
 }
 
-void console_poll(uint16_t current_mv_) {
-  current_mv = current_mv_;
+void console_poll(uint16_t vcal_adc_reading_) {
+  vcal_adc_reading = vcal_adc_reading_;
   uart_console_poll(&cc, "> ");
 }
 
