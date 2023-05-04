@@ -81,6 +81,7 @@ static void save_cmd(uint8_t argc, char* argv[]) {
 
 static void reset_cmd(uint8_t argc, char* argv[]) {
   settings_default(settings);
+  printf("Settings reset (not saved)\n");
 }
 
 static void dump_global_settings(void) {
@@ -167,6 +168,28 @@ static void vcal_cmd(uint8_t argc, char* argv[]) {
       v * 1000.0);
 }
 
+static void vsag_interval_seconds_cmd(uint8_t argc, char* argv[]) {
+  int v = 0;
+  if (!parse_int("vsag_inteval", argv[0], 1, 30, &v)) {
+    return;
+  }
+  settings->global.vsag.interval_seconds = (uint8_t)v;
+  printf(
+      "vsag interval changed to %d seconds (not saved)\n",
+      settings->global.vsag.interval_seconds);
+}
+
+static void vsag_settle_ms_cmd(uint8_t argc, char* argv[]) {
+  int v = 0;
+  if (!parse_int("vsag_settle", argv[0], 100, 5000, &v)) {
+    return;
+  }
+  settings->global.vsag.settle_ms = (uint8_t)v;
+  printf(
+      "vsag settle changed to %d ms (not saved)\n",
+      settings->global.vsag.settle_ms);
+}
+
 struct ConsoleCallback callbacks[] = {
     {"discard", "Discard changes / reload flash", 0, discard_cmd},
     {"ical", "Sets the current shunt resistance (ohms)", 1, ical_cmd},
@@ -174,6 +197,8 @@ struct ConsoleCallback callbacks[] = {
     {"save", "Write configuration to flash memory", 0, save_cmd},
     {"show", "Display settings", -1, show_cmd},
     {"vcal", "Calibrates the voltage ratio", 1, vcal_cmd},
+    {"vsag_interval_seconds", "Changes how often to check vsag", 1, vsag_interval_seconds_cmd},
+    {"vsag_settle_ms", "Changes how long to let the voltage setting before measuring vsag", 1, vsag_settle_ms_cmd},
 };
 
 void console_init(struct Settings* s) {
