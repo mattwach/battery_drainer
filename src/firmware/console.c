@@ -7,6 +7,7 @@
 
 static struct ConsoleConfig cc;
 static struct Settings* settings;
+static uint16_t current_mv;
 
 static uint8_t parse_int(const char* name, const char* vstr, int min, int max, int* val) {
   const int v = atoi(vstr);
@@ -164,7 +165,8 @@ void console_init(struct Settings* s) {
       CONSOLE_VT102);
 }
 
-void console_poll(void) {
+void console_poll(uint16_t current_mv_) {
+  current_mv = current_mv_;
   uart_console_poll(&cc, "> ");
 }
 

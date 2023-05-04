@@ -123,9 +123,9 @@ static void current_profile(
 }
 
 void profile_selection(
-    const struct Settings* settings, struct SharedState* state) {
-  // TODO: read this from the hardware later
-  const uint16_t current_mv = 25100;
+    const struct Settings* settings,
+    struct SharedState* state,
+    uint16_t current_mv) {
   check_buttons(settings, state, current_mv);
   status_line(settings, state, current_mv);
   current_profile(settings, state);

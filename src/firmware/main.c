@@ -26,13 +26,15 @@ static void init(void) {
 }
 
 static void loop(void) {
+  // TODO: read this from the hardware later
+  const uint16_t current_mv = 25100;
   buttons_update(&state);
   if (state.state != DRAINING_BATTERY) {
-    console_poll();
+    console_poll(current_mv);
   }
   switch (state.state) {
     case PROFILE_SELECTION:
-      profile_selection(&settings, &state);
+      profile_selection(&settings, &state, current_mv);
       break;
     default:
       // if we are here, then the state is not yet implemented

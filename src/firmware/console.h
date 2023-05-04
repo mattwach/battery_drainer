@@ -5,7 +5,7 @@
 
 void console_init(struct Settings* s);
 
-void console_poll(void);
+void console_poll(uint16_t current_mv);
 
 #endif
 
