@@ -65,6 +65,8 @@ void settings_save(struct Settings* settings);
 
 void settings_try_add_profile(struct Settings* settings);
 
+void settings_try_duplicate_profile(struct Settings* settings, uint8_t source_idx);
+
 // calculate the cell count and target voltage for a given
 // input voltage
 //

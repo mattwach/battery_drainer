@@ -171,7 +171,7 @@ this requirement, we can get away with less complex calculations.  Thus we have
 Which represents the amount of time the FETs will take to go from 0-100% or reverse.
 For example:
 
-    fet_slew_volt_seconds 5.0
+    fet_slew_volts_seconds 5.0
 
 Will set the number to 5 seconds for voltage changes, meaning the fets would take 5 seconds to change from 0% to 100% open (or vis versa) if voltage is the controlling property.
 

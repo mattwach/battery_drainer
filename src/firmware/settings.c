@@ -85,6 +85,23 @@ void settings_try_add_profile(struct Settings* settings) {
   ++settings->profile_count;
 }
 
+void settings_try_duplicate_profile(struct Settings* settings, uint8_t source_idx) {
+  if (source_idx >= settings->profile_count) {
+    printf("Invalid source profile index");
+    return;
+  }
+  if (settings->profile_count >= MAX_PROFILE_COUNT) {
+    printf("Can not add a profile: max allowed is MAX_PROFILE_COUNT\n");
+    return;
+  }
+
+  const struct ProfileSettings* source_ps = settings->profile + source_idx;
+  struct ProfileSettings* dest_ps = settings->profile + settings->profile_count;
+  memcpy(dest_ps, source_ps, sizeof(struct ProfileSettings));
+  printf("Duplicated profile: %d %s -> %d\n", source_idx, dest_ps->name, settings->profile_count);
+  ++settings->profile_count;
+}
+
 void settings_default(struct Settings* settings) {
   memset(settings, 0, sizeof(struct Settings));
   settings->eyecatcher[0] = 'B';

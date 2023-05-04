@@ -260,14 +260,29 @@ static void fan_cmd(uint8_t argc, char* argv[]) {
       fan->max_celsius);
 }
 
+static void new_cmd(uint8_t argc, char* argv[]) {
+  settings_try_add_profile(settings);
+}
+
+static void duplicate_cmd(uint8_t argc, char* argv[]) {
+  int v = 0;
+  if (!parse_int("profile_index", argv[0], 0, settings->profile_count - 1, &v)) {
+    return;
+  }
+  settings_try_duplicate_profile(settings, (uint8_t)v);
+}
+
+
 struct ConsoleCallback callbacks[] = {
     {"discard", "Discard changes / reload flash", 0, discard_cmd},
     {"ical", "Sets the current shunt resistance (ohms)", 1, ical_cmd},
+    {"duplicate", "Duplicate profile <index> as a new profile", 1, duplicate_cmd},
     {"fan", "Sets fan profile <min_percent> <min_celsius> <max_celsius>", 3, fan_cmd},
     {"fet_slew_volts_seconds", "Sets the FET response speed for voltage targets <seconds>", 1, fet_slew_volts_seconds_cmd},
     {"fet_slew_amps_seconds", "Sets the FET response speed for current targets <seconds>", 1, fet_slew_amps_seconds_cmd},
     {"fet_slew_celsius_seconds", "Sets the FET response speed for temperature targets <seconds>", 1, fet_slew_celsius_seconds_cmd},
     {"finish_display", "Sets the finish display as <seconds_per_mah_drained>", 1, finish_display_cmd},
+    {"new", "Creates a new profile", 0, new_cmd},
     {"reset", "resets settings without saving.", 0, reset_cmd},
     {"save", "Write configuration to flash memory", 0, save_cmd},
     {"show", "Display settings", -1, show_cmd},
