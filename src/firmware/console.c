@@ -190,9 +190,40 @@ static void vsag_settle_ms_cmd(uint8_t argc, char* argv[]) {
       settings->global.vsag.settle_ms);
 }
 
+static void fan_cmd(uint8_t argc, char* argv[]) {
+  int min_percent = 0;
+  if (!parse_int("min_percent", argv[0], 1, 100, &min_percent)) {
+    return;
+  }
+  int min_celsius = 0;
+  if (!parse_int("min_celsius", argv[1], 20, 200, &min_celsius)) {
+    return;
+  }
+  int max_celsius = 0;
+  if (!parse_int("max_celsius", argv[1], 20, 200, &max_celsius)) {
+    return;
+  }
+
+  if (min_celsius > max_celsius) {
+    printf("min_celsius must be less than max_celsius\n");
+    return;
+  }
+
+  struct FanSettings* fan = &(settings->global.fan);
+  fan->min_percent = (uint8_t)min_percent;
+  fan->min_celsius = (uint8_t)min_celsius;
+  fan->max_celsius = (uint8_t)max_celsius;
+
+  printf("fan settings changed.  min% = %d, min temp = %d C, 100% temp = %d C (not saved)\n",
+      fan->min_percent,
+      fan->min_celsius,
+      fan->max_celsius);
+}
+
 struct ConsoleCallback callbacks[] = {
     {"discard", "Discard changes / reload flash", 0, discard_cmd},
     {"ical", "Sets the current shunt resistance (ohms)", 1, ical_cmd},
+    {"fan", "Sets fan profile <min_percent> <min_celsius> <max_celsius>", 3, fan_cmd},
     {"reset", "resets settings without saving.", 0, reset_cmd},
     {"save", "Write configuration to flash memory", 0, save_cmd},
     {"show", "Display settings", -1, show_cmd},
