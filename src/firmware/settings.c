@@ -18,12 +18,16 @@ static uint16_t calc_checksum(const struct Settings* s) {
   return sum;
 }
 
-#define LOW_R 1000.0
-#define HIGH_R (6800.0 + 2200.0) 
+// default resistance is 1000 low and 6800 + 2200 high
+// at 30V we would have I = 30 / 10000 = 3 mA
+// that would read as 0.003 * 1000 = 3V on the low side
+// this would give an ADC reading of 4096.
+// thus our default ratio is 30000 mv / 4096 ~= 7.3242
+#define DEFAULT_VCAL_RATIO 7.3242
 
 static void global_settings_default(struct GlobalSettings* gs) {
   gs->ical_mohms = 133;
-  gs->vcal_ratio = LOW_R / (LOW_R + HIGH_R);
+  gs->vcal_ratio = DEFAULT_VCAL_RATIO;
 
   gs->vsag.interval_seconds = 10;
   gs->vsag.settle_ms = 1000;
