@@ -96,7 +96,7 @@ static void dump_global_settings(void) {
   printf("  fan settings:\n");
   printf("    minimum level:      %d%\n", g->fan.min_percent);
   printf("    minimum temp:       %d C\n", g->fan.min_celsius);
-  printf("    100% temp:          %d C\n", g->fan.max_celsius);
+  printf("    100%% temp:          %d C\n", g->fan.max_celsius);
   printf("  FET settings:\n");
   printf("    voltage slew:       %.2f seconds\n", g->slew.volts);
   printf("    current slew:       %.2f seconds\n", g->slew.amps);
@@ -214,7 +214,7 @@ static void fan_cmd(uint8_t argc, char* argv[]) {
   fan->min_celsius = (uint8_t)min_celsius;
   fan->max_celsius = (uint8_t)max_celsius;
 
-  printf("fan settings changed.  min% = %d, min temp = %d C, 100% temp = %d C (not saved)\n",
+  printf("fan settings changed.  min %% = %d, min temp = %d C, 100%% temp = %d C (not saved)\n",
       fan->min_percent,
       fan->min_celsius,
       fan->max_celsius);
