@@ -22,7 +22,7 @@ static uint8_t parse_int(const char* name, const char* vstr, int min, int max, i
   }
 
   if (v > max) {
-    printf("%s is above the maximum of %d\n", name, min);
+    printf("%s is above the maximum of %d\n", name, max);
     return 0;
   }
 
@@ -63,7 +63,7 @@ static uint8_t parse_float(const char* name, const char* vstr, float min, float 
   }
 
   if (v > max) {
-    printf("%s is above the maximum of %f\n", name, min);
+    printf("%s is above the maximum of %f\n", name, max);
     return 0;
   }
 
