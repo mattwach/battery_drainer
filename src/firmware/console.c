@@ -184,7 +184,7 @@ static void vsag_settle_ms_cmd(uint8_t argc, char* argv[]) {
   if (!parse_int("vsag_settle", argv[0], 100, 5000, &v)) {
     return;
   }
-  settings->global.vsag.settle_ms = (uint8_t)v;
+  settings->global.vsag.settle_ms = (uint16_t)v;
   printf(
       "vsag settle changed to %d ms (not saved)\n",
       settings->global.vsag.settle_ms);
@@ -200,7 +200,7 @@ static void fan_cmd(uint8_t argc, char* argv[]) {
     return;
   }
   int max_celsius = 0;
-  if (!parse_int("max_celsius", argv[1], 20, 200, &max_celsius)) {
+  if (!parse_int("max_celsius", argv[2], 20, 200, &max_celsius)) {
     return;
   }
 
