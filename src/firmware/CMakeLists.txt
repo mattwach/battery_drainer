@@ -22,6 +22,10 @@ target_link_libraries(
     UART_CONSOLE
 )
 
+# enable usb output, disable uart output
+pico_enable_stdio_usb(lipo_battery_drainer 1)
+pico_enable_stdio_uart(lipo_battery_drainer 0)
+
 pico_add_extra_outputs(lipo_battery_drainer)
 
 

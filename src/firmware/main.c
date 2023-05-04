@@ -10,11 +10,15 @@
 #include "pico/stdlib.h"
 
 #define LOOP_SLEEP_TIME 20
+#define LED_PIN PICO_DEFAULT_LED_PIN
 
 struct Settings settings;
 struct SharedState state;
 
 static void init(void) {
+  gpio_init(LED_PIN);
+  gpio_set_dir(LED_PIN, GPIO_OUT);
+  gpio_put(LED_PIN, 1);
   settings_load(&settings);
   console_init(&settings);
   state_init(&state);
@@ -38,9 +42,12 @@ static void loop(void) {
 
 int main() {
   init();
+  uint32_t frame_idx = 0;
   while (1) {
     loop();
     sleep_ms(LOOP_SLEEP_TIME);
+    gpio_put(LED_PIN, frame_idx & 0x10 ? 1 : 0);
+    ++frame_idx;
   }
   return 0;
 }
