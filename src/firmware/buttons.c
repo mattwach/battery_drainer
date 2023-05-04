@@ -56,6 +56,7 @@ static void setup_gpio(uint gpio) {
 void buttons_init(void) {
   setup_gpio(NEXT_BUTTON_GPIO);
   setup_gpio(OK_BUTTON_GPIO);
+  gpio_set_irq_callback(button_pressed_callback);
   irq_set_enabled(IO_IRQ_BANK0, true);
   debounce_init(&next_db, DEBOUNCE_MS);
   debounce_init(&ok_db, DEBOUNCE_MS);
