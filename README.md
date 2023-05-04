@@ -164,7 +164,7 @@ a starting point, then would still need to determine the PID constants.
 Fortunately, we do not need to system to converge in minimum time.  By relaxing
 this requirement, we can get away with less complex calculations.  Thus we have
 
-    fet_slew_volt_seconds <seconds>
+    fet_slew_volts_seconds <seconds>
     fet_slew_amps_seconds <seconds>
     fet_slew_celsius_seconds <seconds>
 
