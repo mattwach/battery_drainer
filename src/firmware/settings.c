@@ -5,8 +5,24 @@
 #include <string.h>
 #include <stdio.h>
 
-#define FLASH_OFFSET (PICO_FLASH_SIZE_BYTES - FLASH_SECTOR_SIZE)
-#define FLASH_ADDRESS ((uint8_t*)(XIP_BASE + FLASH_OFFSET))
+
+static inline size_t calc_sector_size(void) {
+  const int num_sectors = 1 + (sizeof(struct Settings) / FLASH_SECTOR_SIZE);
+  return num_sectors * FLASH_SECTOR_SIZE;
+}
+
+static inline size_t calc_page_size(void) {
+  const int num_pages = 1 + (sizeof(struct Settings) / FLASH_PAGE_SIZE);
+  return num_pages * FLASH_PAGE_SIZE;
+}
+
+static inline uint32_t flash_offset(void) {
+  return (PICO_FLASH_SIZE_BYTES - calc_sector_size());
+}
+
+static inline uint8_t* flash_address(void) {
+  return ((uint8_t*)(XIP_BASE + flash_offset()));
+}
 
 static uint16_t calc_checksum(const struct Settings* s) {
   const uint8_t* start = ((const uint8_t*)s) + sizeof(uint16_t);
@@ -83,7 +99,7 @@ void settings_default(struct Settings* settings) {
 }
 
 void settings_load(struct Settings* settings) {
-  memcpy(settings, FLASH_ADDRESS, sizeof(struct Settings));
+  memcpy(settings, flash_address(), sizeof(struct Settings));
   const uint16_t checksum = calc_checksum(settings);
   if (checksum == settings->checksum) {
     printf("Settings loaded from flash\n");
@@ -92,22 +108,14 @@ void settings_load(struct Settings* settings) {
   }
 }
 
-static inline size_t calc_sector_size(void) {
-  const int num_sectors = 1 + (sizeof(struct Settings) / FLASH_SECTOR_SIZE);
-  return num_sectors * FLASH_SECTOR_SIZE;
-}
-
-static inline size_t calc_page_size(void) {
-  const int num_pages = 1 + (sizeof(struct Settings) / FLASH_PAGE_SIZE);
-  return num_pages * FLASH_PAGE_SIZE;
-}
-
 // Do not call save() excessively as it could wear out the
 // flash memory.
 void settings_save(struct Settings* settings) {
   settings->checksum = calc_checksum(settings);
-  flash_range_erase(FLASH_OFFSET, calc_sector_size());
-  flash_range_program(FLASH_OFFSET, (const uint8_t*)settings, calc_page_size());
+  uint32_t ints = save_and_disable_interrupts();
+  flash_range_erase(flash_offset(), calc_sector_size());
+  flash_range_program(flash_offset(), (const uint8_t*)settings, calc_page_size());
+  restore_interrupts(ints);
   printf("Settings saved to flash.\n");
 }
 
