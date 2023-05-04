@@ -89,7 +89,7 @@ static void dump_global_settings(void) {
   printf("Global settings:\n");
   printf("  ical:                 %d milliOhms\n", g->ical_mohms);
   printf("  vcal ratio:           %.4f\n", g->vcal_ratio);
-  printf("  finish display ratio: %.1f\n", g->finish_display_ratio);
+  printf("  finish display:       %.1f * mah_drained\n", g->finish_display);
   printf("  voltage sag:\n");
   printf("    interval:           %d seconds\n", g->vsag.interval_seconds);
   printf("    settle time:        %d ms\n", g->vsag.settle_ms);
@@ -147,6 +147,16 @@ static void ical_cmd(uint8_t argc, char* argv[]) {
   }
   settings->global.ical_mohms = (uint16_t)(v * 1000);
   printf("ical changed to %d milliohms (not saved)\n", settings->global.ical_mohms);
+}
+
+static void finish_display_cmd(uint8_t argc, char* argv[]) {
+  float v = 0.0;
+  if (!parse_float("finish_display", argv[0], 0.0, 60.0, &v)) {
+    return;
+  }
+  settings->global.finish_display = v;
+  printf("finish display changed to %.2f * mah_drained seconds (not saved)\n",
+      settings->global.finish_display);
 }
 
 static void vcal_cmd(uint8_t argc, char* argv[]) {
@@ -224,6 +234,7 @@ struct ConsoleCallback callbacks[] = {
     {"discard", "Discard changes / reload flash", 0, discard_cmd},
     {"ical", "Sets the current shunt resistance (ohms)", 1, ical_cmd},
     {"fan", "Sets fan profile <min_percent> <min_celsius> <max_celsius>", 3, fan_cmd},
+    {"finish_display", "Sets the finish display as <seconds_per_mah_drained>", 1, finish_display_cmd},
     {"reset", "resets settings without saving.", 0, reset_cmd},
     {"save", "Write configuration to flash memory", 0, save_cmd},
     {"show", "Display settings", -1, show_cmd},

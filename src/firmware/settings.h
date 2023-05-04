@@ -26,7 +26,7 @@ struct GlobalSettings {
   struct VSagSettings vsag;
   struct FanSettings fan;
   struct SlewSettings slew;
-  float finish_display_ratio;
+  float finish_display;
 };
 
 struct PerCellSettings {

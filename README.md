@@ -136,10 +136,10 @@ Note that on may fans, using too low of a percent leads to no rotation.
 
 #### Finish Display Time
 
-Use `finish_display <mah_ratio>` to configure the number of seconds
+Use `finish_display <seconds_per_mah>` to configure the number of seconds
 that the finish stats are shown before the unit shuts down.  Example:
 
-    finish_display_seconds 0.5
+    finish_display 0.5
 
 In the example above, if 1000 mAh were pulled from the battery then the display would be active for 1000 * 0.5 = 500 seconds.  If 100 mAh were pulled, then
 the display would be active for 100 * 0.5 = 50 seconds.

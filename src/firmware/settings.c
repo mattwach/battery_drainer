@@ -56,7 +56,7 @@ static void global_settings_default(struct GlobalSettings* gs) {
   gs->slew.amps = 10.0;
   gs->slew.celsius = 30.0;
 
-  gs->finish_display_ratio = 1.0;
+  gs->finish_display = 1.0;
 }
 
 static void init_profile(struct ProfileSettings* ps) {
