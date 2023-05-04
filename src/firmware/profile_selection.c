@@ -71,7 +71,20 @@ static void status_line(
       sign,
       target_mv / 1000,
       (target_mv % 1000) / 100);
-  text_strLen(text, line, 16);
+  text_strLen(text, line, OLED_COLUMNS);
+}
+
+static void fill_line(char* line, const char* str) {
+  uint8_t i = 0;
+  for (; i<OLED_COLUMNS; ++i) {
+    if (!str[i]) {
+      break;
+    }
+    line[i] = str[i];
+  }
+  for (; i<OLED_COLUMNS; ++i) {
+    line[i] = ' ';
+  }
 }
 
 static void current_profile(
@@ -93,20 +106,20 @@ static void current_profile(
 
   struct Text* text = &(state->text);
   text->row = 2;
-  char line[16];
+  char line[OLED_COLUMNS];
   for (uint8_t i = first_index; i <= last_index; ++i, text->row += 2) {
     text->column = 0;
     text->options = i == state->active_profile_index ?
       TEXT_OPTION_INVERTED :
       0x00;
-    memset(line, ' ', sizeof(line));
     if (i < settings->profile_count) {
-      strcpy(line, settings->profile[i].name);
+      fill_line(line, settings->profile[i].name);
     } else {
-      strcpy(line, "Settings...");
+      fill_line(line, "Settings...");
     }
-    text_strLen(text, line, 16);
+    text_strLen(text, line, OLED_COLUMNS);
   }
+  text->options = 0x00;
 }
 
 void profile_selection(

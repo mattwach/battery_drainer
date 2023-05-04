@@ -17,6 +17,9 @@ enum State {
 #define NEXT_PRESSED 0x01
 #define OK_PRESSED 0x02
 
+#define OLED_ROWS 4
+#define OLED_COLUMNS 16
+
 struct SharedState {
   enum State state;
   struct OLEDM display;
