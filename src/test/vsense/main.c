@@ -72,8 +72,16 @@ static void read_adc(void) {
       val, vmax_mv, vdrop_mv, mv);
 }
 
+static void enable() {
+    const uint ENABLE_PIN = 21;
+    gpio_init(ENABLE_PIN);
+    gpio_set_dir(ENABLE_PIN, GPIO_OUT);
+    gpio_put(ENABLE_PIN, 1);
+}
+
 // program entry point
 int main() {
+  enable();
   struct ConsoleConfig cc;
   uart_console_init(&cc, callbacks, 3, CONSOLE_VT102);
   init_adc();

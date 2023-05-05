@@ -76,8 +76,16 @@ struct ConsoleCallback callbacks[] = {
     {"duty_cycle", "Sets duty_cycle <0-100>", 1, duty_cycle_cmd},
 };
 
+static void enable() {
+    const uint ENABLE_PIN = 21;
+    gpio_init(ENABLE_PIN);
+    gpio_set_dir(ENABLE_PIN, GPIO_OUT);
+    gpio_put(ENABLE_PIN, 1);
+}
+
 // program entry point
 int main() {
+  enable();
   struct ConsoleConfig cc;
   uart_console_init(&cc, callbacks, 1, CONSOLE_VT102);
   init_pwm();

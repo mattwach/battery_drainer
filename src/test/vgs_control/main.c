@@ -94,6 +94,13 @@ static void update_status() {
   update_status_flag = 0;
 }
 
+static void enable() {
+    const uint ENABLE_PIN = 21;
+    gpio_init(ENABLE_PIN);
+    gpio_set_dir(ENABLE_PIN, GPIO_OUT);
+    gpio_put(ENABLE_PIN, 1);
+}
+
 struct ConsoleCallback callbacks[] = {
     {"duty_cycle", "Sets duty_cycle slow and fast, <0-10000> <0-10000>", 2, duty_cycle_cmd},
     {"freq", "Sets frequency in hz, <100-100000>", 1, freq_cmd},
@@ -101,6 +108,7 @@ struct ConsoleCallback callbacks[] = {
 
 // program entry point
 int main() {
+  enable();
   struct ConsoleConfig cc;
   uart_console_init(&cc, callbacks, 2, CONSOLE_VT102);
   init_pwm();

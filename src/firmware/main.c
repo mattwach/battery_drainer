@@ -43,7 +43,15 @@ static void loop(void) {
   }
 }
 
+static void enable() {
+    const uint ENABLE_PIN = 21;
+    gpio_init(ENABLE_PIN);
+    gpio_set_dir(ENABLE_PIN, GPIO_OUT);
+    gpio_put(ENABLE_PIN, 1);
+}
+
 int main() {
+  enable();
   init();
   uint32_t frame_idx = 0;
   while (1) {

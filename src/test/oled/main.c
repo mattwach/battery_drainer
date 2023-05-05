@@ -1,13 +1,22 @@
 #include <oledm/oledm.h>
 #include <oledm/text.h>
 #include <oledm/font/terminus8x16.h>
+#include "pico/stdlib.h"
 
 #define OLEDM_INIT oledm_basic_init
 
 struct OLEDM display;
 struct Text text;
 
+static void enable() {
+    const uint ENABLE_PIN = 21;
+    gpio_init(ENABLE_PIN);
+    gpio_set_dir(ENABLE_PIN, GPIO_OUT);
+    gpio_put(ENABLE_PIN, 1);
+}
+
 int main(void) {
+  enable();
   OLEDM_INIT(&display);
   oledm_start(&display);
 
