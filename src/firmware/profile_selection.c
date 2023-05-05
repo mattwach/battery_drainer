@@ -36,7 +36,7 @@ static void check_buttons(
         &target_mv);
     if (cell_count == 0) {
       state->state = BAD_SETUP_MESSAGE;
-    } else if (ps->cell.damage_warning) {
+    } else if (ps->cell.target_mv <= ps->cell.damage_mv) {
       state->state = DETROY_BATTERY_CONFIRMATION;
     } else {
       state->state = DRAINING_BATTERY;
