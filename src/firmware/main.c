@@ -37,6 +37,9 @@ static void loop(void) {
     case PROFILE_SELECTION:
       profile_selection(&settings, &state, current_mv);
       break;
+    case SETTINGS_MESSAGE:
+      settings_message(&state);
+      break;
     default:
       // if we are here, then the state is not yet implemented
       break;

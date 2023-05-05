@@ -7,6 +7,7 @@ add_executable(
     main.c
     profile_selection.c
     settings.c
+    settings_message.c
     state.c
     util.c
 )
