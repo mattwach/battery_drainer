@@ -345,6 +345,18 @@ static void max_celsius_cmd(uint8_t argc, char* argv[]) {
   printf("Set max_temp of profile %d to %d C (not saved)\n", idx, settings->profile[idx].max_celsius);
 }
 
+static void max_watts_cmd(uint8_t argc, char* argv[]) {
+  int idx = 0;
+  if (!parse_int("profile_index", argv[0], 0, settings->profile_count - 1, &idx)) {
+    return;
+  }
+  int max_watts = 0;
+  if (!parse_int("max_watts", argv[1], 30, 150, &max_watts)) {
+    return;
+  }
+  settings->profile[idx].max_watts = (uint16_t)(max_watts);
+  printf("Set max power of profile %d to %d Watts (not saved)\n", idx, settings->profile[idx].max_watts);
+}
 
 static void vdrop_cmd(uint8_t argc, char* argv[]) {
   int idx = 0;
@@ -426,6 +438,7 @@ struct ConsoleCallback callbacks[] = {
     {"list", "List profile names", 0, list_cmd},
     {"max_amps", "Sets maximum amps: <profile_index> <amps>", 2, max_amps_cmd},
     {"max_celsius", "Sets maximum temperature: <profile_index> <temp>", 2, max_celsius_cmd},
+    {"max_watts", "Sets maximum power: <profile_index> <watts>", 2, max_watts_cmd},
     {"move", "Move a profile: <src_index> <dest_idx>", 2, move_cmd},
     {"name", "Rename a profile: <index> \"<name>\"", 2, name_cmd},
     {"new", "Creates a new profile", 0, new_cmd},
