@@ -74,19 +74,6 @@ static void status_line(
   text_strLen(text, line, OLED_COLUMNS);
 }
 
-static void fill_line(char* line, const char* str) {
-  uint8_t i = 0;
-  for (; i<OLED_COLUMNS; ++i) {
-    if (!str[i]) {
-      break;
-    }
-    line[i] = str[i];
-  }
-  for (; i<OLED_COLUMNS; ++i) {
-    line[i] = ' ';
-  }
-}
-
 static void current_profile(
     const struct Settings* settings, struct SharedState* state) {
   uint8_t first_index = state->active_profile_index;

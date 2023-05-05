@@ -8,6 +8,7 @@ add_executable(
     profile_selection.c
     settings.c
     state.c
+    util.c
 )
 
 target_link_libraries(
