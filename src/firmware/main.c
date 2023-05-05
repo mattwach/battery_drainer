@@ -4,9 +4,11 @@
 
 #include "buttons.h"
 #include "console.h"
+#include "power.h"
 #include "profile_selection.h"
 #include "settings.h"
 #include "state.h"
+
 #include "pico/stdlib.h"
 
 #define LOOP_SLEEP_TIME 20
@@ -46,15 +48,8 @@ static void loop(void) {
   }
 }
 
-static void enable() {
-    const uint ENABLE_PIN = 21;
-    gpio_init(ENABLE_PIN);
-    gpio_set_dir(ENABLE_PIN, GPIO_OUT);
-    gpio_put(ENABLE_PIN, 1);
-}
-
 int main() {
-  enable();
+  power_hold();
   init();
   uint32_t frame_idx = 0;
   while (1) {

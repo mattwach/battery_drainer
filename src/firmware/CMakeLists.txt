@@ -5,6 +5,7 @@ add_executable(
     buttons.c
     console.c
     main.c
+    power.c
     profile_selection.c
     settings.c
     settings_message.c
