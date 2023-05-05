@@ -1,4 +1,5 @@
 #include "console.h"
+#include "state.h"
 
 #include "uart_console/console.h"
 #include <stdlib.h>
@@ -273,6 +274,26 @@ static void duplicate_cmd(uint8_t argc, char* argv[]) {
 }
 
 
+static void name_cmd(uint8_t argc, char* argv[]) {
+  int v = 0;
+  if (!parse_int("profile_index", argv[0], 0, settings->profile_count - 1, &v)) {
+    return;
+  }
+  const int len = strlen(argv[1]);
+  if (len == 0) {
+    printf("Name too short.\n");
+    return;
+  }
+  if (len > OLED_COLUMNS) {
+    printf("Name too long: %d > %d max length\n", len, OLED_COLUMNS);
+    return;
+  }
+  struct ProfileSettings* ps = settings->profile + v;
+  memset(ps->name, 0, sizeof(ps->name));
+  strcpy(ps->name, argv[1]);
+  printf("Profile %d name updated to: %s (not saved)\n", v, ps->name);
+}
+
 struct ConsoleCallback callbacks[] = {
     {"discard", "Discard changes / reload flash", 0, discard_cmd},
     {"ical", "Sets the current shunt resistance (ohms)", 1, ical_cmd},
@@ -282,6 +303,7 @@ struct ConsoleCallback callbacks[] = {
     {"fet_slew_amps_seconds", "Sets the FET response speed for current targets <seconds>", 1, fet_slew_amps_seconds_cmd},
     {"fet_slew_celsius_seconds", "Sets the FET response speed for temperature targets <seconds>", 1, fet_slew_celsius_seconds_cmd},
     {"finish_display", "Sets the finish display as <seconds_per_mah_drained>", 1, finish_display_cmd},
+    {"name", "Rename a profile: <index> \"<name>\"", 2, name_cmd},
     {"new", "Creates a new profile", 0, new_cmd},
     {"reset", "resets settings without saving.", 0, reset_cmd},
     {"save", "Write configuration to flash memory", 0, save_cmd},

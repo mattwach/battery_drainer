@@ -218,8 +218,7 @@ existing profile under a new name to use it's settings as a starting point:
     duplicate 0
 
 would take whatever profile is at index zero and copy it under the next
-available index.   This will be named "Copy of [old name]" by default,
-for example: `Copy of New`
+available index.
 
 #### Rename a profile
 
