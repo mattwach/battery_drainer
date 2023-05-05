@@ -126,6 +126,11 @@ void profile_selection(
     const struct Settings* settings,
     struct SharedState* state,
     uint16_t current_mv) {
+  // This handles sudden changes to the profile coount via the console
+  // when == to profile count, we are on the "setttings" selection.
+  if (state->active_profile_index > settings->profile_count) {
+    state->active_profile_index = settings->profile_count;
+  }
   check_buttons(settings, state, current_mv);
   status_line(settings, state, current_mv);
   current_profile(settings, state);
