@@ -69,6 +69,8 @@ void settings_try_duplicate_profile(struct Settings* settings, uint8_t source_id
 
 void settings_try_delete_profile(struct Settings* settings, uint8_t index);
 
+void settings_try_move_profile(struct Settings* settings, uint8_t src_idx, uint8_t dest_idx);
+
 // calculate the cell count and target voltage for a given
 // input voltage
 //

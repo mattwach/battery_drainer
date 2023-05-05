@@ -87,7 +87,7 @@ void settings_try_add_profile(struct Settings* settings) {
 
 void settings_try_duplicate_profile(struct Settings* settings, uint8_t source_idx) {
   if (source_idx >= settings->profile_count) {
-    printf("Invalid source profile index");
+    printf("Invalid source profile index\n");
     return;
   }
   if (settings->profile_count >= MAX_PROFILE_COUNT) {
@@ -104,7 +104,7 @@ void settings_try_duplicate_profile(struct Settings* settings, uint8_t source_id
 
 void settings_try_delete_profile(struct Settings* settings, uint8_t idx) {
   if (idx >= settings->profile_count) {
-    printf("Invalid profile index");
+    printf("Invalid profile index\n");
     return;
   }
   if (settings->profile_count <= 1) {
@@ -125,6 +125,46 @@ void settings_try_delete_profile(struct Settings* settings, uint8_t idx) {
   // Clear out the now-unused slot just for tidiness
   memset(settings->profile + settings->profile_count, 0, sizeof(struct ProfileSettings));
   printf("Removed profile %d (not saved)\n", idx);
+}
+
+void settings_try_move_profile(struct Settings* settings, uint8_t src_idx, uint8_t dest_idx) {
+  if (src_idx >= settings->profile_count) {
+    printf("Invalid source index\n");
+    return;
+  }
+  if (dest_idx >= settings->profile_count) {
+    printf("Invalid destination index\n");
+    return;
+  }
+  if (src_idx == dest_idx) {
+    printf("source == destination index\n");
+    return;
+  }
+
+  // for out example, we will say we have 5 slots and want to move slot 1 to slot 3
+  // e.g. from [0 1 2 3 4] to [0 2 3 1 4]
+
+  // first, make a backup of the source profile
+  struct ProfileSettings src_ps;
+  memcpy(&src_ps, settings->profile + src_idx, sizeof(struct ProfileSettings));
+
+  // next delete the source slot
+  // Here we go from [0 1 2 3 4] to [0 2 3 4] with 1 backed up.
+  size_t copy_length = sizeof(struct ProfileSettings) * (settings->profile_count - src_idx - 1);
+  if (copy_length > 1) {
+    memmove(settings->profile + src_idx, settings->profile + src_idx + 1, copy_length);
+  }
+
+  // now we want to make an opening at dest_idx
+  // Here we go from [0 2 3 4] to [0 2 3 _ 4]
+  copy_length = sizeof(struct ProfileSettings) * (settings->profile_count - dest_idx - 2);
+  if (copy_length > 1) {
+    memmove(settings->profile + dest_idx + 1, settings->profile + dest_idx, copy_length);
+  }
+
+  // finally, copy the backed-up profile into the empty slot
+  memcpy(settings->profile + dest_idx, &src_ps, sizeof(struct ProfileSettings));
+  printf("Moved profile %d to index %d (not saved)\n", src_idx, dest_idx);
 }
 
 

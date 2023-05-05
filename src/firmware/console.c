@@ -281,6 +281,17 @@ static void delete_cmd(uint8_t argc, char* argv[]) {
   settings_try_delete_profile(settings, (uint8_t)v);
 }
 
+static void move_cmd(uint8_t argc, char* argv[]) {
+  int src_idx = 0;
+  if (!parse_int("src_index", argv[0], 0, settings->profile_count - 1, &src_idx)) {
+    return;
+  }
+  int dest_idx = 0;
+  if (!parse_int("dest_index", argv[0], 0, settings->profile_count - 1, &dest_idx)) {
+    return;
+  }
+  settings_try_move_profile(settings, (uint8_t)src_idx, (uint8_t)dest_idx);
+}
 
 static void name_cmd(uint8_t argc, char* argv[]) {
   int v = 0;
@@ -312,6 +323,7 @@ struct ConsoleCallback callbacks[] = {
     {"fet_slew_amps_seconds", "Sets the FET response speed for current targets <seconds>", 1, fet_slew_amps_seconds_cmd},
     {"fet_slew_celsius_seconds", "Sets the FET response speed for temperature targets <seconds>", 1, fet_slew_celsius_seconds_cmd},
     {"finish_display", "Sets the finish display as <seconds_per_mah_drained>", 1, finish_display_cmd},
+    {"move", "Move a profile: <src_index> <dest_idx>", 2, move_cmd},
     {"name", "Rename a profile: <index> \"<name>\"", 2, name_cmd},
     {"new", "Creates a new profile", 0, new_cmd},
     {"reset", "resets settings without saving.", 0, reset_cmd},
