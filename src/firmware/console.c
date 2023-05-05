@@ -273,6 +273,14 @@ static void duplicate_cmd(uint8_t argc, char* argv[]) {
   settings_try_duplicate_profile(settings, (uint8_t)v);
 }
 
+static void delete_cmd(uint8_t argc, char* argv[]) {
+  int v = 0;
+  if (!parse_int("profile_index", argv[0], 0, settings->profile_count - 1, &v)) {
+    return;
+  }
+  settings_try_delete_profile(settings, (uint8_t)v);
+}
+
 
 static void name_cmd(uint8_t argc, char* argv[]) {
   int v = 0;
@@ -297,6 +305,7 @@ static void name_cmd(uint8_t argc, char* argv[]) {
 struct ConsoleCallback callbacks[] = {
     {"discard", "Discard changes / reload flash", 0, discard_cmd},
     {"ical", "Sets the current shunt resistance (ohms)", 1, ical_cmd},
+    {"delete", "Deletes profile <index>", 1, delete_cmd},
     {"duplicate", "Duplicate profile <index> as a new profile", 1, duplicate_cmd},
     {"fan", "Sets fan profile <min_percent> <min_celsius> <max_celsius>", 3, fan_cmd},
     {"fet_slew_volts_seconds", "Sets the FET response speed for voltage targets <seconds>", 1, fet_slew_volts_seconds_cmd},

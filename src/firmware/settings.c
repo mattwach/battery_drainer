@@ -81,7 +81,7 @@ void settings_try_add_profile(struct Settings* settings) {
 
   struct ProfileSettings* ps = settings->profile + settings->profile_count;
   init_profile(ps);
-  printf("Added profile: %d %s\n", settings->profile_count, ps->name);
+  printf("Added profile: %d %s (not saved)\n", settings->profile_count, ps->name);
   ++settings->profile_count;
 }
 
@@ -98,9 +98,35 @@ void settings_try_duplicate_profile(struct Settings* settings, uint8_t source_id
   const struct ProfileSettings* source_ps = settings->profile + source_idx;
   struct ProfileSettings* dest_ps = settings->profile + settings->profile_count;
   memcpy(dest_ps, source_ps, sizeof(struct ProfileSettings));
-  printf("Duplicated profile: %d %s -> %d\n", source_idx, dest_ps->name, settings->profile_count);
+  printf("Duplicated profile: %d %s -> %d (not saved)\n", source_idx, dest_ps->name, settings->profile_count);
   ++settings->profile_count;
 }
+
+void settings_try_delete_profile(struct Settings* settings, uint8_t idx) {
+  if (idx >= settings->profile_count) {
+    printf("Invalid profile index");
+    return;
+  }
+  if (settings->profile_count <= 1) {
+    printf("At least one profile must be defined\n");
+    return;
+  }
+
+  // say there are 5 profile and we want to remove #1
+  // Thus we had 0, 1, 2, 3, 4 and want to have 0, 2, 3, 4
+  //
+  // copy length is 5 - 1 - 1 = 3
+  const size_t copy_length = sizeof(struct ProfileSettings) * (settings->profile_count - idx - 1);
+  if (copy_length > 1) {
+    memmove(settings->profile + idx, settings->profile + idx + 1, copy_length);
+  }
+  --settings->profile_count;
+
+  // Clear out the now-unused slot just for tidiness
+  memset(settings->profile + settings->profile_count, 0, sizeof(struct ProfileSettings));
+  printf("Removed profile %d (not saved)\n", idx);
+}
+
 
 void settings_default(struct Settings* settings) {
   memset(settings, 0, sizeof(struct Settings));
