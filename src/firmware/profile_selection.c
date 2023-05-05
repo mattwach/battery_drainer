@@ -120,6 +120,13 @@ static void current_profile(
     text_strLen(text, line, OLED_COLUMNS);
   }
   text->options = 0x00;
+
+  // need to fill in any remaining lines with white space
+  fill_line(line, "");
+  for (; text->row < 8; text->row += 2) {
+    text->column = 0;
+    text_strLen(text, line, OLED_COLUMNS);
+  }
 }
 
 void profile_selection(
