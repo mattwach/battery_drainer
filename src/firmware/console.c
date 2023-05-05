@@ -377,7 +377,7 @@ static void cell_count_cmd(uint8_t argc, char* argv[]) {
     return;
   }
   int cell_count = 0;
-  if (!parse_int("cell_count", argv[1], 0, 3, &cell_count)) {
+  if (!parse_int("cell_count", argv[1], 0, 6, &cell_count)) {
     return;
   }
   settings->profile[idx].cell_count = (uint8_t)cell_count;

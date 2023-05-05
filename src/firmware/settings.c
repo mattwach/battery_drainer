@@ -157,7 +157,7 @@ void settings_try_move_profile(struct Settings* settings, uint8_t src_idx, uint8
 
   // now we want to make an opening at dest_idx
   // Here we go from [0 2 3 4] to [0 2 3 _ 4]
-  copy_length = sizeof(struct ProfileSettings) * (settings->profile_count - dest_idx - 2);
+  copy_length = sizeof(struct ProfileSettings) * (settings->profile_count - dest_idx - 1);
   if (copy_length > 1) {
     memmove(settings->profile + dest_idx + 1, settings->profile + dest_idx, copy_length);
   }
