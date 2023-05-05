@@ -6,6 +6,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#define LOW_TARGET_MV 1000
+
 static struct ConsoleConfig cc;
 static struct Settings* settings;
 static uint16_t vcal_adc_reading;
@@ -351,7 +353,7 @@ static void max_watts_cmd(uint8_t argc, char* argv[]) {
     return;
   }
   int max_watts = 0;
-  if (!parse_int("max_watts", argv[1], 30, 150, &max_watts)) {
+  if (!parse_int("max_watts", argv[1], 1, 600, &max_watts)) {
     return;
   }
   settings->profile[idx].max_watts = (uint16_t)(max_watts);
@@ -380,6 +382,10 @@ static void cell_count_cmd(uint8_t argc, char* argv[]) {
   if (!parse_int("cell_count", argv[1], 0, 6, &cell_count)) {
     return;
   }
+  if ((cell_count == 0) && (settings->profile[idx].cell.target_mv < LOW_TARGET_MV)) {
+    printf("Can not set cel counto to AUTO (0) when target_mv < %d\n", LOW_TARGET_MV);
+    return;
+  }
   settings->profile[idx].cell_count = (uint8_t)cell_count;
   printf("Set cell count of profile %d to %d (not saved)\n", idx, settings->profile[idx].cell_count);
 }
@@ -406,7 +412,12 @@ static void per_cell_target_volts_cmd(uint8_t argc, char* argv[]) {
   if (!parse_float("target_volts", argv[1], 0.0, 30.0, &target_volts)) {
     return;
   }
-  settings->profile[idx].cell.target_mv = (uint16_t)(target_volts * 1000.0);
+  const uint16_t target_mv = (uint16_t)(target_volts * 1000.0);
+  if ((target_mv < LOW_TARGET_MV) && (settings->profile[idx].cell_count == 0)) {
+    printf("Can not use AUTO cell_count with a low target voltage.  Please set cell_count > 0.\n");
+    return;
+  }
+  settings->profile[idx].cell.target_mv = target_mv;
   printf("Set target volts of profile %d to %d mV / Cell (not saved)\n", idx, settings->profile[idx].cell.target_mv);
 }
 
