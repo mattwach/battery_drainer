@@ -384,6 +384,19 @@ static void per_cell_target_volts_cmd(uint8_t argc, char* argv[]) {
   printf("Set target volts of profile %d to %d mV / Cell (not saved)\n", idx, settings->profile[idx].cell.target_mv);
 }
 
+static void per_cell_max_vsag_cmd(uint8_t argc, char* argv[]) {
+  int idx = 0;
+  if (!parse_int("profile_index", argv[0], 0, settings->profile_count - 1, &idx)) {
+    return;
+  }
+  float max_vsag = 0.0;
+  if (!parse_float("max_vsag", argv[1], 0.05, 1.0, &max_vsag)) {
+    return;
+  }
+  settings->profile[idx].cell.max_vsag_mv = (uint16_t)(max_vsag * 1000.0);
+  printf("Set max vsag of profile %d to %d mV / Cell (not saved)\n", idx, settings->profile[idx].cell.max_vsag_mv);
+}
+
 
 struct ConsoleCallback callbacks[] = {
     {"cell_count", "Sets cell count (0 is auto): <profile_index> <cell_count>", 2, cell_count_cmd},
@@ -402,6 +415,7 @@ struct ConsoleCallback callbacks[] = {
     {"name", "Rename a profile: <index> \"<name>\"", 2, name_cmd},
     {"new", "Creates a new profile", 0, new_cmd},
     {"per_cell_damage_volts", "Sets damage voltage: <profile_index> <voltage>", 2, per_cell_damage_volts_cmd},
+    {"per_cell_max_vsag", "Sets sag volts: <profile_index> <voltage>", 2, per_cell_max_vsag_cmd},
     {"per_cell_target_volts", "Sets target voltage: <profile_index> <voltage>", 2, per_cell_target_volts_cmd},
     {"reset", "resets settings without saving.", 0, reset_cmd},
     {"save", "Write configuration to flash memory", 0, save_cmd},
