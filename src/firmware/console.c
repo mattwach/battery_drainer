@@ -313,6 +313,12 @@ static void name_cmd(uint8_t argc, char* argv[]) {
   printf("Profile %d name updated to: %s (not saved)\n", v, ps->name);
 }
 
+static void list_cmd(uint8_t argc, char* argv[]) {
+  for (uint8_t i=0; i<settings->profile_count; ++i) {
+    printf("%d: %s\n", i, settings->profile[i].name);
+  }
+}
+
 struct ConsoleCallback callbacks[] = {
     {"discard", "Discard changes / reload flash", 0, discard_cmd},
     {"ical", "Sets the current shunt resistance (ohms)", 1, ical_cmd},
@@ -323,6 +329,7 @@ struct ConsoleCallback callbacks[] = {
     {"fet_slew_amps_seconds", "Sets the FET response speed for current targets <seconds>", 1, fet_slew_amps_seconds_cmd},
     {"fet_slew_celsius_seconds", "Sets the FET response speed for temperature targets <seconds>", 1, fet_slew_celsius_seconds_cmd},
     {"finish_display", "Sets the finish display as <seconds_per_mah_drained>", 1, finish_display_cmd},
+    {"list", "List profile names", 0, list_cmd},
     {"move", "Move a profile: <src_index> <dest_idx>", 2, move_cmd},
     {"name", "Rename a profile: <index> \"<name>\"", 2, name_cmd},
     {"new", "Creates a new profile", 0, new_cmd},
