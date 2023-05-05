@@ -264,7 +264,7 @@ diodes that exist between the two points. Example:
 
 Use `cell_count <profile_index> <count>` to adjust the number of cells.  If set at zero,
 the number of cells will be automatically calculated at start by dividing the voltage
-by the `target_voltage` (see below).  If the automatic calcualtion would lead to incorrect
+by the `per_cell_target_volts` (see below).  If the automatic calcualtion would lead to incorrect
 results in your situation, you'll need to fix the value.
 
 Note that you can also use a value of `1` if you don't want to think in terms of cells
@@ -279,12 +279,12 @@ but only the full voltage.  Examples:
 Sets the per-cell target voltage.  When the target voltage is reached, the unit
 will shut off.  For example:
 
-    target_voltage 1 3.8
+    per_cell_target_volts 1 3.8
 
 Would set the target voltage to 3.8 if `cell_count` is 1, 7.6 if `cell_count` is 2,
 etc.
 
-    target_voltage 1 0.0
+    per_cell_target_volts 1 0.0
 
 Will run the drainer until it can no longer power itself, regardless of the cell count.
 

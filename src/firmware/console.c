@@ -325,16 +325,43 @@ static void vdrop_cmd(uint8_t argc, char* argv[]) {
     return;
   }
   float vdrop = 0.0;
-  if (!parse_float("profile_index", argv[1], -1.0, 3.0, &vdrop)) {
+  if (!parse_float("vdrop", argv[1], -1.0, 3.0, &vdrop)) {
     return;
   }
   settings->profile[idx].drop_mv = (int16_t)(vdrop * 1000.0);
-  printf("Set vdrop of profile %d to %d mV\n", idx, settings->profile[idx].drop_mv);
+  printf("Set vdrop of profile %d to %d mV (not saved)\n", idx, settings->profile[idx].drop_mv);
 }
 
+static void cell_count_cmd(uint8_t argc, char* argv[]) {
+  int idx = 0;
+  if (!parse_int("profile_index", argv[0], 0, settings->profile_count - 1, &idx)) {
+    return;
+  }
+  int cell_count = 0;
+  if (!parse_int("cell_count", argv[1], 0, 3, &cell_count)) {
+    return;
+  }
+  settings->profile[idx].cell_count = (uint8_t)cell_count;
+  printf("Set cell count of profile %d to %d (not saved)\n", idx, settings->profile[idx].cell_count);
+}
+
+static void per_cell_target_volts_cmd(uint8_t argc, char* argv[]) {
+  int idx = 0;
+  if (!parse_int("profile_index", argv[0], 0, settings->profile_count - 1, &idx)) {
+    return;
+  }
+  float target_volts = 0.0;
+  if (!parse_float("target_volts", argv[1], 0.0, 30.0, &target_volts)) {
+    return;
+  }
+  settings->profile[idx].cell.target_mv = (uint16_t)(target_volts * 1000.0);
+  printf("Set target volts of profile %d to %d mV / Cell (not saved)\n", idx, settings->profile[idx].cell.target_mv);
+}
+
+
 struct ConsoleCallback callbacks[] = {
+    {"cell_count", "Sets cell count (0 is auto): <profile_index> <cell_count>", 2, cell_count_cmd},
     {"discard", "Discard changes / reload flash", 0, discard_cmd},
-    {"ical", "Sets the current shunt resistance (ohms)", 1, ical_cmd},
     {"delete", "Deletes profile <index>", 1, delete_cmd},
     {"duplicate", "Duplicate profile <index> as a new profile", 1, duplicate_cmd},
     {"fan", "Sets fan profile <min_percent> <min_celsius> <max_celsius>", 3, fan_cmd},
@@ -342,10 +369,12 @@ struct ConsoleCallback callbacks[] = {
     {"fet_slew_amps_seconds", "Sets the FET response speed for current targets <seconds>", 1, fet_slew_amps_seconds_cmd},
     {"fet_slew_celsius_seconds", "Sets the FET response speed for temperature targets <seconds>", 1, fet_slew_celsius_seconds_cmd},
     {"finish_display", "Sets the finish display as <seconds_per_mah_drained>", 1, finish_display_cmd},
+    {"ical", "Sets the current shunt resistance (ohms)", 1, ical_cmd},
     {"list", "List profile names", 0, list_cmd},
     {"move", "Move a profile: <src_index> <dest_idx>", 2, move_cmd},
     {"name", "Rename a profile: <index> \"<name>\"", 2, name_cmd},
     {"new", "Creates a new profile", 0, new_cmd},
+    {"per_cell_target_volts", "Sets target voltage: <profile_index> <voltage>", 2, per_cell_target_volts_cmd},
     {"reset", "resets settings without saving.", 0, reset_cmd},
     {"save", "Write configuration to flash memory", 0, save_cmd},
     {"show", "Display settings", -1, show_cmd},
