@@ -319,6 +319,19 @@ static void list_cmd(uint8_t argc, char* argv[]) {
   }
 }
 
+static void max_amps_cmd(uint8_t argc, char* argv[]) {
+  int idx = 0;
+  if (!parse_int("profile_index", argv[0], 0, settings->profile_count - 1, &idx)) {
+    return;
+  }
+  float max_amps = 0.0;
+  if (!parse_float("max_amps", argv[1], 0.01, 30.0, &max_amps)) {
+    return;
+  }
+  settings->profile[idx].max_ma = (int16_t)(max_amps * 1000.0);
+  printf("Set max_amps of profile %d to %d mA (not saved)\n", idx, settings->profile[idx].max_ma);
+}
+
 static void vdrop_cmd(uint8_t argc, char* argv[]) {
   int idx = 0;
   if (!parse_int("profile_index", argv[0], 0, settings->profile_count - 1, &idx)) {
@@ -384,6 +397,7 @@ struct ConsoleCallback callbacks[] = {
     {"finish_display", "Sets the finish display as <seconds_per_mah_drained>", 1, finish_display_cmd},
     {"ical", "Sets the current shunt resistance (ohms)", 1, ical_cmd},
     {"list", "List profile names", 0, list_cmd},
+    {"max_amps", "Sets maximum amps: <profile_index> <amps>", 2, max_amps_cmd},
     {"move", "Move a profile: <src_index> <dest_idx>", 2, move_cmd},
     {"name", "Rename a profile: <index> \"<name>\"", 2, name_cmd},
     {"new", "Creates a new profile", 0, new_cmd},

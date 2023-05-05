@@ -292,7 +292,7 @@ Will run the drainer until it can no longer power itself, regardless of the cell
 
 If the target voltage is set below the `damage_voltage`, the user will be told that
 they are about to destroy the connected batteries and will ask for confirmation.
-The default settings is for LOPI batteries and is set to 3.5 volts.  Change it
+The default settings is for LIPO batteries and is set to 3.3 volts.  Change it
 with the `damage_voltage` command:
 
     damage_voltage 1 3.0
