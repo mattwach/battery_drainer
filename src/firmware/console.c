@@ -287,7 +287,7 @@ static void move_cmd(uint8_t argc, char* argv[]) {
     return;
   }
   int dest_idx = 0;
-  if (!parse_int("dest_index", argv[0], 0, settings->profile_count - 1, &dest_idx)) {
+  if (!parse_int("dest_index", argv[1], 0, settings->profile_count - 1, &dest_idx)) {
     return;
   }
   settings_try_move_profile(settings, (uint8_t)src_idx, (uint8_t)dest_idx);
@@ -319,6 +319,19 @@ static void list_cmd(uint8_t argc, char* argv[]) {
   }
 }
 
+static void vdrop_cmd(uint8_t argc, char* argv[]) {
+  int idx = 0;
+  if (!parse_int("profile_index", argv[0], 0, settings->profile_count - 1, &idx)) {
+    return;
+  }
+  float vdrop = 0.0;
+  if (!parse_float("profile_index", argv[1], -1.0, 3.0, &vdrop)) {
+    return;
+  }
+  settings->profile[idx].drop_mv = (int16_t)(vdrop * 1000.0);
+  printf("Set vdrop of profile %d to %d mV\n", idx, settings->profile[idx].drop_mv);
+}
+
 struct ConsoleCallback callbacks[] = {
     {"discard", "Discard changes / reload flash", 0, discard_cmd},
     {"ical", "Sets the current shunt resistance (ohms)", 1, ical_cmd},
@@ -337,6 +350,7 @@ struct ConsoleCallback callbacks[] = {
     {"save", "Write configuration to flash memory", 0, save_cmd},
     {"show", "Display settings", -1, show_cmd},
     {"vcal", "Calibrates the voltage ratio", 1, vcal_cmd},
+    {"vdrop", "Sets voltage drop: <profile_index> <voltage_drop>", 2, vdrop_cmd},
     {"vsag_interval_seconds", "Changes how often to check vsag", 1, vsag_interval_seconds_cmd},
     {"vsag_settle_ms", "Changes how long to let the voltage setting before measuring vsag", 1, vsag_settle_ms_cmd},
 };

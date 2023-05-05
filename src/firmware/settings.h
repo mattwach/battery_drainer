@@ -37,7 +37,7 @@ struct PerCellSettings {
 
 struct ProfileSettings {
   char name[20];
-  uint16_t drop_mv;
+  int16_t drop_mv;
   uint8_t cell_count;  // zero is auto
   struct PerCellSettings cell;
   uint16_t max_ma;
