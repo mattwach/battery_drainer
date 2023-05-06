@@ -26,7 +26,19 @@ struct SharedState {
   struct Text text;
   uint8_t active_profile_index;  // if == the profile count, then we are on the Settings option
   uint8_t button;  // NEXT_PRESSED | OK_PRESSED
+
+  // use for calibration
+  uint16_t vcal_adc_reading;
+  // This is the measured mv + the offset.  The sag value
+  // needs to be added to estimate the unloaded voltage
+  uint16_t loaded_mv;
+  uint16_t estimated_sag_mv;
 };
+
+static inline uint16_t estimate_unloaded_mv(
+  const struct SharedState* state) {
+  return state->loaded_mv + state->estimated_sag_mv;
+}
 
 void state_init(struct SharedState* ss);
 

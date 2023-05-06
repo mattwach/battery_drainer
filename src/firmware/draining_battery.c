@@ -8,15 +8,14 @@ static void abort_charge(struct SharedState* state) {
 
 void draining_battery(
     const struct Settings* settings,
-    struct SharedState* state,
-    uint16_t current_mv) {
+    struct SharedState* state) {
 
   struct DrainingBatteryUIFields dui;
   // fake fields for now
   dui.time_seconds = 332;
   dui.charge_mah = 500;
   dui.cells = 6;
-  dui.current_mv = current_mv;
+  dui.current_mv = estimate_unloaded_mv(state);
   dui.target_mv = 22800;
   dui.finish_seconds = 0;
   dui.current_ma = 15700;

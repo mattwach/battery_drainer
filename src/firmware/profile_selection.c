@@ -6,8 +6,7 @@
 
 static void check_buttons(
     const struct Settings* settings,
-    struct SharedState* state,
-    uint16_t current_mv) {
+    struct SharedState* state) {
   if (!state->button) {
     return;
   }
@@ -32,7 +31,7 @@ static void check_buttons(
     settings_calc_voltage_and_cell_count(
         settings,
         state->active_profile_index,
-        current_mv,
+        state->loaded_mv,
         &cell_count,
         &target_mv);
     if (cell_count == 0) {
@@ -47,28 +46,27 @@ static void check_buttons(
 
 static void status_line(
     const struct Settings* settings,
-    struct SharedState* state,
-    uint16_t current_mv) {
+    struct SharedState* state) {
   char line[32];
   uint8_t cell_count;
   uint16_t target_mv;
   settings_calc_voltage_and_cell_count(
       settings,
       state->active_profile_index,
-      current_mv,
+      state->loaded_mv,
       &cell_count,
       &target_mv);
 
   struct Text* text = &(state->text);
   text->row = 0;
   text->column = 0;
-  const char sign = current_mv > target_mv ? '>' : '<';
+  const char sign = state->loaded_mv > target_mv ? '>' : '<';
   sprintf(
       line,
       "%dS %2d.%dV %c %2d.%dV",
       cell_count,
-      current_mv / 1000,
-      (current_mv % 1000) / 100,
+      state->loaded_mv / 1000,
+      (state->loaded_mv % 1000) / 100,
       sign,
       target_mv / 1000,
       (target_mv % 1000) / 100);
@@ -119,15 +117,14 @@ static void current_profile(
 
 void profile_selection(
     const struct Settings* settings,
-    struct SharedState* state,
-    uint16_t current_mv) {
+    struct SharedState* state) {
   // This handles sudden changes to the profile coount via the console
   // when == to profile count, we are on the "setttings" selection.
   if (state->active_profile_index > settings->profile_count) {
     state->active_profile_index = settings->profile_count;
   }
-  check_buttons(settings, state, current_mv);
-  status_line(settings, state, current_mv);
+  check_buttons(settings, state);
+  status_line(settings, state);
   current_profile(settings, state);
 }
 

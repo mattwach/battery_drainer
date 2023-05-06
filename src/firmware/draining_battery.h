@@ -6,8 +6,7 @@
 
 void draining_battery(
     const struct Settings* settings,
-    struct SharedState* state,
-    uint16_t current_mv);
+    struct SharedState* state);
 
 #endif
 

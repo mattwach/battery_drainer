@@ -10,8 +10,10 @@
 #include "settings.h"
 #include "settings_message.h"
 #include "state.h"
+#include "voltage_sense.h"
 
 #include "pico/stdlib.h"
+#include "hardware/adc.h"
 
 #define LOOP_SLEEP_TIME 20
 #define LED_PIN PICO_DEFAULT_LED_PIN
@@ -27,25 +29,25 @@ static void init(void) {
   console_init(&settings);
   state_init(&state);
   buttons_init();
+  adc_init();
+  voltage_sense_init();  // call adc_init() first
 }
 
 static void loop(void) {
-  // TODO: read these from the hardware later
-  const uint16_t vcal_adc_reading = 3426;
-  const uint16_t current_mv = 25100;
+  voltage_sense_update(&settings, &state);
   buttons_update(&state);
   if (state.state != DRAINING_BATTERY) {
-    console_poll(vcal_adc_reading);
+    console_poll(state.vcal_adc_reading);
   }
   switch (state.state) {
     case PROFILE_SELECTION:
-      profile_selection(&settings, &state, current_mv);
+      profile_selection(&settings, &state);
       break;
     case SETTINGS_MESSAGE:
       settings_message(&state);
       break;
     case DRAINING_BATTERY:
-      draining_battery(&settings, &state, current_mv);
+      draining_battery(&settings, &state);
       break;
     default:
       // if we are here, then the state is not yet implemented
@@ -54,7 +56,7 @@ static void loop(void) {
 }
 
 int main() {
-  sleep_ms(50);
+  sleep_ms(50);  // Allow OLED voltage to settle
   power_hold();
   init();
   uint32_t frame_idx = 0;

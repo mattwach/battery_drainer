@@ -13,11 +13,13 @@ add_executable(
     settings_message.c
     state.c
     util.c
+    voltage_sense.c
 )
 
 target_link_libraries(
     lipo_battery_drainer
     FIXED_TEXT_TERMINUS8X16
+    hardware_adc
     hardware_flash
     DEBOUNCE
     OLEDM_FIXED_TEXT
