@@ -39,7 +39,8 @@ static uint16_t calc_checksum(const struct Settings* s) {
 // that would read as 0.003 * 1000 = 3V on the low side
 // this would give an ADC reading of 4096.
 // thus our default ratio is 30000 mv / 4096 ~= 7.3242
-#define DEFAULT_VCAL_RATIO 7.3242
+//#define DEFAULT_VCAL_RATIO 7.3242
+#define DEFAULT_VCAL_RATIO 7.2464  // measured
 
 static void global_settings_default(struct GlobalSettings* gs) {
   gs->ical_mohms = 133;
@@ -61,7 +62,7 @@ static void global_settings_default(struct GlobalSettings* gs) {
 
 static void init_profile(struct ProfileSettings* ps) {
   strcpy(ps->name, "Default");
-  ps->drop_mv = 600;
+  ps->drop_mv = 0;
   ps->cell_count = 0;
 
   ps->cell.target_mv = 3800;
