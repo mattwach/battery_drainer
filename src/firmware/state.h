@@ -27,6 +27,8 @@ struct SharedState {
   uint8_t active_profile_index;  // if == the profile count, then we are on the Settings option
   uint8_t button;  // NEXT_PRESSED | OK_PRESSED
 
+  uint32_t uptime_ms;
+
   // use for calibration
   uint16_t vcal_adc_reading;
   // This is the measured mv + the offset.  The sag value

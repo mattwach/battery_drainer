@@ -10,16 +10,21 @@
 #include "settings.h"
 #include "settings_message.h"
 #include "state.h"
+#include "util.h"
 #include "voltage_sense.h"
 
 #include "pico/stdlib.h"
 #include "hardware/adc.h"
 
-#define LOOP_SLEEP_TIME 20
+#define LOOP_SLEEP_TIME_MS 20
 #define LED_PIN PICO_DEFAULT_LED_PIN
 
 struct Settings settings;
 struct SharedState state;
+
+static inline uint32_t uptime_ms() {
+  return to_ms_since_boot(get_absolute_time());
+}
 
 static void init(void) {
   gpio_init(LED_PIN);
@@ -61,10 +66,16 @@ int main() {
   init();
   uint32_t frame_idx = 0;
   while (1) {
+    state.uptime_ms = uptime_ms();
     loop();
-    sleep_ms(LOOP_SLEEP_TIME);
     gpio_put(LED_PIN, frame_idx & 0x10 ? 1 : 0);
     ++frame_idx;
+    const uint32_t tdelta = uptime_ms() - state.uptime_ms;
+    if (tdelta < LOOP_SLEEP_TIME_MS) {
+      sleep_ms(LOOP_SLEEP_TIME_MS - tdelta);
+    } else {
+      sleep_ms(1);
+    }
   }
   return 0;
 }
