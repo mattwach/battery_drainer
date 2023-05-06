@@ -11,10 +11,10 @@ static void render_line0(
   const uint8_t seconds = (fields->time_seconds % 60);
 
   const uint8_t ah = fields->charge_mah / 1000;
-  const uint8_t ah_frac = (fields->charge_mah / 100) % 10;
+  const uint8_t ah_frac = (fields->charge_mah / 10) % 100;
   sprintf(
       line,
-      "%02d:%02d:%02d %3d.%dAh",
+      "%02d:%02d:%02d %2d.%02dAh",
       hours,
       minutes,
       seconds,

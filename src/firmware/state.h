@@ -42,6 +42,11 @@ struct SharedState {
 
   uint16_t current_ma;
 
+  // mah would not allow for incremental accumulation so we use
+  // mas (milliamp seconds) instead.
+  uint32_t last_charge_sample_ms;
+  uint32_t charge_mas;
+
   uint8_t temperature_c;
 
   // calculated at profile selection
