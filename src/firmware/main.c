@@ -4,9 +4,11 @@
 
 #include "buttons.h"
 #include "console.h"
+#include "draining_battery.h"
 #include "power.h"
 #include "profile_selection.h"
 #include "settings.h"
+#include "settings_message.h"
 #include "state.h"
 
 #include "pico/stdlib.h"
@@ -41,6 +43,9 @@ static void loop(void) {
       break;
     case SETTINGS_MESSAGE:
       settings_message(&state);
+      break;
+    case DRAINING_BATTERY:
+      draining_battery(&settings, &state, current_mv);
       break;
     default:
       // if we are here, then the state is not yet implemented

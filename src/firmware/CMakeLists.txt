@@ -4,6 +4,8 @@ add_executable(
     lipo_battery_drainer
     buttons.c
     console.c
+    draining_battery.c
+    draining_battery_ui.c
     main.c
     power.c
     profile_selection.c
