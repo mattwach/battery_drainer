@@ -1,7 +1,7 @@
 #ifndef DRAINING_BATTERY_UI_H
 #define DRAINING_BATTERY_UI_H
 
-#include "state.h"
+#include "oledm/text.h"
 
 enum Limiter {
   NONE,
@@ -9,17 +9,12 @@ enum Limiter {
   CURRENT_LIMIT,
   POWER_LIMIT,
   TEMPERATURE_LIMIT,
-  FINISHED_LIMIT,
 };
 
 struct DrainingBatteryUIFields {
   uint16_t time_seconds; 
   uint16_t charge_mah;
-  uint8_t cells;
   uint16_t current_mv;
-
-  // only used while in-progress
-  uint16_t target_mv;
 
   // only used when finished
   uint16_t finish_seconds;
@@ -33,8 +28,18 @@ struct DrainingBatteryUIFields {
   enum Limiter limiter;
 };
 
-void draining_battery_ui_render(
-    struct Text* text, const struct DrainingBatteryUIFields* fields);
+// Note: we cant use struct SharedState because it would create a circular
+// dependency
+void draining_battery_ui_render_active(
+    struct Text* text,
+    const struct DrainingBatteryUIFields* fields,
+    uint8_t cells,
+    uint16_t target_mv);
+
+void draining_battery_ui_render_finished(
+    struct Text* text,
+    const struct DrainingBatteryUIFields* fields,
+    uint8_t cells);
 
 #endif
 

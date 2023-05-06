@@ -27,6 +27,8 @@ static inline uint32_t uptime_ms() {
 }
 
 static void init(void) {
+  sleep_ms(50);  // Allow OLED voltage to settle
+  power_hold();
   gpio_init(LED_PIN);
   gpio_set_dir(LED_PIN, GPIO_OUT);
   gpio_put(LED_PIN, 1);
@@ -61,8 +63,6 @@ static void loop(void) {
 }
 
 int main() {
-  sleep_ms(50);  // Allow OLED voltage to settle
-  power_hold();
   init();
   uint32_t frame_idx = 0;
   while (1) {

@@ -48,28 +48,19 @@ static void status_line(
     const struct Settings* settings,
     struct SharedState* state) {
   char line[32];
-  uint8_t cell_count;
-  uint16_t target_mv;
-  settings_calc_voltage_and_cell_count(
-      settings,
-      state->active_profile_index,
-      state->loaded_mv,
-      &cell_count,
-      &target_mv);
-
   struct Text* text = &(state->text);
   text->row = 0;
   text->column = 0;
-  const char sign = state->loaded_mv > target_mv ? '>' : '<';
+  const char sign = state->loaded_mv > state->target_mv ? '>' : '<';
   sprintf(
       line,
       "%dS %2d.%dV %c %2d.%dV",
-      cell_count,
+      state->cells,
       state->loaded_mv / 1000,
       (state->loaded_mv % 1000) / 100,
       sign,
-      target_mv / 1000,
-      (target_mv % 1000) / 100);
+      state->target_mv / 1000,
+      (state->target_mv % 1000) / 100);
   text_strLen(text, line, OLED_COLUMNS);
 }
 
@@ -123,6 +114,14 @@ void profile_selection(
   if (state->active_profile_index > settings->profile_count) {
     state->active_profile_index = settings->profile_count;
   }
+  
+  settings_calc_voltage_and_cell_count(
+      settings,
+      state->active_profile_index,
+      state->loaded_mv,
+      &(state->cells),
+      &(state->target_mv));
+
   check_buttons(settings, state);
   status_line(settings, state);
   current_profile(settings, state);

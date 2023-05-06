@@ -4,6 +4,7 @@
 #include <inttypes.h>
 #include <oledm/oledm.h>
 #include <oledm/text.h>
+#include "draining_battery_ui.h"
 
 enum State {
   PROFILE_SELECTION,
@@ -36,6 +37,13 @@ struct SharedState {
   // needs to be added to estimate the unloaded voltage
   uint16_t loaded_mv;
   uint16_t estimated_sag_mv;
+
+  // calculated at profile selection
+  uint8_t cells;
+  uint16_t target_mv;
+
+  // Used for finish screen
+  struct DrainingBatteryUIFields final_stats;
 };
 
 static inline uint16_t estimate_unloaded_mv(

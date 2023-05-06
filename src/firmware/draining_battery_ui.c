@@ -1,4 +1,5 @@
 #include "draining_battery_ui.h"
+#include "state.h"
 #include "util.h"
 #include <stdio.h>
 
@@ -25,10 +26,13 @@ static void render_line0(
 }
 
 static void render_line1_active(
-    struct Text* text, const struct DrainingBatteryUIFields* fields) {
+    struct Text* text,
+    const struct DrainingBatteryUIFields* fields,
+    uint8_t cells,
+    uint16_t target_mv) {
   char line[20];
 
-  sprintf(line, "%dS ", fields->cells);
+  sprintf(line, "%dS ", cells);
   text->row = 2;
   text->column = 0;
   text_strLen(text, line, 3);
@@ -44,24 +48,26 @@ static void render_line1_active(
   text->options = 0x00;
 
   const char sign =
-    fields->current_mv > fields->target_mv ?
+    fields->current_mv > target_mv ?
     '>' :
     '<';
-  const uint8_t target_volts = fields->target_mv / 1000;
-  const uint8_t target_volts_frac = (fields->target_mv / 100) % 10;
+  const uint8_t target_volts = target_mv / 1000;
+  const uint8_t target_volts_frac = (target_mv / 100) % 10;
   sprintf(line, " %c %2d.%dV", sign, target_volts, target_volts_frac);
   text_strLen(text, line, 8);
 }
 
 static void render_line1_finished(
-    struct Text* text, const struct DrainingBatteryUIFields* fields) {
+    struct Text* text,
+    const struct DrainingBatteryUIFields* fields,
+    uint8_t cells) {
   char line[20];
   const uint8_t volts = fields->current_mv / 1000;
   const uint8_t volts_frac = (fields->current_mv / 100) % 10;
   sprintf(
       line,
       "%dS %2d.%dV ",
-      fields->cells,
+      cells,
       volts,
       volts_frac);
   text->row = 2;
@@ -117,16 +123,23 @@ static void render_line3(
   text_strLen(text, line, 12);
 }
 
-void draining_battery_ui_render(
-    struct Text* text, const struct DrainingBatteryUIFields* fields) {
+void draining_battery_ui_render_active(
+    struct Text* text,
+    const struct DrainingBatteryUIFields* fields,
+    uint8_t cells,
+    uint16_t target_mv) {
   render_line0(text, fields);
+  render_line1_active(text, fields, cells, target_mv);
+  render_line2(text, fields);
+  render_line3(text, fields);
+}
 
-  if (fields->limiter == FINISHED_LIMIT) {
-    render_line1_finished(text, fields);
-  } else {
-    render_line1_active(text, fields);
-  }
-
+void draining_battery_ui_render_finished(
+    struct Text* text,
+    const struct DrainingBatteryUIFields* fields,
+    uint8_t cells) {
+  render_line0(text, fields);
+  render_line1_finished(text, fields, cells);
   render_line2(text, fields);
   render_line3(text, fields);
 }
