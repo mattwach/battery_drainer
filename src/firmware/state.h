@@ -28,6 +28,7 @@ struct SharedState {
   uint8_t button;  // NEXT_PRESSED | OK_PRESSED
 
   uint32_t uptime_ms;
+  uint32_t drain_stated_ms;
 
   // use for calibration
   uint16_t vcal_adc_reading;
