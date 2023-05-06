@@ -21,7 +21,7 @@ static void check_buttons(
 
   if (state->button & OK_PRESSED) {
     if (state->active_profile_index >= settings->profile_count) {
-      state->state = SETTINGS_MESSAGE;
+      state_change(state, SETTINGS_MESSAGE);
       return;
     }
 
@@ -35,11 +35,11 @@ static void check_buttons(
         &cell_count,
         &target_mv);
     if (cell_count == 0) {
-      state->state = BAD_SETUP_MESSAGE;
+      state_change(state, BAD_SETUP_MESSAGE);
     } else if (ps->cell.target_mv <= ps->cell.damage_mv) {
-      state->state = DETROY_BATTERY_CONFIRMATION;
+      state_change(state, DAMAGE_WARNING);
     } else {
-      state->state = DRAINING_BATTERY;
+      state_change(state, DRAINING_BATTERY);
     }
   }
 }

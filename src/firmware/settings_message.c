@@ -20,7 +20,7 @@ void settings_message(struct SharedState* state) {
   }
 
   if (state->button) {
-    state->state = PROFILE_SELECTION;
+    state_change(state, PROFILE_SELECTION);
   }
 }
 

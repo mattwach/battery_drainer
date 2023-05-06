@@ -10,7 +10,7 @@ enum State {
   PROFILE_SELECTION,
   SETTINGS_MESSAGE,
   BAD_SETUP_MESSAGE,
-  DETROY_BATTERY_CONFIRMATION,
+  DAMAGE_WARNING,
   DRAINING_BATTERY,
   FINISHED,
 };
@@ -22,6 +22,7 @@ enum State {
 #define OLED_COLUMNS 16
 
 struct SharedState {
+  // Dont change directly so that state_started_ms can be reset
   enum State state;
   struct OLEDM display;
   struct Text text;
@@ -30,6 +31,7 @@ struct SharedState {
 
   uint32_t uptime_ms;
   uint32_t state_started_ms;
+  uint8_t damage_confirm;
 
   // use for calibration
   uint16_t vcal_adc_reading;
@@ -52,6 +54,8 @@ static inline uint16_t estimate_unloaded_mv(
 }
 
 void state_init(struct SharedState* ss);
+
+void state_change(struct SharedState* ss, enum State s);
 
 #endif
 

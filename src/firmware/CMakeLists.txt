@@ -4,6 +4,7 @@ add_executable(
     lipo_battery_drainer
     buttons.c
     console.c
+    damage_warning.c
     draining_battery.c
     draining_battery_ui.c
     finished.c

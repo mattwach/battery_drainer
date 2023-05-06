@@ -5,6 +5,7 @@
 #include "buttons.h"
 #include "console.h"
 #include "finished.h"
+#include "damage_warning.h"
 #include "draining_battery.h"
 #include "power.h"
 #include "profile_selection.h"
@@ -53,6 +54,9 @@ static void loop(void) {
       break;
     case SETTINGS_MESSAGE:
       settings_message(&state);
+      break;
+    case DAMAGE_WARNING:
+      damage_warning(&state);
       break;
     case DRAINING_BATTERY:
       draining_battery(&settings, &state);

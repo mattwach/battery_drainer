@@ -14,3 +14,8 @@ void state_init(struct SharedState* ss) {
   text_init(&ss->text, terminus8x16, display);
 }
 
+void state_change(struct SharedState* ss, enum State s) {
+  ss->state_started_ms = 0;
+  ss->state = s;
+  ss->damage_confirm = 0;
+}

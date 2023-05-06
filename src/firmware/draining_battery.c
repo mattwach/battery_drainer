@@ -3,8 +3,7 @@
 #include "draining_battery_ui.h"
 
 static void abort_charge(struct SharedState* state) {
-  state->state_started_ms = 0;
-  state->state = FINISHED;
+  state_change(state, FINISHED);
 }
 
 static inline void max8(uint8_t cur, uint8_t *final) {
