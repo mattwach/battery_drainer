@@ -54,6 +54,7 @@ static void loop(void) {
 }
 
 int main() {
+  sleep_ms(50);
   power_hold();
   init();
   uint32_t frame_idx = 0;
