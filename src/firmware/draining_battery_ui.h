@@ -33,7 +33,7 @@ struct DrainingBatteryUIFields {
   enum Limiter limiter;
 };
 
-void draning_battery_ui_render(
+void draining_battery_ui_render(
     struct Text* text, const struct DrainingBatteryUIFields* fields);
 
 #endif
