@@ -48,8 +48,10 @@ void draining_battery(
   dui.time_seconds = (state->uptime_ms - state->state_started_ms) / 1000;
   dui.charge_mah = 500;
   dui.current_mv = estimate_unloaded_mv(state);
-  dui.current_ma = 15700;
-  dui.power_watts = 394;
+  dui.current_ma = state->current_ma;
+  dui.power_watts = (
+    ((uint32_t)dui.current_mv * (uint32_t)dui.current_ma) /
+    1000000);
   dui.temp_c = 55;
   dui.fet_percent = 100;
   dui.fan_percent = 25;

@@ -4,6 +4,7 @@
 
 #include "buttons.h"
 #include "console.h"
+#include "current_sense.h"
 #include "finished.h"
 #include "damage_warning.h"
 #include "draining_battery.h"
@@ -40,10 +41,12 @@ static void init(void) {
   buttons_init();
   adc_init();
   voltage_sense_init();  // call adc_init() first
+  current_sense_init();  // call adc_init() first
 }
 
 static void loop(void) {
   voltage_sense_update(&settings, &state);
+  current_sense_update(&settings, &state);
   buttons_update(&state);
   if (state.state != DRAINING_BATTERY) {
     console_poll(state.vcal_adc_reading);

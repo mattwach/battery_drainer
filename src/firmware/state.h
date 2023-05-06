@@ -40,6 +40,8 @@ struct SharedState {
   uint16_t loaded_mv;
   uint16_t estimated_sag_mv;
 
+  uint16_t current_ma;
+
   // calculated at profile selection
   uint8_t cells;
   uint16_t target_mv;
