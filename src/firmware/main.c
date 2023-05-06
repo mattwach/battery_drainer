@@ -13,6 +13,7 @@
 #include "settings.h"
 #include "settings_message.h"
 #include "state.h"
+#include "temperature_sense.h"
 #include "util.h"
 #include "voltage_sense.h"
 
@@ -42,11 +43,13 @@ static void init(void) {
   adc_init();
   voltage_sense_init();  // call adc_init() first
   current_sense_init();  // call adc_init() first
+  temperature_sense_init();  // call adc_init() first
 }
 
 static void loop(void) {
   voltage_sense_update(&settings, &state);
   current_sense_update(&settings, &state);
+  temperature_sense_update(&settings, &state);
   buttons_update(&state);
   if (state.state != DRAINING_BATTERY) {
     console_poll(state.vcal_adc_reading);

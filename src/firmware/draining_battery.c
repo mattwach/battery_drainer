@@ -52,7 +52,7 @@ void draining_battery(
   dui.power_watts = (
     ((uint32_t)dui.current_mv * (uint32_t)dui.current_ma) /
     1000000);
-  dui.temp_c = 55;
+  dui.temp_c = state->temperature_c;
   dui.fet_percent = 100;
   dui.fan_percent = 25;
   dui.limiter = VOLTAGE_SAG;

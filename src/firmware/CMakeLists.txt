@@ -15,6 +15,7 @@ add_executable(
     settings.c
     settings_message.c
     state.c
+    temperature_sense.c
     util.c
     voltage_sense.c
 )

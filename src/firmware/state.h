@@ -42,6 +42,8 @@ struct SharedState {
 
   uint16_t current_ma;
 
+  uint8_t temperature_c;
+
   // calculated at profile selection
   uint8_t cells;
   uint16_t target_mv;
