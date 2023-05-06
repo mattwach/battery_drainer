@@ -60,7 +60,8 @@ static void render_line1_active(
 static void render_line1_finished(
     struct Text* text,
     const struct DrainingBatteryUIFields* fields,
-    uint8_t cells) {
+    uint8_t cells,
+    uint16_t finish_seconds) {
   char line[20];
   const uint8_t volts = fields->current_mv / 1000;
   const uint8_t volts_frac = (fields->current_mv / 100) % 10;
@@ -74,7 +75,7 @@ static void render_line1_finished(
   text->column = 0;
   text_strLen(text, line, 9);
 
-  sprintf(line, "%6dS", fields->finish_seconds);
+  sprintf(line, "%6dS", finish_seconds);
   text->options = TEXT_OPTION_INVERTED;
   text_strLen(text, line, 7);
   text->options = 0x00;
@@ -137,9 +138,10 @@ void draining_battery_ui_render_active(
 void draining_battery_ui_render_finished(
     struct Text* text,
     const struct DrainingBatteryUIFields* fields,
-    uint8_t cells) {
+    uint8_t cells,
+    uint16_t finish_seconds) {
   render_line0(text, fields);
-  render_line1_finished(text, fields, cells);
+  render_line1_finished(text, fields, cells, finish_seconds);
   render_line2(text, fields);
   render_line3(text, fields);
 }

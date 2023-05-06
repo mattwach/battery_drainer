@@ -4,6 +4,7 @@
 
 #include "buttons.h"
 #include "console.h"
+#include "finished.h"
 #include "draining_battery.h"
 #include "power.h"
 #include "profile_selection.h"
@@ -55,6 +56,9 @@ static void loop(void) {
       break;
     case DRAINING_BATTERY:
       draining_battery(&settings, &state);
+      break;
+    case FINISHED:
+      finished(&state, settings.global.finish_display);
       break;
     default:
       // if we are here, then the state is not yet implemented

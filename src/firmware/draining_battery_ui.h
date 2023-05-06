@@ -15,16 +15,11 @@ struct DrainingBatteryUIFields {
   uint16_t time_seconds; 
   uint16_t charge_mah;
   uint16_t current_mv;
-
-  // only used when finished
-  uint16_t finish_seconds;
-
   uint16_t current_ma;
   uint16_t power_watts;
   uint8_t temp_c;
   uint8_t fet_percent;
   uint8_t fan_percent;
-
   enum Limiter limiter;
 };
 
@@ -39,7 +34,8 @@ void draining_battery_ui_render_active(
 void draining_battery_ui_render_finished(
     struct Text* text,
     const struct DrainingBatteryUIFields* fields,
-    uint8_t cells);
+    uint8_t cells,
+    uint16_t finish_seconds);
 
 #endif
 

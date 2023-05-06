@@ -6,6 +6,7 @@ add_executable(
     console.c
     draining_battery.c
     draining_battery_ui.c
+    finished.c
     main.c
     power.c
     profile_selection.c
