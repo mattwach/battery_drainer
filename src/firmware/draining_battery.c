@@ -1,6 +1,7 @@
 #include "draining_battery.h"
 
 #include "draining_battery_ui.h"
+#include "vgs_control.h"
 
 // how often to accumulate into charge_mas
 // at a rating of 100ms, there needs to me at least 5ma
@@ -27,6 +28,7 @@ static inline void max16(uint16_t cur, uint16_t *final) {
 static void init_state(struct SharedState* state) {
   state->state_started_ms = state->uptime_ms;
   state->last_charge_sample_ms = state->uptime_ms;
+  state->vgs_level = 0;
 }
 
 static void update_final_stats(
@@ -64,8 +66,11 @@ void draining_battery(
     accumulate_charge(state);
   }
 
+  // temporarily set vgs level for validation purposes
+  state->vgs_level = (uint16_t)(state->uptime_ms & 0xFFFF);
+  vgs_control(state->vgs_level);
+
   struct DrainingBatteryUIFields dui;
-  // fake fields for now
   dui.time_seconds = (state->uptime_ms - state->state_started_ms) / 1000;
   dui.charge_mah = state->charge_mas / 3600;
   dui.current_mv = estimate_unloaded_mv(state);
@@ -74,7 +79,7 @@ void draining_battery(
     ((uint32_t)dui.current_mv * (uint32_t)dui.current_ma) /
     1000000);
   dui.temp_c = state->temperature_c;
-  dui.fet_percent = 100;
+  dui.fet_percent = (uint8_t)(((uint32_t)state->vgs_level * 100) / 65535);
   dui.fan_percent = 25;
   dui.limiter = VOLTAGE_SAG;
 

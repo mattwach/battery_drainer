@@ -15,6 +15,7 @@
 #include "state.h"
 #include "temperature_sense.h"
 #include "util.h"
+#include "vgs_control.h"
 #include "voltage_sense.h"
 
 #include "pico/stdlib.h"
@@ -40,6 +41,7 @@ static void init(void) {
   console_init(&settings);
   state_init(&state);
   buttons_init();
+  vgs_control_init();
   adc_init();
   voltage_sense_init();  // call adc_init() first
   current_sense_init();  // call adc_init() first

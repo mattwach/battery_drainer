@@ -53,6 +53,9 @@ struct SharedState {
   uint8_t cells;
   uint16_t target_mv;
 
+  // ranges 0-65536
+  uint16_t vgs_level;
+
   // Used for finish screen
   struct DrainingBatteryUIFields final_stats;
 };

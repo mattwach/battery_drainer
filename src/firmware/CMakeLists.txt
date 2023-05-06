@@ -17,6 +17,7 @@ add_executable(
     state.c
     temperature_sense.c
     util.c
+    vgs_control.c
     voltage_sense.c
 )
 
@@ -25,6 +26,7 @@ target_link_libraries(
     FIXED_TEXT_TERMINUS8X16
     hardware_adc
     hardware_flash
+    hardware_pwm
     DEBOUNCE
     OLEDM_FIXED_TEXT
     OLEDM_I2C
