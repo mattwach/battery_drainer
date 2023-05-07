@@ -9,10 +9,10 @@
 #include "damage_warning.h"
 #include "draining_battery.h"
 #include "fan_control.h"
+#include "message.h"
 #include "power.h"
 #include "profile_selection.h"
 #include "settings.h"
-#include "settings_message.h"
 #include "state.h"
 #include "temperature_sense.h"
 #include "util.h"
@@ -64,8 +64,10 @@ static void loop(void) {
     case PROFILE_SELECTION:
       profile_selection(&settings, &state);
       break;
+    case CONDITION_MET_MESSAGE:
     case SETTINGS_MESSAGE:
-      settings_message(&state);
+    case ZERO_CELLS_MESSAGE:
+      message(&state);
       break;
     case DAMAGE_WARNING:
       damage_warning(&state);

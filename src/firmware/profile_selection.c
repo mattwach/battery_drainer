@@ -35,7 +35,9 @@ static void check_buttons(
         &cell_count,
         &target_mv);
     if (cell_count == 0) {
-      state_change(state, BAD_SETUP_MESSAGE);
+      state_change(state, ZERO_CELLS_MESSAGE);
+    } else if (state->loaded_mv < state->target_mv) {
+      state_change(state, CONDITION_MET_MESSAGE);
     } else if (ps->cell.target_mv <= ps->cell.damage_mv) {
       state_change(state, DAMAGE_WARNING);
     } else {

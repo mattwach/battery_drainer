@@ -11,10 +11,10 @@ add_executable(
     fan_control.c
     finished.c
     main.c
+    message.c
     power.c
     profile_selection.c
     settings.c
-    settings_message.c
     state.c
     temperature_sense.c
     util.c
