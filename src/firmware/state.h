@@ -4,7 +4,6 @@
 #include <inttypes.h>
 #include <oledm/oledm.h>
 #include <oledm/text.h>
-#include "draining_battery_ui.h"
 
 enum State {
   PROFILE_SELECTION,
@@ -20,6 +19,24 @@ enum State {
 
 #define OLED_ROWS 4
 #define OLED_COLUMNS 16
+
+enum Limiter {
+  NO_LIMIT,
+  VOLTAGE_SAG_LIMIT,
+  CURRENT_LIMIT,
+  POWER_LIMIT,
+  TEMPERATURE_LIMIT,
+};
+
+struct MaxValues {
+  uint16_t time_seconds;
+  uint16_t charge_mah;
+  uint16_t current_ma;
+  uint16_t power_watts;
+  uint8_t temperature_c;
+  uint8_t fet_percent;
+  uint8_t fan_percent;
+};
 
 struct SharedState {
   // Dont change directly so that state_started_ms can be reset
@@ -38,7 +55,7 @@ struct SharedState {
   // This is the measured mv + the offset.  The sag value
   // needs to be added to estimate the unloaded voltage
   uint16_t loaded_mv;
-  uint16_t estimated_sag_mv;
+  uint16_t last_unloaded_sample_mv;
 
   uint16_t current_ma;
 
@@ -57,14 +74,16 @@ struct SharedState {
   uint16_t vgs_level;
   uint16_t fan_level;
 
-  // Used for finish screen
-  struct DrainingBatteryUIFields final_stats;
-};
+  // response state
+  float velocity;
+  uint32_t last_response_update_ms;
 
-static inline uint16_t estimate_unloaded_mv(
-  const struct SharedState* state) {
-  return state->loaded_mv + state->estimated_sag_mv;
-}
+  // what is limiting vgs output
+  enum Limiter limiter;
+
+  // Used for finish screen
+  struct MaxValues max_values;
+};
 
 void state_init(struct SharedState* ss);
 

@@ -21,4 +21,6 @@ void state_change(struct SharedState* ss, enum State s) {
   ss->damage_confirm = 0;
   ss->last_charge_sample_ms = 0;
   ss->charge_mas = 0;
+  ss->limiter = NO_LIMIT;
+  ss->last_response_update_ms = 0;
 }

@@ -1,4 +1,5 @@
 #include "finished.h"
+#include "draining_battery_ui.h"
 #include "power.h"
 
 #define MIN_FINISH_SECONDS 10
@@ -13,7 +14,7 @@ void finished(struct SharedState* state, float finish_display) {
   }
 
   uint16_t finish_seconds = (uint16_t)(
-    (float)state->final_stats.charge_mah * finish_display);
+    (float)state->max_values.charge_mah * finish_display);
   if (finish_seconds < MIN_FINISH_SECONDS) {
     finish_seconds = MIN_FINISH_SECONDS;
   }
@@ -27,9 +28,7 @@ void finished(struct SharedState* state, float finish_display) {
     finish_seconds - elapsed_seconds;
 
   draining_battery_ui_render_finished(
-    &(state->text),
-    &state->final_stats,
-    state->cells,
+    state,
     finish_seconds_left);
 
   if (state->button || (finish_seconds_left == 0)) {
