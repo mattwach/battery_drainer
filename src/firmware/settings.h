@@ -14,10 +14,11 @@ struct VSagSettings {
   uint16_t settle_ms;
 };
 
-struct SlewSettings {
-  float volts;
-  float amps;
-  float celsius;
+struct ResponseSettings {
+  float max_velocity;
+  float min_velocity;
+  float acceleration;
+  float deceleration;
 };
 
 struct GlobalSettings {
@@ -25,7 +26,7 @@ struct GlobalSettings {
   float vcal_ratio;
   struct VSagSettings vsag;
   struct FanSettings fan;
-  struct SlewSettings slew;
+  struct ResponseSettings response;
   float finish_display;
 };
 

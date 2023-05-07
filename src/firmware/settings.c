@@ -53,9 +53,10 @@ static void global_settings_default(struct GlobalSettings* gs) {
   gs->fan.min_celsius = 40;
   gs->fan.max_celsius = 70;
 
-  gs->slew.volts = 15.0;
-  gs->slew.amps = 10.0;
-  gs->slew.celsius = 30.0;
+  gs->response.max_velocity = 10.0;
+  gs->response.min_velocity = 0.05;
+  gs->response.acceleration = 0.1;
+  gs->response.deceleration = 0.5;
 
   gs->finish_display = 1.0;
 }

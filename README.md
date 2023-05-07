@@ -136,7 +136,7 @@ Note that on may fans, using too low of a percent leads to no rotation.
 
 #### Finish Display Time
 
-Use `finish_display <seconds_per_mah>` to configure the number of seconds
+Use `finish_display <mah_ratio>` to configure the number of seconds
 that the finish stats are shown before the unit shuts down.  Example:
 
     finish_display 0.5
@@ -158,51 +158,56 @@ Thus the goal is to reach one of these maximums while staying under the maximum
 for all others.  Which maximum is reached will vary by battery, fan settings, room
 temperature, etc.
 
-Coming up with and tuning an optimal PID algorithm that meets the above requirements would be daunting due to the large number of free variables.  For example we would need to combine all four terms above to define an "error" as
-a starting point, then would still need to determine the PID constants.
+Coming up with and tuning an optimal PID algorithm that meets the above
+requirements would be daunting due to the large number of free variables. For
+example we would need to combine all four terms above to define an "error" as a
+starting point, then would still need to determine the PID constants.
 
 Fortunately, we do not need to system to converge in minimum time.  By relaxing
-this requirement, we can get away with less complex calculations.  Thus we have
+this requirement, we can get away with less complex calculations. 
 
-    fet_slew_volts_seconds <seconds>
-    fet_slew_amps_seconds <seconds>
-    fet_slew_celsius_seconds <seconds>
+The tuning algorithm is an annealing type algorithm where we use the terms
+"velocity" and "acceleration" as a mental model.  As an analogy, imagine trying
+to adjust the volume knob on a friend's stereo.  You would likely start with
+some gross adjustment until you overshoot the mark, then hunt with increasingly
+fine movements until you are satisfied.  If a "loud" commercial comes on,
+you will need to adjust it again - again starting a bit fast and fine tuning.
 
-Which represents the amount of time the FETs will take to go from 0-100% or reverse.
-For example:
+With that in mind, here are the parameters of the algorithm:
 
-    fet_slew_volts_seconds 5.0
-
-Will set the number to 5 seconds for voltage changes, meaning the fets would take 5 seconds to change from 0% to 100% open (or vis versa) if voltage is the controlling property.
-
-Similar for current, and temperature.
-
-So how are all of these combined?  Using the following:
-
-* The initial "open" and "close" seconds are set to the lowest value.
-* If any parameter exceeds its value then the FETs close at it's close seconds and the new open seconds may be raised to that parameters seconds.
+* *max_velocity*  The maximum (and starting) velocity in percent / second
+* *min_velocity* The minumum allow change velocity in percent / second.
+* *deceleration_factor* the amount to decrease the velocity on an overshoot
+  (going past the intended mark): from 0 to max_velocity
+* *acceleration* the amount to increate the velocity (not reaching
+  the intended mark) in percent / second. from 0.0 to max_velocity
 
 Example:
 
+  * max_velocity = 30
+  * min_velocity = 0.05
+  * deceleration = 0.5
+  * acceleration = 0.1
 
-    fet_slew_volt_seconds 10
-    fet_slew_amps_seconds 5
-    fet_slew_celsius_seconds 50
+  say the per sample time is 100ms
 
-Say the updates are happening every 50ms or 20 updates/second.
+  The PWM will scale from 0 percent to 100% at 3% per sample, taking 33 samples
+  or 3.3 seconds to get there.
 
-* The initial `open_seconds` and `close_seconds` are both 5 seconds because this is the minimum value (set by `fet_slew_amps_seconds`).
-* On initial power on, all parameters are OK, thus the FETs will fully open within
-5 seconds.  This equates to a 1% change per update (100 * 0.050 / 5)
-* If the voltage sag becomes too high, the FETs will close at a 0.5% change per
-update (100 * 0.050 / 10).  This will become the new `open_seconds`, even
-when every parameter is met.
-* Likewise, if the temperature becomes too high, the FETs will close at 0.1% per
-update (100 * 0.050 / 50).  This will become the new `open_seconds`, even
-when every parameter is met.
-* Now lets say the sag is again exceeded, the FETs will close at 0.5% per update
-as before but will reopen at 0.1% per seconds as this `open_seconds` was already
-clamped in by the fan exceeding earlier.
+  Say instead we hit a limit on the 10th sample.  PWN at this point would
+  be 3 * 10 = 30%.  The velocity is reversed and decelerated, becoming
+  to (-30 + 0.5) * 0.1 = -2.95% per sample
+
+  On the next sample, PWM will change to 30 - 2.95 = 27.05%  Say that now
+  everything is below threshold.  This means that we may have backed off
+  too far.  Thus we reverse and decelerate again.  The new velocity becomes
+  (29.5 - 0.5) * 0.1 = 2.9% per sample.
+
+  One the next sample, PWM will change to 27.05 + 2.9 = 29.95.  Say that we
+  are still too low.  In that case, the acceleration factor kicks in and
+  the new velocity is not inverted, becoming (29 + 0.1) * 0.1 = 2.91% per sample.
+
+  and so on.
 
 ### Profile Management
 

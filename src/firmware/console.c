@@ -101,9 +101,10 @@ static void dump_global_settings(void) {
   printf("    minimum temp:       %d C\n", g->fan.min_celsius);
   printf("    100%% temp:          %d C\n", g->fan.max_celsius);
   printf("  FET settings:\n");
-  printf("    voltage slew:       %.2f seconds\n", g->slew.volts);
-  printf("    current slew:       %.2f seconds\n", g->slew.amps);
-  printf("    temp slew:          %.2f seconds\n", g->slew.celsius);
+  printf("    max_velocity:       %.2f %% / second\n", g->response.max_velocity);
+  printf("    min_velocity        %.2f %% / second\n", g->response.min_velocity);
+  printf("    acceleration:       %.2f %% / s^2\n", g->response.acceleration);
+  printf("    deceleration:       %.2f %% / s^2\n", g->response.deceleration);
 }
 
 static void dump_profile(int i) {
@@ -162,34 +163,52 @@ static void finish_display_cmd(uint8_t argc, char* argv[]) {
       settings->global.finish_display);
 }
 
-static void fet_slew_volts_seconds_cmd(uint8_t argc, char* argv[]) {
+static void max_velocity_cmd(uint8_t argc, char* argv[]) {
   float v = 0.0;
-  if (!parse_float("volts_slew_seconds", argv[0], 0.1, 60.0, &v)) {
+  if (!parse_float("max_velocity", argv[0], 0.1, 100.0, &v)) {
     return;
   }
-  settings->global.slew.volts = v;
-  printf("volts slew  changed to %.2f seconds (not saved)\n",
-      settings->global.slew.volts);
+  if (v < settings->global.response.min_velocity) {
+    printf("max_velocity can not be less than min_velocity\n");
+    return;
+  }
+  settings->global.response.max_velocity = v;
+  printf("max_velocity changed to %.2f %% / second (not saved)\n",
+      settings->global.response.max_velocity);
 }
 
-static void fet_slew_amps_seconds_cmd(uint8_t argc, char* argv[]) {
+static void min_velocity_cmd(uint8_t argc, char* argv[]) {
   float v = 0.0;
-  if (!parse_float("volts_amps_seconds", argv[0], 0.1, 60.0, &v)) {
+  if (!parse_float("min_velocity", argv[0], 0.1, 10.0, &v)) {
     return;
   }
-  settings->global.slew.amps = v;
-  printf("amps slew  changed to %.2f seconds (not saved)\n",
-      settings->global.slew.amps);
+  if (v > settings->global.response.max_velocity) {
+    printf("min_velocity can not be greater than max_velocity\n");
+    return;
+  }
+  settings->global.response.min_velocity = v;
+  printf("min_velocity changed to %.2f %% / second (not saved)\n",
+      settings->global.response.min_velocity);
 }
 
-static void fet_slew_celsius_seconds_cmd(uint8_t argc, char* argv[]) {
+static void acceleration_cmd(uint8_t argc, char* argv[]) {
   float v = 0.0;
-  if (!parse_float("celsius_amps_seconds", argv[0], 0.1, 60.0, &v)) {
+  if (!parse_float("acceleration", argv[0], 0.001, 10.0, &v)) {
     return;
   }
-  settings->global.slew.celsius = v;
-  printf("celsius slew  changed to %.2f seconds (not saved)\n",
-      settings->global.slew.celsius);
+  settings->global.response.acceleration = v;
+  printf("acceleration changed to %.2f %% / s^2 (not saved)\n",
+      settings->global.response.acceleration);
+}
+
+static void deceleration_cmd(uint8_t argc, char* argv[]) {
+  float v = 0.0;
+  if (!parse_float("deceleration", argv[0], 0.001, 10.0, &v)) {
+    return;
+  }
+  settings->global.response.deceleration = v;
+  printf("deceleration changed to %.2f %% / s^2 (not saved)\n",
+      settings->global.response.deceleration);
 }
 
 static void vcal_cmd(uint8_t argc, char* argv[]) {
@@ -436,20 +455,21 @@ static void per_cell_max_vsag_cmd(uint8_t argc, char* argv[]) {
 
 
 struct ConsoleCallback callbacks[] = {
+    {"acceleration", "Sets FET change undershoot acceleration (% / s^2)", 1, acceleration_cmd},
     {"cell_count", "Sets cell count (0 is auto): <profile_index> <cell_count>", 2, cell_count_cmd},
-    {"discard", "Discard changes / reload flash", 0, discard_cmd},
+    {"deceleration", "Sets FET change overshoot deceleration (% / s^2)", 1, deceleration_cmd},
     {"delete", "Deletes profile <index>", 1, delete_cmd},
+    {"discard", "Discard changes / reload flash", 0, discard_cmd},
     {"duplicate", "Duplicate profile <index> as a new profile", 1, duplicate_cmd},
     {"fan", "Sets fan profile <min_percent> <min_celsius> <max_celsius>", 3, fan_cmd},
-    {"fet_slew_volts_seconds", "Sets the FET response speed for voltage targets <seconds>", 1, fet_slew_volts_seconds_cmd},
-    {"fet_slew_amps_seconds", "Sets the FET response speed for current targets <seconds>", 1, fet_slew_amps_seconds_cmd},
-    {"fet_slew_celsius_seconds", "Sets the FET response speed for temperature targets <seconds>", 1, fet_slew_celsius_seconds_cmd},
     {"finish_display", "Sets the finish display as <seconds_per_mah_drained>", 1, finish_display_cmd},
     {"ical", "Sets the current shunt resistance (ohms)", 1, ical_cmd},
     {"list", "List profile names", 0, list_cmd},
     {"max_amps", "Sets maximum amps: <profile_index> <amps>", 2, max_amps_cmd},
     {"max_celsius", "Sets maximum temperature: <profile_index> <temp>", 2, max_celsius_cmd},
+    {"max_velocity", "Sets the maximum FET change velocity (% / second)", 1, max_velocity_cmd},
     {"max_watts", "Sets maximum power: <profile_index> <watts>", 2, max_watts_cmd},
+    {"min_velocity", "Sets the minimum FET change velocity (% / second)", 1, min_velocity_cmd},
     {"move", "Move a profile: <src_index> <dest_idx>", 2, move_cmd},
     {"name", "Rename a profile: <index> \"<name>\"", 2, name_cmd},
     {"new", "Creates a new profile", 0, new_cmd},
