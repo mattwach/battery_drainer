@@ -21,6 +21,4 @@ void state_change(struct SharedState* ss, enum State s) {
   ss->damage_confirm = 0;
   ss->last_charge_sample_ms = 0;
   ss->charge_mas = 0;
-  ss->vgs_level = 0;
-  vgs_control(0);  // Turn off current as a safety measure
 }

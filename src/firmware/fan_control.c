@@ -25,11 +25,40 @@ void fan_control_init(void) {
   pwm_set_wrap(FAN_PWM_SLICE, WRAP);
 }
 
-void fan_control(uint16_t level) {
+static void set_pwm(const struct SharedState* state) {
   pwm_set_enabled(FAN_PWM_SLICE, 0);
-  if (level == 0) {
+  if (state->fan_level == 0) {
     return;
   }
-  pwm_set_chan_level(FAN_PWM_SLICE, FAN_CHAN, calc_level(level));
+  pwm_set_chan_level(
+    FAN_PWM_SLICE, FAN_CHAN, calc_level(state->fan_level));
   pwm_set_enabled(FAN_PWM_SLICE, 1);
+}
+
+static uint16_t calc_new_level(
+  const struct Settings* settings, const struct SharedState* state) {
+  const struct FanSettings* f = &(settings->global.fan);
+  if (state->temperature_c < f->min_celsius) {
+    return 0;
+  }
+  if (f->min_celsius >= f->max_celsius) {
+    // this would create match errors below
+    return 65535;
+  }
+  const uint32_t percent_base = (uint32_t)f->min_percent * 65535 / 100;
+  const uint32_t percent_range = 65535 - percent_base;
+  const uint32_t percent_add = (
+    percent_range *
+    (state->temperature_c - f->min_celsius) /
+    (f->max_celsius - f->min_celsius));
+  return (uint16_t)(percent_base + percent_add);
+}
+
+void fan_control(
+  const struct Settings* settings, struct SharedState* state) {
+  const uint16_t old_level = state->fan_level;
+  state->fan_level = calc_new_level(settings, state);
+  if (old_level != state->fan_level) {
+    set_pwm(state);
+  }
 }

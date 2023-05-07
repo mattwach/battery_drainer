@@ -34,17 +34,36 @@ void vgs_control_init(void) {
   pwm_set_wrap(PWM_SLICE, WRAP);
 }
 
-void vgs_control(uint16_t level) {
+static void set_level(const struct SharedState* state) {
   pwm_set_enabled(PWM_SLICE, 0);
-  if (level == 0) {
+  if (state->vgs_level == 0) {
     return;
   }
   // note that values >= 32768 are capped at full-on within calc_level
-  pwm_set_chan_level(PWM_SLICE, SLOW_CHAN, calc_level(level));
-  if (level <= 32768) {
+  pwm_set_chan_level(PWM_SLICE, SLOW_CHAN, calc_level(state->vgs_level));
+  if (state->vgs_level <= 32768) {
     pwm_set_chan_level(PWM_SLICE, FAST_CHAN, 0);
   } else {
-    pwm_set_chan_level(PWM_SLICE, FAST_CHAN, calc_level(level - 32768));
+    pwm_set_chan_level(
+      PWM_SLICE, FAST_CHAN, calc_level(state->vgs_level - 32768));
   }
   pwm_set_enabled(PWM_SLICE, 1);
+}
+
+static uint16_t calc_new_level(
+  const struct Settings* settings, const struct SharedState* state) {
+  if (state->state != DRAINING_BATTERY) {
+    return 0;
+  }
+
+  return 0;
+}
+
+void vgs_control(
+  const struct Settings* settings, struct SharedState* state) {
+  const uint16_t old_level = state->vgs_level;
+  state->vgs_level = calc_new_level(settings, state);
+  if (old_level != state->vgs_level) {
+    set_level(state);
+  }
 }

@@ -8,6 +8,7 @@
 #include "finished.h"
 #include "damage_warning.h"
 #include "draining_battery.h"
+#include "fan_control.h"
 #include "power.h"
 #include "profile_selection.h"
 #include "settings.h"
@@ -42,6 +43,7 @@ static void init(void) {
   state_init(&state);
   buttons_init();
   vgs_control_init();
+  fan_control_init();
   adc_init();
   voltage_sense_init();  // call adc_init() first
   current_sense_init();  // call adc_init() first
@@ -52,6 +54,8 @@ static void loop(void) {
   voltage_sense_update(&settings, &state);
   current_sense_update(&settings, &state);
   temperature_sense_update(&settings, &state);
+  fan_control(&settings, &state);
+  vgs_control(&settings, &state);
   buttons_update(&state);
   if (state.state != DRAINING_BATTERY) {
     console_poll(state.vcal_adc_reading);

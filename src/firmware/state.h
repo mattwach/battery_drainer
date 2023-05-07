@@ -55,6 +55,7 @@ struct SharedState {
 
   // ranges 0-65536
   uint16_t vgs_level;
+  uint16_t fan_level;
 
   // Used for finish screen
   struct DrainingBatteryUIFields final_stats;
