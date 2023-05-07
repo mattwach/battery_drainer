@@ -86,6 +86,10 @@ static uint16_t calc_new_level(
     return 0;
   }
 
+  if (state->is_sampling_voltage) {
+    return 0;
+  }
+
   const struct ResponseSettings* r = &(settings->global.response);
 
   if (state->last_response_update_ms == 0) {
