@@ -39,7 +39,7 @@ static void init(void) {
   gpio_set_dir(LED_PIN, GPIO_OUT);
   gpio_put(LED_PIN, 1);
   settings_load(&settings);
-  console_init(&settings);
+  console_init(&settings, &state);
   state_init(&state);
   buttons_init();
   vgs_control_init();
@@ -57,7 +57,7 @@ static void loop(void) {
   fan_control(&settings, &state);
   vgs_control(&settings, &state);
   buttons_update(&state);
-  if (state.state != DRAINING_BATTERY) {
+  if ((state.state != DRAINING_BATTERY) || (state.fake_mv > 0)) {
     console_poll(state.vcal_adc_reading);
   }
   switch (state.state) {

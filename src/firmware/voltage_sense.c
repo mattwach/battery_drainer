@@ -11,6 +11,10 @@ void voltage_sense_init(void) {
 }
 
 void voltage_sense_update(const struct Settings* settings, struct SharedState* state) {
+  if (state->fake_mv) {
+    state->loaded_mv = state->fake_mv;
+    return;
+  }
   adc_select_input(VSENSE_GPIO - ADC_BASE_GPIO);
   state->vcal_adc_reading = adc_read();
   const uint16_t vcal_mv = (uint16_t)((float)state->vcal_adc_reading * settings->global.vcal_ratio);

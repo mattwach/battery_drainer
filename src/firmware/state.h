@@ -57,6 +57,8 @@ struct SharedState {
   // needs to be added to estimate the unloaded voltage
   uint16_t loaded_mv;
   uint16_t last_unloaded_sample_mv;
+  // Thi scan be used for testing without a battery connected
+  uint16_t fake_mv;
 
   uint16_t current_ma;
 

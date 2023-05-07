@@ -10,6 +10,7 @@
 
 static struct ConsoleConfig cc;
 static struct Settings* settings;
+static struct SharedState* state;
 static uint16_t vcal_adc_reading;
 
 static uint8_t parse_int(const char* name, const char* vstr, int min, int max, int* val) {
@@ -340,6 +341,15 @@ static void list_cmd(uint8_t argc, char* argv[]) {
   }
 }
 
+static void fake_mv_cmd(uint8_t argc, char* argv[]) {
+  int v = 0;
+  if (!parse_int("mv", argv[0], 0, 30000, &v)) {
+    return;
+  }
+  state->fake_mv = v;
+  printf("Faking Voltage as %d mV\n", state->fake_mv);
+}
+
 static void max_amps_cmd(uint8_t argc, char* argv[]) {
   int idx = 0;
   if (!parse_int("profile_index", argv[0], 0, settings->profile_count - 1, &idx)) {
@@ -462,6 +472,7 @@ struct ConsoleCallback callbacks[] = {
     {"discard", "Discard changes / reload flash", 0, discard_cmd},
     {"duplicate", "Duplicate profile <index> as a new profile", 1, duplicate_cmd},
     {"fan", "Sets fan profile <min_percent> <min_celsius> <max_celsius>", 3, fan_cmd},
+    {"fake_mv", "If non-zero the system will use the provided mv.  Used for testing.  Be careful!", 1, fake_mv_cmd},
     {"finish_display", "Sets the finish display as <seconds_per_mah_drained>", 1, finish_display_cmd},
     {"ical", "Sets the current shunt resistance (ohms)", 1, ical_cmd},
     {"list", "List profile names", 0, list_cmd},
@@ -485,8 +496,9 @@ struct ConsoleCallback callbacks[] = {
     {"vsag_settle_ms", "Changes how long to let the voltage setting before measuring vsag", 1, vsag_settle_ms_cmd},
 };
 
-void console_init(struct Settings* s) {
+void console_init(struct Settings* s, struct SharedState* ss) {
   settings = s;
+  state = ss;
   uart_console_init(
       &cc,
       callbacks,

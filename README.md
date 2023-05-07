@@ -329,6 +329,12 @@ Use `max_watts <profile_indx> <watts>` to change the maximum allowed wattage (vo
 
     max_watts 1 150
 
+### Testing
+
+The console provides a `fake_mv` command.  If used, the voltage sense logic will provide that value instead
+of the actual voltage reading.  It is useful for doing testing with no battery connected (since you can't
+otherwise make it to the charging screen)  Using this setting with a battery connected is not recommended.
+
 ## Parts list
 
 To see the parts list, open up the schematic in KiCad and look at the "Symbol
