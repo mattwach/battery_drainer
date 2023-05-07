@@ -86,10 +86,6 @@ static uint16_t calc_new_level(
     return 0;
   }
 
-  if (state->is_sampling_voltage) {
-    return 0;
-  }
-
   const struct ResponseSettings* r = &(settings->global.response);
 
   if (state->last_response_update_ms == 0) {
@@ -151,7 +147,11 @@ static uint16_t calc_new_level(
 void vgs_control(
   const struct Settings* settings, struct SharedState* state) {
   const uint16_t old_level = state->vgs_level;
-  state->vgs_level = calc_new_level(settings, state);
+  uint16_t new_level = 0;
+  if (!state->is_sampling_voltage) {
+    new_level = calc_new_level(settings, state);
+    state->vgs_level = new_level;
+  }
   if (old_level != state->vgs_level) {
     set_level(state);
   }

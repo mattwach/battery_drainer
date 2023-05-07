@@ -48,7 +48,7 @@ void voltage_sense_update(const struct Settings* settings, struct SharedState* s
     return;
   }
 
-  if (delta_ms >= settings->global.vsag.interval_seconds) {
+  if (delta_ms >= ((uint32_t)settings->global.vsag.interval_seconds * 1000)) {
     // time to enter the unloaded calculation phase
     state->is_sampling_voltage = 1;
     state->last_voltage_sample_ms = state->uptime_ms;
