@@ -8,6 +8,7 @@ add_executable(
     damage_warning.c
     draining_battery.c
     draining_battery_ui.c
+    fan_control.c
     finished.c
     main.c
     power.c
