@@ -52,6 +52,8 @@ static void global_settings_default(struct GlobalSettings* gs) {
   gs->fan.min_percent = 20;
   gs->fan.min_celsius = 40;
   gs->fan.max_celsius = 70;
+  gs->fan.min_watts = 5;
+  gs->fan.max_watts = 70;
 
   gs->response.max_velocity = 10.0;
   gs->response.min_velocity = 0.05;
@@ -70,9 +72,9 @@ static void init_profile(struct ProfileSettings* ps) {
   ps->cell.damage_mv = 3300;
   ps->cell.max_vsag_mv = 300;
 
-  ps->max_ma = 25000;
+  ps->max_ma = 5000;
   ps->max_celsius = 80;
-  ps->max_watts = 400;
+  ps->max_watts = 100;
 }
 
 void settings_try_add_profile(struct Settings* settings) {

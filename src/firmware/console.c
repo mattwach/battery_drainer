@@ -253,7 +253,7 @@ static void vsag_settle_ms_cmd(uint8_t argc, char* argv[]) {
       settings->global.vsag.settle_ms);
 }
 
-static void fan_cmd(uint8_t argc, char* argv[]) {
+static void fan_temp_cmd(uint8_t argc, char* argv[]) {
   int min_percent = 0;
   if (!parse_int("min_percent", argv[0], 1, 100, &min_percent)) {
     return;
@@ -281,6 +281,36 @@ static void fan_cmd(uint8_t argc, char* argv[]) {
       fan->min_percent,
       fan->min_celsius,
       fan->max_celsius);
+}
+
+static void fan_power_cmd(uint8_t argc, char* argv[]) {
+  int min_percent = 0;
+  if (!parse_int("min_percent", argv[0], 1, 100, &min_percent)) {
+    return;
+  }
+  int min_watts = 0;
+  if (!parse_int("min_watts", argv[1], 1, 1000, &min_watts)) {
+    return;
+  }
+  int max_watts = 0;
+  if (!parse_int("max_watts", argv[2], 1, 1000, &max_watts)) {
+    return;
+  }
+
+  if (min_watts > max_watts) {
+    printf("min_watts must be less than max_watts\n");
+    return;
+  }
+
+  struct FanSettings* fan = &(settings->global.fan);
+  fan->min_percent = (uint8_t)min_percent;
+  fan->min_watts = (uint16_t)min_watts;
+  fan->max_watts = (uint16_t)max_watts;
+
+  printf("fan settings changed.  min %% = %d, min power = %d Watts, 100%% power = %d Watts (not saved)\n",
+      fan->min_percent,
+      fan->min_watts,
+      fan->max_watts);
 }
 
 static void new_cmd(uint8_t argc, char* argv[]) {
@@ -471,7 +501,8 @@ struct ConsoleCallback callbacks[] = {
     {"delete", "Deletes profile <index>", 1, delete_cmd},
     {"discard", "Discard changes / reload flash", 0, discard_cmd},
     {"duplicate", "Duplicate profile <index> as a new profile", 1, duplicate_cmd},
-    {"fan", "Sets fan profile <min_percent> <min_celsius> <max_celsius>", 3, fan_cmd},
+    {"fan_p", "Sets fan power profile <min_percent> <min_watts> <max_watts>", 3, fan_power_cmd},
+    {"fan_t", "Sets fan temperature profile <min_percent> <min_celsius> <max_celsius>", 3, fan_temp_cmd},
     {"fake_mv", "If non-zero the system will use the provided mv.  Used for testing.  Be careful!", 1, fake_mv_cmd},
     {"finish_display", "Sets the finish display as <seconds_per_mah_drained>", 1, finish_display_cmd},
     {"ical", "Sets the current shunt resistance (ohms)", 1, ical_cmd},

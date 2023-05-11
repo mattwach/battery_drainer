@@ -126,11 +126,16 @@ Next is `vsag_settle_ms` which determines how long to allow the battery to recov
 
 #### Fan Settings
 
-Use `fan <min_percent> <min_celsius> <max_celsius>` to control any connected fan(s)
+Use `fan_t <min_percent> <min_celsius> <max_celsius>` to control any connected fan(s)
 At `min_celsius`, the fan(s) will run at `min_percent` and smoothly ramp to
 100% speed at and beyond `max_celsius`. Example:
 
-    fan 20 40 80 
+    fan_t 20 40 80 
+
+Use `fan_p <min_percent> <min_power> <max_power>` to control fans by power output.
+
+The settings for `fan_t` and `fan_p` are active at the same time.  Whichever
+leads to the higher fan speed at a given moment will be used.
 
 Note that on may fans, using too low of a percent leads to no rotation.
 

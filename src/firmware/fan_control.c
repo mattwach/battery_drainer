@@ -35,7 +35,7 @@ static void set_pwm(const struct SharedState* state) {
   pwm_set_enabled(FAN_PWM_SLICE, 1);
 }
 
-static uint16_t calc_new_level(
+static uint16_t calc_new_level_by_temp(
   const struct Settings* settings, const struct SharedState* state) {
   const struct FanSettings* f = &(settings->global.fan);
   if (state->temperature_c < f->min_celsius) {
@@ -52,6 +52,33 @@ static uint16_t calc_new_level(
     (state->temperature_c - f->min_celsius) /
     (f->max_celsius - f->min_celsius));
   return (uint16_t)(percent_base + percent_add);
+}
+
+static uint16_t calc_new_level_by_power(
+  const struct Settings* settings, const struct SharedState* state) {
+  const struct FanSettings* f = &(settings->global.fan);
+  const uint32_t power_watts = state->current_ma * state->loaded_mv / 1000000;
+  if (power_watts < f->min_watts) {
+    return 0;
+  }
+  if (f->min_watts >= f->max_watts) {
+    // this would create match errors below
+    return 65535;
+  }
+  const uint32_t percent_base = (uint32_t)f->min_percent * 65535 / 100;
+  const uint32_t percent_range = 65535 - percent_base;
+  const uint32_t percent_add = (
+    percent_range *
+    (power_watts - f->min_watts) /
+    (f->max_watts - f->min_watts));
+  return (uint16_t)(percent_base + percent_add);
+}
+
+static inline uint16_t calc_new_level(
+  const struct Settings* settings, const struct SharedState* state) {
+    const uint16_t temp_level = calc_new_level_by_temp(settings, state);
+    const uint16_t power_level = calc_new_level_by_power(settings, state);
+    return temp_level > power_level ? temp_level : power_level;
 }
 
 void fan_control(

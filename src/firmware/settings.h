@@ -7,6 +7,8 @@ struct FanSettings {
   uint8_t min_percent;
   uint8_t min_celsius;
   uint8_t max_celsius;
+  uint16_t min_watts;
+  uint16_t max_watts;
 };
 
 struct VSagSettings {
