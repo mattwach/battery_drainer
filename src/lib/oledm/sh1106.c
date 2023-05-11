@@ -5,6 +5,8 @@
 
 #include "oledm_driver_common.inc"
 
+#define ROTATE_180
+
 enum ESH1106Commands
 {
     SH1106_SETLOWCOLUMN     = 0x00,
@@ -105,7 +107,11 @@ void oledm_start(struct OLEDM* display) {
 
   // For proper up to down display, COMSCAN
   // needs to be inverted from default
+#ifdef ROTATE_180
+  oledm_command(SH1106_COMSCANINC, err);
+#else
   oledm_command(SH1106_COMSCANDEC, err);
+#endif
 
   oledm_command(SH1106_SETSTARTLINE | display->start_line, err);
 
@@ -113,8 +119,12 @@ void oledm_start(struct OLEDM* display) {
 
   // For proper left-to-right display, thh SH1106_SEGREMAP
   // needs to be revered from default.
+#ifdef ROTATE_180
+  oledm_command(SH1106_SEGREMAP | 0x00, err);
+#else
   oledm_command(SH1106_SEGREMAP | 0x01, err);
-   
+#endif   
+
   // Default: SH1106_NORMALDISPLAY
   // Default: SH1106_SETMULTIPLEX, 63
   // Default: SH1106_SETDISPLAYOFFSET, 0x00
