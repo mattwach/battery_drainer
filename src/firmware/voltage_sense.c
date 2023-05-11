@@ -2,6 +2,7 @@
 #include "pico/stdlib.h"
 #include "hardware/gpio.h"
 #include "hardware/adc.h"
+//#include <stdio.h>
 
 #define VSENSE_GPIO 26
 #define ADC_BASE_GPIO 26
@@ -38,6 +39,7 @@ void voltage_sense_update(const struct Settings* settings, struct SharedState* s
       state->last_unloaded_sample_mv = voltage_sense(settings, state);
       state->is_sampling_voltage = 0;
       state->last_voltage_sample_ms = state->uptime_ms;  // needed to delay loaded_mv
+      //printf("measure unloaded\n");
     }
     return;
   }
@@ -50,6 +52,7 @@ void voltage_sense_update(const struct Settings* settings, struct SharedState* s
 
   if (delta_ms >= ((uint32_t)settings->global.vsag.interval_seconds * 1000)) {
     // time to enter the unloaded calculation phase
+    //printf("start sampling\n");
     state->is_sampling_voltage = 1;
     state->last_voltage_sample_ms = state->uptime_ms;
     return;

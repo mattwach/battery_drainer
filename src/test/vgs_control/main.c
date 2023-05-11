@@ -15,14 +15,14 @@
 #define FAST_CHAN 0
 #define SLOW_CHAN 1
 
-#define DIVIDER 10
+#define DIVIDER 1
 #define MAX_FREQ 125000000
 #define MAX_PWM_FREQ (MAX_FREQ / DIVIDER)
 
 uint8_t update_status_flag = 1;
-uint32_t freq = 4096;
-uint16_t fast_duty_cycle = 5000;
-uint16_t slow_duty_cycle = 5000;
+uint32_t freq = 32768;
+uint16_t fast_duty_cycle = 0;
+uint16_t slow_duty_cycle = 0;
 
 static uint16_t calc_level(uint16_t duty_cycle, uint16_t wrap) {
   return ((uint32_t)(wrap) * (uint32_t)duty_cycle) / 10000;
