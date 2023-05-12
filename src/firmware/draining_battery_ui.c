@@ -15,10 +15,11 @@ static void render_line0(struct SharedState* ss, uint8_t active) {
     ss->charge_mas / 3600 :
     ss->max_values.charge_mah;
   const uint8_t ah = charge_mah / 1000;
-  const uint8_t ah_frac = (charge_mah / 10) % 100;
+  const uint8_t ah_frac = charge_mah % 1000;
   sprintf(
       line,
-      "%02d:%02d:%02d %2d.%02dAh",
+      //1:03:24 12345mAh
+      "%d:%02d:%02d %05dmAh",
       hours,
       minutes,
       seconds,
