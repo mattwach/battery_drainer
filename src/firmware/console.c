@@ -100,7 +100,9 @@ static void dump_global_settings(void) {
   printf("  fan settings:\n");
   printf("    minimum level:      %d%\n", g->fan.min_percent);
   printf("    minimum temp:       %d C\n", g->fan.min_celsius);
-  printf("    100%% temp:          %d C\n", g->fan.max_celsius);
+  printf("    100%% temp:         %d C\n", g->fan.max_celsius);
+  printf("    minimum watts:      %d Watts\n", g->fan.min_watts);
+  printf("    100%% watts:        %d Watts\n", g->fan.max_watts);
   printf("  FET settings:\n");
   printf("    max_velocity:       %.2f %% / second\n", g->response.max_velocity);
   printf("    min_velocity        %.2f %% / second\n", g->response.min_velocity);

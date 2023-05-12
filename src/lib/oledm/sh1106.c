@@ -5,7 +5,7 @@
 
 #include "oledm_driver_common.inc"
 
-#define ROTATE_180
+//#define ROTATE_180
 
 enum ESH1106Commands
 {
