@@ -73,6 +73,12 @@ void draining_battery(
 
   draining_battery_ui_render_active(state);
 
+  if ((state->last_unloaded_sample_mv > 0) &&
+      (state->last_unloaded_sample_mv <= state->target_mv)) {
+    // Battery has reached it's target voltage.
+    abort_charge(state);
+  }
+
   if (state->button) {
     abort_charge(state);
   }
