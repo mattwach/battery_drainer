@@ -43,7 +43,7 @@ static void render_line1_active(struct SharedState* ss) {
   const uint8_t volts_frac = (ss->loaded_mv / 100) % 10;
   sprintf(line, "%2d.%dV", volts, volts_frac);
   text->options =
-    ss->limiter == VOLTAGE_SAG_LIMIT ?
+    ss->voltage_sag_limited_ms > ss->uptime_ms ?
     TEXT_OPTION_INVERTED :
     0x00;
   text_strLen(text, line, 5);
@@ -92,7 +92,7 @@ static void render_line2(struct SharedState* ss, uint8_t active) {
   text->row = 4;
   text->column = 0;
   text->options =
-    ss->limiter == CURRENT_LIMIT ?
+    ss->current_limited_ms > ss->uptime_ms ?
     TEXT_OPTION_INVERTED :
     0x00;
   sprintf(line, "%2d.%dA", amps, amps_frac);
@@ -102,7 +102,7 @@ static void render_line2(struct SharedState* ss, uint8_t active) {
   text_strLen(text, "      ", 6);
 
   text->options =
-   ss->limiter == POWER_LIMIT ?
+   ss->power_limited_ms > ss->uptime_ms ?
    TEXT_OPTION_INVERTED :
    0x00;
   const uint16_t power_watts =
@@ -120,7 +120,7 @@ static void render_line3(struct SharedState* ss, uint8_t active) {
   text->row = 6;
   text->column = 0;
   text->options =
-    ss->limiter == TEMPERATURE_LIMIT ?
+    ss->temperature_limited_ms > ss->uptime_ms ?
     TEXT_OPTION_INVERTED :
     0x00;
   const uint8_t temp_c =

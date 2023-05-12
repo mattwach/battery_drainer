@@ -21,14 +21,6 @@ enum State {
 #define OLED_ROWS 4
 #define OLED_COLUMNS 16
 
-enum Limiter {
-  NO_LIMIT,
-  VOLTAGE_SAG_LIMIT,
-  CURRENT_LIMIT,
-  POWER_LIMIT,
-  TEMPERATURE_LIMIT,
-};
-
 struct MaxValues {
   uint16_t time_seconds;
   uint16_t charge_mah;
@@ -83,8 +75,13 @@ struct SharedState {
   float velocity;
   uint32_t last_response_update_ms;
 
-  // what is limiting vgs output
-  enum Limiter limiter;
+  // If something limits output, a timer is set
+  // where that parameter is shown highlighted until
+  // the time is exceeded.  This avoid flickering
+  uint32_t voltage_sag_limited_ms;
+  uint32_t current_limited_ms;
+  uint32_t power_limited_ms;
+  uint32_t temperature_limited_ms;
 
   // Used for finish screen
   struct MaxValues max_values;

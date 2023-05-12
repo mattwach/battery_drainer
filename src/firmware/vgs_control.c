@@ -19,6 +19,9 @@
 #define FREQ 10000
 #define WRAP (MAX_FREQ / FREQ)
 
+// how long to highlight a transient limiter
+#define SHOW_LIMIT_MS 500
+
 // duty cycle ranges from 0-32767
 static inline uint16_t calc_level(uint16_t duty_cycle) {
   if (duty_cycle >= 32767) {
@@ -50,22 +53,28 @@ static void set_level(const struct SharedState* state) {
   pwm_set_enabled(PWM_SLICE, 1);
 }
 
-static enum Limiter find_limiter(
-  const struct Settings* settings, const struct SharedState* state) {
+static uint8_t find_limiters(
+  const struct Settings* settings, struct SharedState* state) {
     const struct ProfileSettings* ps =
         settings->profile + state->active_profile_index;
 
+    const uint32_t deadline_ms = state->uptime_ms + SHOW_LIMIT_MS;
+    uint8_t something_limited = 0;
+
     if (state->current_ma > ps->max_ma) {
-      return CURRENT_LIMIT;
+      state->current_limited_ms = deadline_ms;
+      something_limited = 1;
     }
 
     if (state->temperature_c > ps->max_celsius) {
-      return TEMPERATURE_LIMIT;
+      state->temperature_limited_ms = deadline_ms;
+      something_limited = 1;
     }
 
     const uint32_t power = state->current_ma * state->loaded_mv / 1000000;
     if (power > ps->max_watts) {
-      return POWER_LIMIT;
+      state->power_limited_ms = deadline_ms;
+      something_limited = 1;
     }
 
     const uint16_t sag_mv =
@@ -74,10 +83,11 @@ static enum Limiter find_limiter(
       0;
     const uint16_t per_cell_sag_mv = sag_mv / state->cells;
     if (per_cell_sag_mv > ps->cell.max_vsag_mv) {
-      return VOLTAGE_SAG_LIMIT;
+      state->voltage_sag_limited_ms = deadline_ms;
+      something_limited = 1;
     }
 
-    return NO_LIMIT;
+    return something_limited;
 }
 
 static uint16_t calc_new_level(
@@ -94,9 +104,9 @@ static uint16_t calc_new_level(
     return 0;
   }
 
-  state->limiter = find_limiter(settings, state);
+  const uint8_t something_limited = find_limiters(settings, state);
 
-  if (state->limiter == NO_LIMIT) {
+  if (!something_limited) {
     if (state->velocity > 0) {
       // ok, but nothing is maximized.  example 10 -> 11
       state->velocity += r->acceleration;
