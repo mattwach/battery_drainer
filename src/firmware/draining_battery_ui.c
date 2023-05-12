@@ -132,17 +132,30 @@ static void render_line3(struct SharedState* ss, uint8_t active) {
   text_strLen(text, line, 4);
   text->options = 0x00;
 
-  uint8_t fet_percent =
-    active ? (uint8_t)(((uint32_t)ss->vgs_level * 100) / 65535) :
+  uint8_t fet_centi_percent =
+    active ? (uint8_t)(((uint32_t)ss->vgs_level * 100) / 655) :
     ss->max_values.fet_percent;
   if (active && ss->is_sampling_voltage) {
-    fet_percent = 0;
+    fet_centi_percent = 0;
   }
   const uint8_t fan_percent =
     active ? (uint8_t)(((uint32_t)ss->fan_level * 100) / 65535) :
     ss->max_values.fan_percent;
-  sprintf(line, " P%3d%% F%3d%%", fet_percent, fan_percent);
-  text_strLen(text, line, 12);
+
+  if ((fet_centi_percent > 0) && (fet_centi_percent < 100)) {
+    // " P.12%"
+    sprintf(line, " P.%02d%%", fet_centi_percent % 100);
+  } else if ((fet_centi_percent > 100) && (fet_centi_percent < 1000)) {
+    // " P1.2%"
+    sprintf(line, " P%d.%d%%", fet_centi_percent / 100, (fet_centi_percent / 10) % 10);
+  } else {
+    // " P 12%"
+    sprintf(line, " P%3d%%", fet_centi_percent / 100);
+  }
+  text_strLen(text, line, 6);
+
+  sprintf(line, " F%3d%%", fan_percent);
+  text_strLen(text, line, 6);
 }
 
 void draining_battery_ui_render_active(struct SharedState* state) {
