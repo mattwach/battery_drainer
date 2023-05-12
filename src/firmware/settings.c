@@ -221,7 +221,7 @@ void settings_calc_voltage_and_cell_count(
   if (ps->cell.target_mv == 0) {
     return;
   }
-  uint32_t cells = ps->cell_count > 0 ? ps->cell_count : current_mv / ps->cell.target_mv;
+  uint32_t cells = ps->cell_count > 0 ? ps->cell_count : current_mv / (ps->cell.target_mv - 150);
   if (cells > 6) {
       // Target_mv must be too low for the calculation to work
     return;
