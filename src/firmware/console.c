@@ -92,13 +92,13 @@ static void dump_global_settings(void) {
   const struct GlobalSettings* g = &(settings->global);
   printf("Global settings:\n");
   printf("  ical:                 %d milliOhms\n", g->ical_mohms);
-  printf("  vcal ratio:           %.4f\n", g->vcal_ratio);
-  printf("  finish display:       %.1f * mah_drained\n", g->finish_display);
+  printf("  vcal:                 %.4f ADC/mV\n", g->vcal_ratio);
+  printf("  finish_display:       %.1f * mah_drained\n", g->finish_display);
   printf("  voltage sag:\n");
   printf("    interval:           %d seconds\n", g->vsag.interval_seconds);
   printf("    settle time:        %d ms\n", g->vsag.settle_ms);
   printf("  fan settings:\n");
-  printf("    minimum level:      %d%\n", g->fan.min_percent);
+  printf("    minimum level:      %d%%\n", g->fan.min_percent);
   printf("    minimum temp:       %d C\n", g->fan.min_celsius);
   printf("    100%% temp:         %d C\n", g->fan.max_celsius);
   printf("    minimum watts:      %d Watts\n", g->fan.min_watts);
@@ -116,18 +116,18 @@ static void dump_profile(int i) {
   printf("Profile %d:\n", i);
   printf("  name:           %s\n", p->name);
   printf("  vdrop:          %d mV\n", p->drop_mv);
-  printf("  max current:    %.1f A\n", (float)p->max_ma / 1000.0);
-  printf("  max temp:       %d C\n", p->max_celsius);
-  printf("  max power:      %d Watts\n", p->max_watts);
+  printf("  max_amps:       %.1f A\n", (float)p->max_ma / 1000.0);
+  printf("  max_celsuis:      %d C\n", p->max_celsius);
+  printf("  max_watts:        %d Watts\n", p->max_watts);
   if (p->cell_count) {
     printf("  cell_count:     %d\n", p->cell_count);
   } else {
     printf("  cell_count:     AUTO\n");
   }
   printf("  per_cell:\n");
-  printf("    target volts: %d mV\n", p->cell.target_mv);
-  printf("    damage volts: %d mV\n", p->cell.damage_mv);
-  printf("    max sag:      %d mV\n", p->cell.max_vsag_mv);
+  printf("    target_volts: %d mV\n", p->cell.target_mv);
+  printf("    damage_volts: %d mV\n", p->cell.damage_mv);
+  printf("    max_vsag:     %d mV\n", p->cell.max_vsag_mv);
 }
 
 static void show_cmd(uint8_t argc, char* argv[]) {
@@ -497,23 +497,23 @@ static void per_cell_max_vsag_cmd(uint8_t argc, char* argv[]) {
 
 
 struct ConsoleCallback callbacks[] = {
-    {"acceleration", "Sets FET change undershoot acceleration (% / s^2)", 1, acceleration_cmd},
     {"cell_count", "Sets cell count (0 is auto): <profile_index> <cell_count>", 2, cell_count_cmd},
-    {"deceleration", "Sets FET change overshoot deceleration (% / s^2)", 1, deceleration_cmd},
     {"delete", "Deletes profile <index>", 1, delete_cmd},
     {"discard", "Discard changes / reload flash", 0, discard_cmd},
     {"duplicate", "Duplicate profile <index> as a new profile", 1, duplicate_cmd},
-    {"fan_p", "Sets fan power profile <min_percent> <min_watts> <max_watts>", 3, fan_power_cmd},
-    {"fan_t", "Sets fan temperature profile <min_percent> <min_celsius> <max_celsius>", 3, fan_temp_cmd},
+    {"fan_celsius", "Sets fan temperature profile <min_percent> <min_celsius> <max_celsius>", 3, fan_temp_cmd},
+    {"fan_watts", "Sets fan power profile <min_percent> <min_watts> <max_watts>", 3, fan_power_cmd},
     {"fake_mv", "If non-zero the system will use the provided mv.  Used for testing.  Be careful!", 1, fake_mv_cmd},
     {"finish_display", "Sets the finish display as <seconds_per_mah_drained>", 1, finish_display_cmd},
+    {"fet_acceleration", "Sets FET change undershoot acceleration (% / s^2)", 1, acceleration_cmd},
+    {"fet_deceleration", "Sets FET change overshoot deceleration (% / s^2)", 1, deceleration_cmd},
+    {"fet_min_velocity", "Sets the minimum FET change velocity (% / second)", 1, min_velocity_cmd},
+    {"fet_max_velocity", "Sets the maximum FET change velocity (% / second)", 1, max_velocity_cmd},
     {"ical", "Sets the current shunt resistance (ohms)", 1, ical_cmd},
     {"list", "List profile names", 0, list_cmd},
     {"max_amps", "Sets maximum amps: <profile_index> <amps>", 2, max_amps_cmd},
     {"max_celsius", "Sets maximum temperature: <profile_index> <temp>", 2, max_celsius_cmd},
-    {"max_velocity", "Sets the maximum FET change velocity (% / second)", 1, max_velocity_cmd},
     {"max_watts", "Sets maximum power: <profile_index> <watts>", 2, max_watts_cmd},
-    {"min_velocity", "Sets the minimum FET change velocity (% / second)", 1, min_velocity_cmd},
     {"move", "Move a profile: <src_index> <dest_idx>", 2, move_cmd},
     {"name", "Rename a profile: <index> \"<name>\"", 2, name_cmd},
     {"new", "Creates a new profile", 0, new_cmd},
@@ -524,7 +524,7 @@ struct ConsoleCallback callbacks[] = {
     {"save", "Write configuration to flash memory", 0, save_cmd},
     {"show", "Display settings", -1, show_cmd},
     {"vcal", "Calibrates the voltage ratio", 1, vcal_cmd},
-    {"vdrop", "Sets voltage drop: <profile_index> <voltage_drop>", 2, vdrop_cmd},
+    {"vdrop_mv", "Sets voltage drop: <profile_index> <voltage_drop>", 2, vdrop_cmd},
     {"vsag_interval_seconds", "Changes how often to check vsag", 1, vsag_interval_seconds_cmd},
     {"vsag_settle_ms", "Changes how long to let the voltage setting before measuring vsag", 1, vsag_settle_ms_cmd},
 };

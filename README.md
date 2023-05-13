@@ -126,13 +126,13 @@ Next is `vsag_settle_ms` which determines how long to allow the battery to recov
 
 #### Fan Settings
 
-Use `fan_t <min_percent> <min_celsius> <max_celsius>` to control any connected fan(s)
+Use `fan_celsius <min_percent> <min_celsius> <max_celsius>` to control any connected fan(s)
 At `min_celsius`, the fan(s) will run at `min_percent` and smoothly ramp to
 100% speed at and beyond `max_celsius`. Example:
 
     fan_t 20 40 80 
 
-Use `fan_p <min_percent> <min_power> <max_power>` to control fans by power output.
+Use `fan_watts <min_percent> <min_watts> <max_watts>` to control fans by power output.
 
 The settings for `fan_t` and `fan_p` are active at the same time.  Whichever
 leads to the higher fan speed at a given moment will be used.
@@ -184,15 +184,15 @@ With that in mind, here are the parameters of the algorithm:
 * *min_velocity* The minumum allow change velocity in percent / second.
 * *deceleration_factor* the amount to decrease the velocity on an overshoot
   (going past the intended mark): from 0 to max_velocity
-* *acceleration* the amount to increate the velocity (not reaching
+* *acceleration* the amount to increase the velocity (not reaching
   the intended mark) in percent / second. from 0.0 to max_velocity
 
 Example:
 
-  * max_velocity = 30
-  * min_velocity = 0.05
-  * deceleration = 0.5
-  * acceleration = 0.1
+  * fet_max_velocity = 30
+  * fet_min_velocity = 0.05
+  * fet_deceleration = 0.5
+  * fet_acceleration = 0.1
 
   say the per sample time is 100ms
 
