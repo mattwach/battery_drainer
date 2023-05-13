@@ -43,6 +43,10 @@ static uint16_t calc_new_level_by_temp(
     // this would create match errors below
     return 65535;
   }
+  if (state->temperature_c > f->max_celsius) {
+    // full power
+    return 65535;
+  }
   const uint32_t percent_base = (uint32_t)f->min_percent * 65535 / 100;
   const uint32_t percent_range = 65535 - percent_base;
   const uint32_t percent_add = (
@@ -65,6 +69,10 @@ static uint16_t calc_new_level_by_power(
   if (f->min_watts >= f->max_watts) {
     // this would create match errors below
     return 65535;
+  }
+  if (power_watts > f->max_watts) {
+    // full power
+    retturn 65535;
   }
   const uint32_t percent_base = (uint32_t)f->min_percent * 65535 / 100;
   const uint32_t percent_range = 65535 - percent_base;
