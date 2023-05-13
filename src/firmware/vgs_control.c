@@ -39,9 +39,6 @@ void vgs_control_init(void) {
 
 static void set_level(uint16_t new_level) {
   pwm_set_enabled(PWM_SLICE, 0);
-  if (new_level == 0) {
-    return;
-  }
   // note that values >= 32768 are capped at full-on within calc_level
   pwm_set_chan_level(PWM_SLICE, SLOW_CHAN, calc_level(new_level));
   if (new_level <= 32768) {
