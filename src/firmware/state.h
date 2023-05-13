@@ -4,6 +4,7 @@
 #include <inttypes.h>
 #include <oledm/oledm.h>
 #include <oledm/text.h>
+#include "uint16_avg.h"
 
 enum State {
   CONDITION_MET_MESSAGE,
@@ -70,8 +71,8 @@ struct SharedState {
   // ranges 0-65536
   uint16_t vgs_level;
   uint16_t fan_level;
-  // used to control fan change rate
-  uint32_t next_fan_change_ms;
+  // average power level, used to dampen fan speed changes
+  struct Uint16Avg avg_power_watts;
 
   // response state
   float velocity;
