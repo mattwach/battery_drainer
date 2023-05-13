@@ -72,7 +72,7 @@ static uint16_t calc_new_level_by_power(
   }
   if (power_watts > f->max_watts) {
     // full power
-    retturn 65535;
+    return 65535;
   }
   const uint32_t percent_base = (uint32_t)f->min_percent * 65535 / 100;
   const uint32_t percent_range = 65535 - percent_base;
