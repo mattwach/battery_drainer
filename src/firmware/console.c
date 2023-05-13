@@ -524,7 +524,7 @@ struct ConsoleCallback callbacks[] = {
     {"save", "Write configuration to flash memory", 0, save_cmd},
     {"show", "Display settings", -1, show_cmd},
     {"vcal", "Calibrates the voltage ratio", 1, vcal_cmd},
-    {"vdrop_mv", "Sets voltage drop: <profile_index> <voltage_drop>", 2, vdrop_cmd},
+    {"vdrop", "Sets voltage drop: <profile_index> <voltage_drop>", 2, vdrop_cmd},
     {"vsag_interval_seconds", "Changes how often to check vsag", 1, vsag_interval_seconds_cmd},
     {"vsag_settle_ms", "Changes how long to let the voltage setting before measuring vsag", 1, vsag_settle_ms_cmd},
 };
