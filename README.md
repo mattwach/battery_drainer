@@ -1,5 +1,5 @@
-# lipo_battery_drainer
-This project describes hardware to safely discharge LIPO batteries to storage levels
+# battery_drainer
+This project describes hardware to safely discharge batteries to storage levels
 
 # WARNING
 
@@ -508,7 +508,7 @@ the power dissipation via FAST and SLOW PWM signals (as described earlier).
 
 [falstad model](https://tinyurl.com/22wuu5mp)
 
-The LIPO drainer is designed to draw nearly zero power (outside of parasitic
+The battery drainer is designed to draw nearly zero power (outside of parasitic
 losses) when it is off, including after the discharging has completed.  Thus the
 user can leave the unit unattended (assuming the needed precautions have been
 taken) without concern of overdraining.
@@ -549,7 +549,7 @@ supported with appropriate firmware.
 
 ### Fan connection
 
-The LIPO generator effectively converts battery energy to heat, thus you'll need
+The battery drainer effectively converts battery energy to heat, thus you'll need
 a cooling strategy to avoid overheating and damaging the discharge circuit.
 Like cooling other devices such as CPUs and GPUs, a passive solution is
 sometimes adequate and an active solution is often needed.
