@@ -33,12 +33,13 @@ static inline uint16_t calc_level(uint16_t duty_cycle) {
 void vgs_control_init(void) {
   gpio_set_function(FAST_GPIO, GPIO_FUNC_PWM);
   gpio_set_function(SLOW_GPIO, GPIO_FUNC_PWM);
-  pwm_set_enabled(PWM_SLICE, 0);
   pwm_set_wrap(PWM_SLICE, WRAP);
+  pwm_set_chan_level(PWM_SLICE, SLOW_CHAN, 0);
+  pwm_set_chan_level(PWM_SLICE, FAST_CHAN, 0);
+  pwm_set_enabled(PWM_SLICE, 1);
 }
 
 static void set_level(uint16_t new_level) {
-  pwm_set_enabled(PWM_SLICE, 0);
   // note that values >= 32768 are capped at full-on within calc_level
   pwm_set_chan_level(PWM_SLICE, SLOW_CHAN, calc_level(new_level));
   if (new_level <= 32768) {
@@ -47,7 +48,6 @@ static void set_level(uint16_t new_level) {
     pwm_set_chan_level(
       PWM_SLICE, FAST_CHAN, calc_level(new_level - 32768));
   }
-  pwm_set_enabled(PWM_SLICE, 1);
 }
 
 static uint8_t find_limiters(
@@ -154,11 +154,8 @@ static uint16_t calc_new_level(
 void vgs_control(
   const struct Settings* settings, struct SharedState* state) {
   if (!state->is_sampling_voltage) {
-    const uint16_t new_level = calc_new_level(settings, state);
-    if (new_level != state->vgs_level) {
-      set_level(new_level);
-      state->vgs_level = new_level;
-    }
+    state->vgs_level = calc_new_level(settings, state);
+    set_level(state->vgs_level);
   } else {
     set_level(0);
   }
