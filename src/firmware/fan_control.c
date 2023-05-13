@@ -10,6 +10,11 @@
 #define FAN_PWM_SLICE 5
 #define FAN_CHAN 0
 
+// how often the fan speed is allowed to change
+#define MIN_FAN_CHANGE_MS 1000
+// how much the fan is allowed to change (0-65535)
+#define MAX_FAN_CHANGE 6554
+
 #define MAX_FREQ 125000000
 #define FREQ 25000
 #define WRAP (MAX_FREQ / FREQ)
@@ -49,7 +54,7 @@ static uint16_t calc_new_level_by_temp(
   const uint32_t percent_range = 65535 - percent_base;
   const uint32_t percent_add = (
     percent_range *
-    (state->temperature_c - f->min_celsius) /
+    (uint32_t)(state->temperature_c - f->min_celsius) /
     (f->max_celsius - f->min_celsius));
   return (uint16_t)(percent_base + percent_add);
 }
@@ -69,12 +74,12 @@ static uint16_t calc_new_level_by_power(
   const uint32_t percent_range = 65535 - percent_base;
   const uint32_t percent_add = (
     percent_range *
-    (power_watts - f->min_watts) /
+    (uint32_t)(power_watts - f->min_watts) /
     (f->max_watts - f->min_watts));
   return (uint16_t)(percent_base + percent_add);
 }
 
-static inline uint16_t calc_new_level(
+static inline int32_t calc_new_level(
   const struct Settings* settings, const struct SharedState* state) {
     const uint16_t temp_level = calc_new_level_by_temp(settings, state);
     const uint16_t power_level = calc_new_level_by_power(settings, state);
@@ -83,9 +88,32 @@ static inline uint16_t calc_new_level(
 
 void fan_control(
   const struct Settings* settings, struct SharedState* state) {
-  const uint16_t old_level = state->fan_level;
-  state->fan_level = calc_new_level(settings, state);
-  if (old_level != state->fan_level) {
-    set_pwm(state);
+  if (state->uptime_ms < state->next_fan_change_ms) {
+    return;
   }
+  state->next_fan_change_ms = state->uptime_ms + MIN_FAN_CHANGE_MS;
+
+  const int32_t old_level = state->fan_level;
+  int32_t level = calc_new_level(settings, state); 
+  int32_t difference = level - old_level;
+
+  if (difference > 0) {
+    if (difference > MAX_FAN_CHANGE) {
+      difference = MAX_FAN_CHANGE;
+    }
+  } else {
+    if (difference < -MAX_FAN_CHANGE) {
+      difference = -MAX_FAN_CHANGE;
+    }
+  }
+  level += difference;
+
+  if (level <= settings->global.fan.min_percent) {
+    level = 0;
+  } else if (level >= 0xFFFF) {
+    level = 0xFFFF;
+  }
+
+  state->fan_level = level;
+  set_pwm(state);
 }

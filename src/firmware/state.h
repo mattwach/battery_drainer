@@ -70,6 +70,8 @@ struct SharedState {
   // ranges 0-65536
   uint16_t vgs_level;
   uint16_t fan_level;
+  // used to control fan change rate
+  uint32_t next_fan_change_ms;
 
   // response state
   float velocity;
