@@ -1,7 +1,6 @@
 #include "vgs_control.h"
 #include "pico/stdlib.h"
 #include "hardware/pwm.h"
-#include "uint16_avg.h"
 
 #define FAST_GPIO 16
 #define SLOW_GPIO 17
@@ -62,9 +61,7 @@ static uint8_t find_limiters(
     const uint32_t deadline_ms = state->uptime_ms + SHOW_LIMIT_MS;
     uint8_t something_limited = 0;
 
-    const uint16_t avg_ma = uint16_avg_get(&(state->avg_ma));
-
-    if (avg_ma > ps->max_ma) {
+    if (state->current_ma > ps->max_ma) {
       state->current_limited_ms = deadline_ms;
       something_limited = 1;
     }
@@ -74,7 +71,7 @@ static uint8_t find_limiters(
       something_limited = 1;
     }
 
-    const uint32_t power = avg_ma * state->loaded_mv / 1000000;
+    const uint32_t power = state->current_ma * state->loaded_mv / 1000000;
     if (power > ps->max_watts) {
       state->power_limited_ms = deadline_ms;
       something_limited = 1;

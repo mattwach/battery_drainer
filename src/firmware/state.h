@@ -4,7 +4,6 @@
 #include <inttypes.h>
 #include <oledm/oledm.h>
 #include <oledm/text.h>
-#include "uint16_avg.h"
 
 enum State {
   CONDITION_MET_MESSAGE,
@@ -25,7 +24,7 @@ enum State {
 struct MaxValues {
   uint16_t time_seconds;
   uint16_t charge_mah;
-  uint16_t avg_ma;
+  uint16_t current_ma;
   uint16_t power_watts;
   uint8_t temperature_c;
   uint8_t fet_percent;
@@ -55,7 +54,7 @@ struct SharedState {
   // Thi scan be used for testing without a battery connected
   uint16_t fake_mv;
 
-  struct Uint16Avg avg_ma;
+  uint16_t current_ma;
 
   // mah would not allow for incremental accumulation so we use
   // mas (milliamp seconds) instead.

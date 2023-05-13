@@ -1,7 +1,6 @@
 #include "draining_battery.h"
 
 #include "draining_battery_ui.h"
-#include "uint16_avg.h"
 
 // how often to accumulate into charge_mas
 // at a rating of 100ms, there needs to me at least 5ma
@@ -35,10 +34,9 @@ static void update_final_stats(struct SharedState* ss) {
   struct MaxValues* mv = &(ss->max_values);
   max16((ss->uptime_ms - ss->state_started_ms) / 1000, &(mv->time_seconds));
   max16(ss->charge_mas / 3600, &(mv->charge_mah));
-  const uint16_t avg_ma = uint16_avg_get(&(ss->avg_ma));
-  max16(avg_ma, &(mv->avg_ma));
+  max16(ss->current_ma, &(mv->current_ma));
   max16(
-    ss->loaded_mv * avg_ma / 1000000,
+    ss->loaded_mv * ss->current_ma / 1000000,
     &(mv->power_watts));
   max8(ss->temperature_c, &(mv->temperature_c));
   max8(
@@ -53,8 +51,7 @@ static void accumulate_charge(struct SharedState* state) {
   const uint32_t ms_elapsed = state->uptime_ms - state->last_charge_sample_ms;
   // we assume that whatever ma we are at now was the value over the
   // last ms_elapsed
-  const uint16_t avg_ma = uint16_avg_get(&(state->avg_ma));
-  const uint32_t mas_accumulated = (avg_ma * ms_elapsed) / 1000;
+  const uint32_t mas_accumulated = (state->current_ma * ms_elapsed) / 1000;
   state->charge_mas += mas_accumulated;
   state->last_charge_sample_ms = state->uptime_ms;
 }
