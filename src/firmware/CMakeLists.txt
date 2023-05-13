@@ -1,7 +1,7 @@
 add_compile_options( -DI2C_WRITE_BUFFER_SIZE=2048 )
 
 add_executable(
-    lipo_battery_drainer
+    battery_drainer
     buttons.c
     console.c
     current_sense.c
@@ -24,7 +24,7 @@ add_executable(
 )
 
 target_link_libraries(
-    lipo_battery_drainer
+    battery_drainer
     FIXED_TEXT_TERMINUS8X16
     hardware_adc
     hardware_flash
@@ -38,9 +38,9 @@ target_link_libraries(
 )
 
 # enable usb output, disable uart output
-pico_enable_stdio_usb(lipo_battery_drainer 1)
-pico_enable_stdio_uart(lipo_battery_drainer 0)
+pico_enable_stdio_usb(battery_drainer 1)
+pico_enable_stdio_uart(battery_drainer 0)
 
-pico_add_extra_outputs(lipo_battery_drainer)
+pico_add_extra_outputs(battery_drainer)
 
 
