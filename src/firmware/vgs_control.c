@@ -37,18 +37,18 @@ void vgs_control_init(void) {
   pwm_set_wrap(PWM_SLICE, WRAP);
 }
 
-static void set_level(const struct SharedState* state) {
+static void set_level(uint16_t new_level) {
   pwm_set_enabled(PWM_SLICE, 0);
-  if (state->vgs_level == 0) {
+  if (new_level == 0) {
     return;
   }
   // note that values >= 32768 are capped at full-on within calc_level
-  pwm_set_chan_level(PWM_SLICE, SLOW_CHAN, calc_level(state->vgs_level));
-  if (state->vgs_level <= 32768) {
+  pwm_set_chan_level(PWM_SLICE, SLOW_CHAN, calc_level(new_level));
+  if (new_level <= 32768) {
     pwm_set_chan_level(PWM_SLICE, FAST_CHAN, 0);
   } else {
     pwm_set_chan_level(
-      PWM_SLICE, FAST_CHAN, calc_level(state->vgs_level - 32768));
+      PWM_SLICE, FAST_CHAN, calc_level(new_level - 32768));
   }
   pwm_set_enabled(PWM_SLICE, 1);
 }
@@ -156,14 +156,14 @@ static uint16_t calc_new_level(
 
 void vgs_control(
   const struct Settings* settings, struct SharedState* state) {
-  const uint16_t old_level = state->vgs_level;
-  uint16_t new_level = 0;
   if (!state->is_sampling_voltage) {
-    new_level = calc_new_level(settings, state);
-    state->vgs_level = new_level;
-  }
-  if (old_level != state->vgs_level) {
-    set_level(state);
+    const uint16_t new_level = calc_new_level(settings, state);
+    if (new_level != state->vgs_level) {
+      set_level(new_level);
+      state->vgs_level = new_level;
+    }
+  } else {
+    set_level(0);
   }
   state->last_response_update_ms = state->uptime_ms;
 }

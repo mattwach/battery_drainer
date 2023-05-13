@@ -130,8 +130,8 @@ static void render_line3(struct SharedState* ss, uint8_t active) {
   text->options = 0x00;
 
   uint8_t fet_centi_percent =
-    active ? (uint8_t)(((uint32_t)ss->vgs_level * 100) / 655) :
-    ss->max_values.fet_percent;
+    active ? (uint8_t)(((uint32_t)(ss->vgs_level) * 100) / 655) :
+    ss->max_values.fet_percent * 100;
   if (active && ss->is_sampling_voltage) {
     fet_centi_percent = 0;
   }
