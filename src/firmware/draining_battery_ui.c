@@ -14,17 +14,14 @@ static void render_line0(struct SharedState* ss, uint8_t active) {
   const uint32_t charge_mah = active ?
     ss->charge_mas / 3600 :
     ss->max_values.charge_mah;
-  const uint8_t ah = charge_mah / 1000;
-  const uint8_t ah_frac = charge_mah % 1000;
   sprintf(
       line,
       //1:03:24 12345mAh
-      "%d:%02d:%02d %05dmAh",
+      "%d:%02d:%02d %5dmAh",
       hours,
       minutes,
       seconds,
-      ah,
-      ah_frac);
+      charge_mah);
   struct Text* text = &(ss->text);
   text->row = 0;
   text->column = 0;
