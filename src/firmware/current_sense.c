@@ -1,4 +1,5 @@
 #include "current_sense.h"
+#include "uint16_avg.h"
 #include "pico/stdlib.h"
 #include "hardware/gpio.h"
 #include "hardware/adc.h"
@@ -22,5 +23,6 @@ void current_sense_update(
   //    r = 133 mOhms
   //    adc_mv / r = 1500 / 133 mv/mOhms = 11.278 A
   //    11.278 A * 1000 = 11278 mA
-  state->current_ma = (adc_mv * 1000) / settings->global.ical_mohms;
+  uint16_avg_add(
+    &(state->avg_ma), (adc_mv * 1000) / settings->global.ical_mohms);
 }

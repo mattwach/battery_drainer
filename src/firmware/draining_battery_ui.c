@@ -1,5 +1,6 @@
 #include "draining_battery_ui.h"
 #include "util.h"
+#include "uint16_avg.h"
 #include <stdio.h>
 
 static void render_line0(struct SharedState* ss, uint8_t active) {
@@ -83,12 +84,12 @@ static void render_line1_finished(struct SharedState* ss, uint16_t finish_second
 
 static void render_line2(struct SharedState* ss, uint8_t active) {
   char line[20];
-  const uint16_t current_ma =
+  const uint16_t avg_ma =
     active ?
-    ss->current_ma :
-    ss->max_values.current_ma;
-  const uint8_t amps = current_ma / 1000;
-  const uint8_t amps_frac = (current_ma / 100) % 10;
+    uint16_avg_get(&(ss->avg_ma)) :
+    ss->max_values.avg_ma;
+  const uint8_t amps = avg_ma / 1000;
+  const uint8_t amps_frac = (avg_ma / 100) % 10;
   struct Text* text = &(ss->text);
   text->row = 4;
   text->column = 0;
@@ -108,7 +109,7 @@ static void render_line2(struct SharedState* ss, uint8_t active) {
    0x00;
   const uint16_t power_watts =
     active ?
-    (uint32_t)ss->loaded_mv * (uint32_t)ss->current_ma / 1000000 :
+    (uint32_t)ss->loaded_mv * (uint32_t)avg_ma / 1000000 :
     ss->max_values.power_watts;
   sprintf(line, "%4dW", power_watts);
   text_strLen(text, line, 5);

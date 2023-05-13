@@ -1,4 +1,5 @@
 #include "fan_control.h"
+#include "uint16_avg.h"
 #include "pico/stdlib.h"
 #include "hardware/pwm.h"
 
@@ -60,9 +61,10 @@ static uint16_t calc_new_level_by_temp(
 }
 
 static uint16_t calc_new_level_by_power(
-  const struct Settings* settings, const struct SharedState* state) {
+  const struct Settings* settings, struct SharedState* state) {
   const struct FanSettings* f = &(settings->global.fan);
-  const uint32_t power_watts = state->current_ma * state->loaded_mv / 1000000;
+  const uint16_t avg_ma = uint16_avg_get(&(state->avg_ma));
+  const uint32_t power_watts = avg_ma * state->loaded_mv / 1000000;
   if (power_watts < f->min_watts) {
     return 0;
   }
@@ -80,7 +82,7 @@ static uint16_t calc_new_level_by_power(
 }
 
 static inline int32_t calc_new_level(
-  const struct Settings* settings, const struct SharedState* state) {
+  const struct Settings* settings, struct SharedState* state) {
     const uint16_t temp_level = calc_new_level_by_temp(settings, state);
     const uint16_t power_level = calc_new_level_by_power(settings, state);
     return temp_level > power_level ? temp_level : power_level;

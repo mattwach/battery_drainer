@@ -17,6 +17,7 @@ add_executable(
     settings.c
     state.c
     temperature_sense.c
+    uint16_avg.c
     util.c
     vgs_control.c
     voltage_sense.c
