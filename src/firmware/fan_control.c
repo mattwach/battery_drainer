@@ -23,16 +23,14 @@ void fan_control_init(void) {
   gpio_set_function(FAN_GPIO, GPIO_FUNC_PWM);
   pwm_set_enabled(FAN_PWM_SLICE, 0);
   pwm_set_wrap(FAN_PWM_SLICE, WRAP);
+  pwm_set_chan_level(
+    FAN_PWM_SLICE, FAN_CHAN, 0);
+  pwm_set_enabled(FAN_PWM_SLICE, 1);
 }
 
 static void set_pwm(const struct SharedState* state) {
-  pwm_set_enabled(FAN_PWM_SLICE, 0);
-  if (state->fan_level == 0) {
-    return;
-  }
   pwm_set_chan_level(
     FAN_PWM_SLICE, FAN_CHAN, calc_level(state->fan_level));
-  pwm_set_enabled(FAN_PWM_SLICE, 1);
 }
 
 static uint16_t calc_new_level_by_temp(
