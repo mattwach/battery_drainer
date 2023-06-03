@@ -1,4 +1,5 @@
 use <mattwach/util.scad>
+include <mattwach/vitamins/electronics/buttons.scad>
 include <mattwach/vitamins/electronics/oled.scad>
 include <mattwach/vitamins/electronics/pi_pico.scad>
 include <mattwach/vitamins/rc/xt60.scad>
@@ -69,9 +70,47 @@ module main_pcb() {
         main_pcb_thickness]) xt60_pw_male();
   }
 
+  module buttons() {
+    button_width = 3.6;
+    module button() {
+      tz(main_pcb_thickness) pcb_button(
+          length = 6.2,
+          width = button_width,
+          height = 3.5,
+          button_length = 3,
+          button_width = 1.5,
+          button_height = 2
+      );
+    }
+
+    module reset_button() {
+      reset_button_xoffset = 25;
+      reset_button_yoffset = 46;
+      txy(reset_button_xoffset, reset_button_yoffset) button();
+      
+    }
+
+    module control_buttons() {
+      control_button_xoffset = 66;
+      control_button_yoffset = 11.4;
+      control_button_count = 4;
+      control_button_xspan = 10;
+
+      for (i = [0:control_button_count-1]) {
+        txy(
+            button_width + control_button_xoffset + i * control_button_xspan,
+            control_button_yoffset) rz(90) button();
+      }
+    }
+
+    reset_button();
+    control_buttons();
+  }
+
   pcb();
   pico();
   oled();
   xt60_connector();
+  buttons();
 }
 
