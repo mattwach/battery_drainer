@@ -1,6 +1,7 @@
 use <mattwach/util.scad>
 include <mattwach/vitamins/electronics/oled.scad>
 include <mattwach/vitamins/electronics/pi_pico.scad>
+include <mattwach/vitamins/rc/xt60.scad>
 
 module main_pcb() {
   overlap = 0.01;
@@ -59,8 +60,18 @@ module main_pcb() {
         oled_z_offset]) oled_128x64_1_5in_i2c(true);
   }
 
+  module xt60_connector() {
+    xt60_xinset = 18.4;
+    xt60_yinset = 10.5;
+    translate([
+        main_pcb_length - xt60_xinset,
+        xt60_yinset,
+        main_pcb_thickness]) xt60_pw_male();
+  }
+
   pcb();
   pico();
   oled();
+  xt60_connector();
 }
 
