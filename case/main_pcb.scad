@@ -1,5 +1,6 @@
 use <mattwach/util.scad>
 include <mattwach/vitamins/electronics/buttons.scad>
+include <mattwach/vitamins/electronics/fuse.scad>
 include <mattwach/vitamins/electronics/oled.scad>
 include <mattwach/vitamins/electronics/pi_pico.scad>
 include <mattwach/vitamins/rc/xt60.scad>
@@ -107,10 +108,21 @@ module main_pcb() {
     control_buttons();
   }
 
+  module fuse() {
+    fuse_xoffset = 7.2;
+    fuse_yoffset = 32;
+    fuse_zoffset = 7 + main_pcb_thickness;
+    translate([
+        main_pcb_length - fuse_xoffset,
+        fuse_yoffset,
+        fuse_zoffset]) rx(-90) glass_fuse(diameter=5.6, length=32, metal_length=6.4);
+  }
+
   pcb();
   pico();
   oled();
   xt60_connector();
   buttons();
+  fuse();
 }
 
