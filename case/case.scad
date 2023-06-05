@@ -32,8 +32,8 @@ module placed_cooling_fan() {
 
 module assembly() {
   heat_sink();
-  *placed_cooling_fan();
-  *placed_pcb();
+  placed_cooling_fan();
+  placed_pcb();
 }
 
 module case() {
@@ -71,6 +71,7 @@ module case() {
   }
 
   module fan_shroud() {
+    fan_shroud_inset = 20;
     fan_shroud_depth = 20;
     fan_shroud_gap = 1;
     fan_shroud_width = cooling_fan_width + fan_shroud_gap + case_fan_pad * 2;
@@ -91,6 +92,22 @@ module case() {
         fan_shroud_width - case_fan_pad * 2,
         fan_shroud_depth + overlap * 4,
         fan_shroud_height - case_fan_pad * 2]);
+      translate([
+        case_fan_pad + fan_shroud_inset,
+        -overlap,
+        -overlap
+      ]) cube([
+        fan_shroud_width - case_fan_pad * 2 - fan_shroud_inset * 2,
+        fan_shroud_depth + overlap * 4,
+        fan_shroud_height + overlap * 2]);
+      translate([
+        -overlap,
+        -overlap,
+        case_fan_pad + fan_shroud_gap + fan_shroud_inset
+      ]) cube([
+        fan_shroud_width + overlap * 2,
+        fan_shroud_depth + overlap * 4,
+        fan_shroud_height - case_fan_pad * 2 - fan_shroud_inset * 2]);
     }
   }
 
