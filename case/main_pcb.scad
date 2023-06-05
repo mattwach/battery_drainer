@@ -4,6 +4,7 @@ include <mattwach/vitamins/electronics/fuse.scad>
 include <mattwach/vitamins/electronics/oled.scad>
 include <mattwach/vitamins/electronics/pi_pico.scad>
 include <mattwach/vitamins/rc/xt60.scad>
+include <NopSCADlib/vitamins/pin_headers.scad>
 
 module main_pcb() {
   overlap = 0.01;
@@ -118,11 +119,25 @@ module main_pcb() {
         fuse_zoffset]) rx(-90) glass_fuse(diameter=5.6, length=32, metal_length=6.4);
   }
 
+  module pins() {
+    module fan_pins() {
+      pin_centerx = 2.54 * 2;
+      pin_centery = 2.54 / 2;
+      translate([
+          pin_centerx,
+          pin_centery,
+          main_pcb_thickness]) pin_header(2p54header, 4, 1);
+    }
+
+    fan_pins();
+  }
+
   pcb();
   pico();
   oled();
   xt60_connector();
   buttons();
   fuse();
+  pins();
 }
 
