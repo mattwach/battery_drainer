@@ -10,8 +10,12 @@ cooling_fan_height = 120;
 cooling_fan_thickness = 25;
 overlap = 0.01;
 heat_sink_mount_xpad = 6;
-case_xsize = heat_sink_xsize + heat_sink_mount_xpad * 2;
+heat_sink_mount_inset = 5;
 fan_shroud_gap = 1;
+case_fan_pad = 3;
+case_bottom_pad = case_fan_pad + fan_shroud_gap;
+case_xsize = heat_sink_xsize + heat_sink_mount_xpad * 2;
+case_zsize = heat_sink_zsize + case_bottom_pad + case_fan_pad;
 
 module cooling_fan() {
   fan(fan120x25);  
@@ -40,10 +44,6 @@ module assembly() {
 }
 
 module backside() {
-  case_fan_pad = 3;
-  case_bottom_pad = case_fan_pad + fan_shroud_gap;
-  case_zsize = heat_sink_zsize + case_bottom_pad + case_fan_pad;
-
   module back_plate() {
     back_plate_thickness = 3;
     module plate() {
@@ -112,7 +112,6 @@ module backside() {
   }
 
   module heat_sink_mount() {
-    heat_sink_mount_inset = 5;
     heat_sink_mount_depth_inset = 0.01;
     heat_sink_mount_ipad = 0.5;
     heat_sink_mount_depth = cooling_fan_thickness + heat_sink_ysize - heat_sink_mount_depth_inset;
@@ -180,8 +179,35 @@ module backside() {
   }
 }
 
+module frontside() {
+  module interface_feet() {
+    foot_xsize = heat_sink_mount_xpad + heat_sink_mount_inset;
+    foot_zsize = case_fan_pad + heat_sink_mount_inset;
+    module foot() {
+      foot_depth = 2;
+      translate([
+          -heat_sink_mount_xpad,
+          -foot_depth,
+          -case_fan_pad]) cube([
+            foot_xsize,
+            foot_depth,
+            foot_zsize]);
+    }
+
+    foot();
+    tx(case_xsize - foot_xsize) foot();
+    tz(case_zsize - foot_zsize) foot();
+    tx(case_xsize - foot_xsize) tz(case_zsize - foot_zsize) foot();
+  }
+
+  color("yellow") union() {
+    interface_feet();
+  }
+}
+
 
 $fa=2.0;
 $fs=0.5;
 assembly();
 backside();
+frontside();
