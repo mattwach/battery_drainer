@@ -32,8 +32,8 @@ module placed_cooling_fan() {
 
 module assembly() {
   heat_sink();
-  placed_cooling_fan();
-  placed_pcb();
+  *placed_cooling_fan();
+  *placed_pcb();
 }
 
 module case() {
@@ -71,7 +71,7 @@ module case() {
   }
 
   module fan_shroud() {
-    fan_shroud_depth = 23;
+    fan_shroud_depth = 20;
     fan_shroud_gap = 1;
     fan_shroud_width = cooling_fan_width + fan_shroud_gap + case_fan_pad * 2;
     fan_shroud_height = cooling_fan_height + fan_shroud_gap + case_fan_pad * 2;
@@ -94,12 +94,51 @@ module case() {
     }
   }
 
+  module heat_sink_mount() {
+    heat_sink_mount_inset = 5;
+    heat_sink_mount_xpad = 6;
+    heat_sink_mount_depth_inset = 1;
+    heat_sink_mount_ipad = 0.5;
+    heat_sink_mount_depth = cooling_fan_thickness + heat_sink_ysize - heat_sink_mount_depth_inset;
+    translate([
+        case_xpad - heat_sink_mount_xpad,
+        -heat_sink_mount_depth,
+        case_bottom_pad - case_fan_pad]) difference() {
+      cube([
+          heat_sink_xsize + heat_sink_mount_xpad * 2,
+          heat_sink_mount_depth + overlap,
+          heat_sink_zsize + case_fan_pad * 2]);
+      translate([
+          heat_sink_mount_xpad - heat_sink_mount_ipad,
+          -overlap,
+          case_fan_pad - heat_sink_mount_ipad]) cube([
+            heat_sink_xsize + heat_sink_mount_ipad * 2,
+            heat_sink_mount_depth + overlap * 4,
+            heat_sink_zsize + heat_sink_mount_ipad * 2]);
+      translate([
+          heat_sink_mount_xpad - heat_sink_mount_ipad + heat_sink_mount_inset,
+          -overlap,
+          -overlap]) cube([
+            heat_sink_xsize + heat_sink_mount_ipad * 2 - heat_sink_mount_inset * 2,
+            heat_sink_mount_depth + overlap * 4,
+            heat_sink_zsize + heat_sink_mount_ipad * 2 + case_fan_pad * 2 + overlap * 2]);
+      translate([
+          -overlap,
+          -overlap,
+          case_fan_pad - heat_sink_mount_ipad + heat_sink_mount_inset]) cube([
+            heat_sink_xsize + heat_sink_mount_ipad * 2 + heat_sink_mount_xpad * 2 + overlap * 2,
+            heat_sink_mount_depth + overlap * 4,
+            heat_sink_zsize + heat_sink_mount_ipad * 2 - heat_sink_mount_inset * 2]);
+    }
+  }
+
   translate([
       -case_xpad,
       heat_sink_ysize + cooling_fan_thickness,
       -case_bottom_pad]) color("orange") union() {
     back_plate();
     fan_shroud();
+    heat_sink_mount();
   }
 }
 
