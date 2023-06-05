@@ -1,6 +1,7 @@
 use <mattwach/util.scad>
 include <heat_sink.scad>
 include <main_pcb.scad>
+include <NopSCADlib/core.scad>
 include <NopSCADlib/vitamins/fans.scad>
 
 module cooling_fan() {
