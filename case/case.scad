@@ -38,7 +38,7 @@ module assembly() {
   placed_pcb();
 }
 
-module case() {
+module backside() {
   case_fan_pad = 3;
   case_bottom_pad = 10;
   case_zsize = heat_sink_zsize + case_bottom_pad + case_fan_pad;
@@ -162,4 +162,4 @@ module case() {
 $fa=2.0;
 $fs=0.5;
 assembly();
-case();
+backside();
