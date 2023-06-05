@@ -113,9 +113,30 @@ module backside() {
 
   module heat_sink_mount() {
     heat_sink_mount_inset = 5;
-    heat_sink_mount_depth_inset = 0.3;
+    heat_sink_mount_depth_inset = 0.01;
     heat_sink_mount_ipad = 0.5;
     heat_sink_mount_depth = cooling_fan_thickness + heat_sink_ysize - heat_sink_mount_depth_inset;
+
+    hole_inset_x = heat_sink_mount_inset / 2;
+    hole_inset_z = (case_fan_pad + heat_sink_mount_inset) / 2;
+
+    module frontside_mounting_holes() {
+      hole_diameter = 2.85;
+      hole_depth = 15;
+
+      module hole() {
+        ty(-overlap) rx(-90) cylinder(d=hole_diameter, h=hole_depth + overlap);
+      }
+
+      module row() {
+        tx(hole_inset_x) hole();
+        tx(case_xsize - hole_inset_x) hole();
+      }
+
+      tz(hole_inset_z) row();
+      tz(case_zsize - hole_inset_z) row();
+    }
+
     translate([
         0,
         -heat_sink_mount_depth,
@@ -145,6 +166,7 @@ module backside() {
             heat_sink_xsize + heat_sink_mount_ipad * 2 + heat_sink_mount_xpad * 2 + overlap * 2,
             heat_sink_mount_depth + overlap * 4,
             heat_sink_zsize + heat_sink_mount_ipad * 2 - heat_sink_mount_inset * 2]);
+      frontside_mounting_holes();
     }
   }
 
