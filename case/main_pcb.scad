@@ -121,11 +121,12 @@ module main_pcb() {
 
   module pins() {
     module fan_pins() {
-      pin_centerx = 2.54 * 2;
-      pin_centery = 2.54 / 2;
+      pin_centerx = 2.54 * 2 - 2.54 / 2;
+      offset_x = 2.5;
+      offset_y = 64;
       translate([
-          pin_centerx,
-          pin_centery,
+          pin_centerx + offset_x,
+          offset_y,
           main_pcb_thickness]) pin_header(2p54header, 4, 1);
     }
 
