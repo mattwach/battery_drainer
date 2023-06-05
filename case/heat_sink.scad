@@ -1,11 +1,11 @@
 use <mattwach/util.scad>
 
+heat_sink_xsize = 138.9;
+heat_sink_ysize = 36;
+heat_sink_zsize = 120.3;
+
 module heat_sink() {
   overlap = 0.01;
-  heat_sink_xsize = 138.9;
-  heat_sink_ysize = 36;
-  heat_sink_zsize = 120.3;
-
   module block() {
     cube([heat_sink_xsize, heat_sink_ysize, heat_sink_zsize]);
   }

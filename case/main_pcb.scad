@@ -6,11 +6,12 @@ include <mattwach/vitamins/electronics/pi_pico.scad>
 include <mattwach/vitamins/rc/xt60.scad>
 include <NopSCADlib/vitamins/pin_headers.scad>
 
+main_pcb_length = 121.9;
+main_pcb_width = 88;
+main_pcb_thickness = 1.8;
+
 module main_pcb() {
   overlap = 0.01;
-  main_pcb_length = 121.9;
-  main_pcb_width = 88;
-  main_pcb_thickness = 1.8;
 
   module pcb() {
     module mount_holes() {
