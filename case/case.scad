@@ -70,10 +70,37 @@ module case() {
     }
   }
 
+  module fan_shroud() {
+    fan_shroud_depth = 23;
+    fan_shroud_gap = 1;
+    fan_shroud_width = cooling_fan_width + fan_shroud_gap + case_fan_pad * 2;
+    fan_shroud_height = cooling_fan_height + fan_shroud_gap + case_fan_pad * 2;
+    translate([
+        (case_xsize - fan_shroud_width) / 2,
+        -fan_shroud_depth,
+        case_bottom_pad - case_fan_pad - fan_shroud_gap]) difference() {
+      cube([
+          fan_shroud_width,
+          fan_shroud_depth + overlap,
+          fan_shroud_height]);
+      translate([
+        case_fan_pad,
+        -overlap,
+        case_fan_pad + fan_shroud_gap
+      ]) cube([
+        fan_shroud_width - case_fan_pad * 2,
+        fan_shroud_depth + overlap * 4,
+        fan_shroud_height - case_fan_pad * 2]);
+    }
+  }
+
   translate([
       -case_xpad,
       heat_sink_ysize + cooling_fan_thickness,
-      -case_bottom_pad]) color("orange") back_plate();
+      -case_bottom_pad]) color("orange") union() {
+    back_plate();
+    fan_shroud();
+  }
 }
 
 
