@@ -9,6 +9,8 @@ cooling_fan_width = 120;
 cooling_fan_height = 120;
 cooling_fan_thickness = 25;
 overlap = 0.01;
+heat_sink_mount_xpad = 6;
+case_xsize = heat_sink_xsize + heat_sink_mount_xpad * 2;
 
 module cooling_fan() {
   fan(fan120x25);  
@@ -37,10 +39,8 @@ module assembly() {
 }
 
 module case() {
-  case_xpad = 10;
   case_fan_pad = 3;
   case_bottom_pad = 10;
-  case_xsize = heat_sink_xsize + case_xpad * 2;
   case_zsize = heat_sink_zsize + case_bottom_pad + case_fan_pad;
 
   module back_plate() {
@@ -113,16 +113,15 @@ module case() {
 
   module heat_sink_mount() {
     heat_sink_mount_inset = 5;
-    heat_sink_mount_xpad = 6;
-    heat_sink_mount_depth_inset = 1;
+    heat_sink_mount_depth_inset = 0.3;
     heat_sink_mount_ipad = 0.5;
     heat_sink_mount_depth = cooling_fan_thickness + heat_sink_ysize - heat_sink_mount_depth_inset;
     translate([
-        case_xpad - heat_sink_mount_xpad,
+        0,
         -heat_sink_mount_depth,
         case_bottom_pad - case_fan_pad]) difference() {
       cube([
-          heat_sink_xsize + heat_sink_mount_xpad * 2,
+          case_xsize,
           heat_sink_mount_depth + overlap,
           heat_sink_zsize + case_fan_pad * 2]);
       translate([
@@ -150,7 +149,7 @@ module case() {
   }
 
   translate([
-      -case_xpad,
+      -heat_sink_mount_xpad,
       heat_sink_ysize + cooling_fan_thickness,
       -case_bottom_pad]) color("orange") union() {
     back_plate();
