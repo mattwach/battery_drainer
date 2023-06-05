@@ -11,6 +11,7 @@ cooling_fan_thickness = 25;
 overlap = 0.01;
 heat_sink_mount_xpad = 6;
 case_xsize = heat_sink_xsize + heat_sink_mount_xpad * 2;
+fan_shroud_gap = 1;
 
 module cooling_fan() {
   fan(fan120x25);  
@@ -40,7 +41,7 @@ module assembly() {
 
 module backside() {
   case_fan_pad = 3;
-  case_bottom_pad = 10;
+  case_bottom_pad = case_fan_pad + fan_shroud_gap;
   case_zsize = heat_sink_zsize + case_bottom_pad + case_fan_pad;
 
   module back_plate() {
@@ -73,7 +74,6 @@ module backside() {
   module fan_shroud() {
     fan_shroud_inset = 20;
     fan_shroud_depth = 20;
-    fan_shroud_gap = 1;
     fan_shroud_width = cooling_fan_width + fan_shroud_gap + case_fan_pad * 2;
     fan_shroud_height = cooling_fan_height + fan_shroud_gap + case_fan_pad * 2;
     translate([
