@@ -1,10 +1,10 @@
-use <mattwach/util.scad>
-use <mattwach/honeycomb.scad>
-use <mattwach/vitamins/bolts.scad>
+use <lib/mattwach/util.scad>
+use <lib/mattwach/honeycomb.scad>
+use <lib/mattwach/vitamins/bolts.scad>
 include <heat_sink.scad>
 include <main_pcb.scad>
-include <NopSCADlib/core.scad>
-include <NopSCADlib/vitamins/fans.scad>
+include <lib/NopSCADlib/core.scad>
+include <lib/NopSCADlib/vitamins/fans.scad>
 
 back_plate_thickness = 3;
 cooling_fan_width = 120;

@@ -1,10 +1,10 @@
-use <mattwach/util.scad>
-include <mattwach/vitamins/electronics/buttons.scad>
-include <mattwach/vitamins/electronics/fuse.scad>
-include <mattwach/vitamins/electronics/oled.scad>
-include <mattwach/vitamins/electronics/pi_pico.scad>
-include <mattwach/vitamins/rc/xt60.scad>
-include <NopSCADlib/vitamins/pin_headers.scad>
+use <lib/mattwach/util.scad>
+include <lib/mattwach/vitamins/electronics/buttons.scad>
+include <lib/mattwach/vitamins/electronics/fuse.scad>
+include <lib/mattwach/vitamins/electronics/oled.scad>
+include <lib/mattwach/vitamins/electronics/pi_pico.scad>
+include <lib/mattwach/vitamins/rc/xt60.scad>
+include <lib/NopSCADlib/vitamins/pin_headers.scad>
 
 main_pcb_length = 121.9;
 main_pcb_width = 88;

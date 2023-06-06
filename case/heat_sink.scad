@@ -1,4 +1,4 @@
-use <mattwach/util.scad>
+use <lib/mattwach/util.scad>
 
 heat_sink_xsize = 138.9;
 heat_sink_ysize = 36;
