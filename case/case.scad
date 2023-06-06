@@ -180,11 +180,12 @@ module backside() {
 }
 
 module frontside() {
+  foot_depth = 2;
+
   module interface_feet() {
     foot_xsize = heat_sink_mount_xpad + heat_sink_mount_inset;
     foot_zsize = case_fan_pad + heat_sink_mount_inset;
     module foot() {
-      foot_depth = 2;
       translate([
           -heat_sink_mount_xpad,
           -foot_depth,
@@ -200,8 +201,30 @@ module frontside() {
     tx(case_xsize - foot_xsize) tz(case_zsize - foot_zsize) foot();
   }
 
+  module main_plate() {
+    main_plate_thickness = 4;
+    main_plate_width = 9;
+    translate([
+        -heat_sink_mount_xpad,
+        -foot_depth - main_plate_thickness + overlap,
+        -case_fan_pad]) difference() {
+      cube([
+          case_xsize,
+          main_plate_thickness + overlap,
+          case_zsize]);
+      translate([
+          main_plate_width,
+          -overlap * 6,
+          -overlap]) cube([
+            case_xsize - main_plate_width * 2,
+            main_plate_thickness + overlap * 12,
+            case_zsize - main_plate_width + overlap]);
+    }
+  }
+
   color("yellow") union() {
     interface_feet();
+    main_plate();
   }
 }
 
