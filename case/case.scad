@@ -5,12 +5,16 @@ include <main_pcb.scad>
 include <NopSCADlib/core.scad>
 include <NopSCADlib/vitamins/fans.scad>
 
+back_plate_thickness = 3;
 cooling_fan_width = 120;
 cooling_fan_height = 120;
 cooling_fan_thickness = 25;
 overlap = 0.01;
 heat_sink_mount_xpad = 6;
 heat_sink_mount_inset = 5;
+heat_sink_mount_depth_inset = 0.01;
+heat_sink_mount_depth = cooling_fan_thickness + heat_sink_ysize - heat_sink_mount_depth_inset;
+heat_sink_mount_ipad = 0.5;
 fan_shroud_gap = 1;
 case_fan_pad = 3;
 case_bottom_pad = case_fan_pad + fan_shroud_gap;
@@ -18,11 +22,11 @@ case_xsize = heat_sink_xsize + heat_sink_mount_xpad * 2;
 case_zsize = heat_sink_zsize + case_bottom_pad + case_fan_pad;
 hole_inset_x = heat_sink_mount_inset / 2;
 hole_inset_z = (case_fan_pad + heat_sink_mount_inset) / 2;
-pcb_yoffest = 20;
-pcd_plate_gap = 10;
+pcb_yoffest = 13;
+pcd_plate_gap = 15;
 main_plate_width = 9;
-foot_width = main_plate_width;
 foot_height = 10;
+foot_width = heat_sink_mount_inset + heat_sink_mount_xpad - heat_sink_mount_ipad;
 
 module cooling_fan() {
   fan(fan120x25);  
@@ -65,7 +69,6 @@ module frontside_mounting_holes(hole_diameter=2.85, hole_depth=15) {
 
 module backside() {
   module back_plate() {
-    back_plate_thickness = 3;
     module plate() {
       cube([case_xsize, back_plate_thickness, case_zsize]);
     }
@@ -96,12 +99,13 @@ module backside() {
     fan_shroud_depth = 20;
     fan_shroud_width = cooling_fan_width + fan_shroud_gap + case_fan_pad * 2;
     fan_shroud_height = cooling_fan_height + fan_shroud_gap + case_fan_pad * 2;
+    fan_shroud_xextend = 24;
     translate([
         (case_xsize - fan_shroud_width) / 2,
         -fan_shroud_depth,
         case_bottom_pad - case_fan_pad - fan_shroud_gap]) difference() {
-      cube([
-          fan_shroud_width,
+      tx(-fan_shroud_xextend / 2) cube([
+          fan_shroud_width + fan_shroud_xextend,
           fan_shroud_depth + overlap,
           fan_shroud_height]);
       translate([
@@ -121,21 +125,17 @@ module backside() {
         fan_shroud_depth + overlap * 4,
         fan_shroud_height + overlap * 2]);
       translate([
-        -overlap,
+        -overlap - fan_shroud_xextend / 2,
         -overlap,
         case_fan_pad + fan_shroud_gap + fan_shroud_inset
       ]) cube([
-        fan_shroud_width + overlap * 2,
+        fan_shroud_width + fan_shroud_xextend + overlap * 2,
         fan_shroud_depth + overlap * 4,
         fan_shroud_height - case_fan_pad * 2 - fan_shroud_inset * 2]);
     }
   }
 
   module heat_sink_mount() {
-    heat_sink_mount_depth_inset = 0.01;
-    heat_sink_mount_ipad = 0.5;
-    heat_sink_mount_depth = cooling_fan_thickness + heat_sink_ysize - heat_sink_mount_depth_inset;
-
     translate([
         0,
         -heat_sink_mount_depth,
@@ -169,6 +169,21 @@ module backside() {
     }
   }
 
+  module back_feet() {
+    module foot() {
+      translate([
+          0,
+          -heat_sink_mount_depth,
+          case_bottom_pad - case_fan_pad - foot_height]) cube([
+            foot_width,
+            heat_sink_mount_depth + back_plate_thickness,
+            foot_height + overlap]);
+    }
+
+    foot();
+    tx(case_xsize - foot_width) foot();
+  }
+
   translate([
       -heat_sink_mount_xpad,
       heat_sink_ysize + cooling_fan_thickness,
@@ -176,6 +191,7 @@ module backside() {
     back_plate();
     fan_shroud();
     heat_sink_mount();
+    back_feet();
   }
 }
 
@@ -228,15 +244,15 @@ module frontside() {
           -heat_sink_mount_xpad,
           -foot_depth - main_plate_thickness - post_length + overlap,
           -case_fan_pad]) cube([
-            main_plate_width,
+            foot_width,
             post_length,
             main_plate_width]);
     }
 
     post();
-    tx(case_xsize - main_plate_width) post();
+    tx(case_xsize - foot_width) post();
     tz(case_zsize - main_plate_width) post();
-    tx(case_xsize - main_plate_width) tz(case_zsize - main_plate_width) post();
+    tx(case_xsize - foot_width) tz(case_zsize - main_plate_width) post();
   }
 
   module front_feet() {
