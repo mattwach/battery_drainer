@@ -1,5 +1,6 @@
 use <mattwach/util.scad>
 use <mattwach/honeycomb.scad>
+use <mattwach/vitamins/bolts.scad>
 include <heat_sink.scad>
 include <main_pcb.scad>
 include <NopSCADlib/core.scad>
@@ -16,6 +17,7 @@ heat_sink_mount_depth_inset = 0.01;
 heat_sink_mount_depth = cooling_fan_thickness + heat_sink_ysize - heat_sink_mount_depth_inset;
 heat_sink_mount_ipad = 0.5;
 fan_shroud_gap = 1;
+glass_plate_thickness = 3.175;
 case_fan_pad = 3;
 case_bottom_pad = case_fan_pad + fan_shroud_gap;
 case_xsize = heat_sink_xsize + heat_sink_mount_xpad * 2;
@@ -304,8 +306,6 @@ module frontside() {
 }
 
 module glass_plate() {
-  glass_plate_thickness = 3.175;
-
   module plate() {
     cube([case_xsize, glass_plate_thickness, case_zsize]);
   }
@@ -411,10 +411,31 @@ module glass_plate() {
   }
 }
 
+module bolts() {
+  module hole() {
+    ty(-overlap) rx(90) bolt_M3(30);
+  }
+
+  module row() {
+    tx(hole_inset_x) hole();
+    tx(case_xsize - hole_inset_x) hole();
+  }
+
+  translate([
+      -heat_sink_mount_xpad,
+      -front_foot_depth - front_interface_thickness - front_post_length - glass_plate_thickness,
+      -case_fan_pad - 1]) {
+    tz(hole_inset_z) row();
+    tz(case_zsize - hole_inset_z) row();
+  }
+}
+
 
 $fa=2.0;
 $fs=0.5;
 assembly();
 backside();
 frontside();
+bolts();
 glass_plate();
+
