@@ -319,8 +319,13 @@ module glass_plate() {
           hole_depth=glass_plate_thickness + overlap * 2);
   }
 
-  module single_button() {
+  module finger_button() {
     diameter = 15;
+    ty(-overlap) rx(-90) cylinder(h=glass_plate_thickness + overlap * 2, d=diameter);
+  }
+
+  module pen_button() {
+    diameter = 8;
     ty(-overlap) rx(-90) cylinder(h=glass_plate_thickness + overlap * 2, d=diameter);
   }
 
@@ -333,8 +338,8 @@ module glass_plate() {
         0,
         iface_zoffset]) {
       hull() {
-        single_button();
-        tx(iface_length) single_button();
+        finger_button();
+        tx(iface_length) finger_button();
       }
     }
   }
@@ -345,7 +350,7 @@ module glass_plate() {
     translate([
         reset_xoffset,
         0,
-        reset_zoffset]) single_button();
+        reset_zoffset]) pen_button();
   }
 
   module boot_button() {
@@ -354,7 +359,7 @@ module glass_plate() {
     translate([
         boot_xoffset,
         0,
-        boot_zoffset]) single_button();
+        boot_zoffset]) pen_button();
   }
 
   module fuse_slot() {
