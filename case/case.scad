@@ -277,7 +277,7 @@ module frontside() {
     module hole() {
       hole_width = 3.5;
       hole_height = 2.25;
-      hole_z_offset = 63;
+      hole_z_offset = 75;
       translate([
           -heat_sink_mount_xpad + (main_plate_width - hole_width) / 2,
           -front_foot_depth - front_interface_thickness,
