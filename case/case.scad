@@ -19,7 +19,7 @@ case_zsize = heat_sink_zsize + case_bottom_pad + case_fan_pad;
 hole_inset_x = heat_sink_mount_inset / 2;
 hole_inset_z = (case_fan_pad + heat_sink_mount_inset) / 2;
 pcb_yoffest = 20;
-pcd_plate_gap = 20;
+pcd_plate_gap = 10;
 
 module cooling_fan() {
   fan(fan120x25);  
@@ -46,9 +46,7 @@ module assembly() {
   placed_pcb();
 }
 
-module frontside_mounting_holes(hole_diameter=2.85) {
-  hole_depth = 15;
-
+module frontside_mounting_holes(hole_diameter=2.85, hole_depth=15) {
   module hole() {
     ty(-overlap) rx(-90) cylinder(d=hole_diameter, h=hole_depth + overlap);
   }
@@ -182,6 +180,7 @@ module frontside() {
   foot_depth = 2;
   main_plate_thickness = 4;
   main_plate_width = 9;
+  post_length = pcb_yoffest + pcd_plate_gap;
 
   module interface_feet() {
     foot_xsize = heat_sink_mount_xpad + heat_sink_mount_inset;
@@ -222,7 +221,6 @@ module frontside() {
   }
 
   module front_plate_mounting_posts() {
-    post_length = pcb_yoffest + pcd_plate_gap;
     module post() {
       translate([
           -heat_sink_mount_xpad,
@@ -247,8 +245,10 @@ module frontside() {
     }
     translate([
         -heat_sink_mount_xpad,
-        -main_plate_thickness - foot_depth - overlap,
-        -case_bottom_pad]) frontside_mounting_holes(3.2);
+        -main_plate_thickness - foot_depth - post_length - overlap,
+        -case_bottom_pad]) frontside_mounting_holes(
+          hole_diameter=3.2,
+          hole_depth=main_plate_thickness + foot_depth + post_length + overlap * 4);
   }
 }
 
