@@ -20,6 +20,9 @@ hole_inset_x = heat_sink_mount_inset / 2;
 hole_inset_z = (case_fan_pad + heat_sink_mount_inset) / 2;
 pcb_yoffest = 20;
 pcd_plate_gap = 10;
+main_plate_width = 9;
+foot_width = main_plate_width;
+foot_height = 10;
 
 module cooling_fan() {
   fan(fan120x25);  
@@ -179,7 +182,6 @@ module backside() {
 module frontside() {
   foot_depth = 2;
   main_plate_thickness = 4;
-  main_plate_width = 9;
   post_length = pcb_yoffest + pcd_plate_gap;
 
   module interface_feet() {
@@ -237,11 +239,27 @@ module frontside() {
     tx(case_xsize - main_plate_width) tz(case_zsize - main_plate_width) post();
   }
 
+  module front_feet() {
+    module foot() {
+      translate([
+          -heat_sink_mount_xpad,
+          -foot_depth - main_plate_thickness - post_length,
+          -case_fan_pad - foot_height]) cube([
+            foot_width,
+            post_length + main_plate_thickness + foot_depth,
+            foot_height + overlap]);
+    }
+
+    foot();
+    tx(case_xsize - foot_width) foot();
+  }
+
   color("yellow") difference() {
     union() {
       interface_feet();
       main_plate();
       front_plate_mounting_posts();
+      front_feet();
     }
     translate([
         -heat_sink_mount_xpad,
