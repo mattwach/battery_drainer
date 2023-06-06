@@ -16,6 +16,8 @@ case_fan_pad = 3;
 case_bottom_pad = case_fan_pad + fan_shroud_gap;
 case_xsize = heat_sink_xsize + heat_sink_mount_xpad * 2;
 case_zsize = heat_sink_zsize + case_bottom_pad + case_fan_pad;
+hole_inset_x = heat_sink_mount_inset / 2;
+hole_inset_z = (case_fan_pad + heat_sink_mount_inset) / 2;
 
 module cooling_fan() {
   fan(fan120x25);  
@@ -41,6 +43,22 @@ module assembly() {
   heat_sink();
   placed_cooling_fan();
   placed_pcb();
+}
+
+module frontside_mounting_holes(hole_diameter=2.85) {
+  hole_depth = 15;
+
+  module hole() {
+    ty(-overlap) rx(-90) cylinder(d=hole_diameter, h=hole_depth + overlap);
+  }
+
+  module row() {
+    tx(hole_inset_x) hole();
+    tx(case_xsize - hole_inset_x) hole();
+  }
+
+  tz(hole_inset_z) row();
+  tz(case_zsize - hole_inset_z) row();
 }
 
 module backside() {
@@ -116,26 +134,6 @@ module backside() {
     heat_sink_mount_ipad = 0.5;
     heat_sink_mount_depth = cooling_fan_thickness + heat_sink_ysize - heat_sink_mount_depth_inset;
 
-    hole_inset_x = heat_sink_mount_inset / 2;
-    hole_inset_z = (case_fan_pad + heat_sink_mount_inset) / 2;
-
-    module frontside_mounting_holes() {
-      hole_diameter = 2.85;
-      hole_depth = 15;
-
-      module hole() {
-        ty(-overlap) rx(-90) cylinder(d=hole_diameter, h=hole_depth + overlap);
-      }
-
-      module row() {
-        tx(hole_inset_x) hole();
-        tx(case_xsize - hole_inset_x) hole();
-      }
-
-      tz(hole_inset_z) row();
-      tz(case_zsize - hole_inset_z) row();
-    }
-
     translate([
         0,
         -heat_sink_mount_depth,
@@ -181,6 +179,7 @@ module backside() {
 
 module frontside() {
   foot_depth = 2;
+  main_plate_thickness = 4;
 
   module interface_feet() {
     foot_xsize = heat_sink_mount_xpad + heat_sink_mount_inset;
@@ -202,7 +201,6 @@ module frontside() {
   }
 
   module main_plate() {
-    main_plate_thickness = 4;
     main_plate_width = 9;
     translate([
         -heat_sink_mount_xpad,
@@ -222,9 +220,15 @@ module frontside() {
     }
   }
 
-  color("yellow") union() {
-    interface_feet();
-    main_plate();
+  color("yellow") difference() {
+    union() {
+      interface_feet();
+      main_plate();
+    }
+    translate([
+        -heat_sink_mount_xpad,
+        -main_plate_thickness - foot_depth - overlap,
+        -case_bottom_pad]) frontside_mounting_holes(3.2);
   }
 }
 
