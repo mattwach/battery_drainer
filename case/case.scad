@@ -10,7 +10,7 @@ cooling_fan_width = 120;
 cooling_fan_height = 120;
 cooling_fan_thickness = 25;
 overlap = 0.01;
-heat_sink_mount_xpad = 6;
+heat_sink_mount_xpad = 8;
 heat_sink_mount_inset = 5;
 heat_sink_mount_depth_inset = 0.01;
 heat_sink_mount_depth = cooling_fan_thickness + heat_sink_ysize - heat_sink_mount_depth_inset;
@@ -20,8 +20,8 @@ case_fan_pad = 3;
 case_bottom_pad = case_fan_pad + fan_shroud_gap;
 case_xsize = heat_sink_xsize + heat_sink_mount_xpad * 2;
 case_zsize = heat_sink_zsize + case_bottom_pad + case_fan_pad;
-hole_inset_x = heat_sink_mount_inset / 2;
-hole_inset_z = (case_fan_pad + heat_sink_mount_inset) / 2;
+hole_inset_x = heat_sink_mount_xpad / 2;
+hole_inset_z = (case_fan_pad + heat_sink_mount_inset + heat_sink_mount_ipad) / 2;
 pcb_yoffest = 13;
 pcd_plate_gap = 15;
 main_plate_width = 9;
@@ -270,6 +270,22 @@ module frontside() {
     tx(case_xsize - foot_width) foot();
   }
 
+  module fan_cable_tiedown() {
+    hole_span = 12;
+    module hole() {
+      hole_width = 3.5;
+      hole_height = 2.25;
+      hole_z_offset = 63;
+      translate([
+          -heat_sink_mount_xpad + (main_plate_width - hole_width) / 2,
+          -foot_depth - main_plate_thickness,
+          hole_z_offset]) cube([hole_width, main_plate_thickness + overlap * 3, hole_height]);
+    }
+
+    tz(-hole_span / 2) hole();
+    tz(hole_span / 2) hole();
+  }
+
   color("yellow") difference() {
     union() {
       interface_feet();
@@ -283,6 +299,7 @@ module frontside() {
         -case_bottom_pad]) frontside_mounting_holes(
           hole_diameter=3.2,
           hole_depth=main_plate_thickness + foot_depth + post_length + overlap * 4);
+    fan_cable_tiedown();
   }
 }
 
