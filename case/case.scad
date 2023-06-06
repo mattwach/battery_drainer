@@ -22,11 +22,15 @@ case_xsize = heat_sink_xsize + heat_sink_mount_xpad * 2;
 case_zsize = heat_sink_zsize + case_bottom_pad + case_fan_pad;
 hole_inset_x = heat_sink_mount_xpad / 2;
 hole_inset_z = (case_fan_pad + heat_sink_mount_inset + heat_sink_mount_ipad) / 2;
-pcb_yoffest = 13;
-pcd_plate_gap = 15;
+pcb_yoffset = 13;
+pcd_plate_gap = 11.5;
 main_plate_width = 9;
-foot_height = 10;
-foot_width = heat_sink_mount_inset + heat_sink_mount_xpad - heat_sink_mount_ipad;
+front_interface_thickness = 4;
+front_foot_height = 10;
+front_foot_width = heat_sink_mount_inset + heat_sink_mount_xpad - heat_sink_mount_ipad;
+front_foot_depth = 2;
+front_post_length = pcb_yoffset + pcd_plate_gap;
+
 
 module cooling_fan() {
   fan(fan120x25);  
@@ -36,7 +40,7 @@ module placed_pcb() {
   pcb_xoffset = (heat_sink_xsize - main_pcb_length) / 2;
   translate([
       pcb_xoffset,
-      -pcb_yoffest,
+      -pcb_yoffset - 6,
       0]) rx(90) main_pcb();
 }
 
@@ -174,14 +178,14 @@ module backside() {
       translate([
           0,
           -heat_sink_mount_depth,
-          case_bottom_pad - case_fan_pad - foot_height]) cube([
-            foot_width,
+          case_bottom_pad - case_fan_pad - front_foot_height]) cube([
+            front_foot_width,
             heat_sink_mount_depth + back_plate_thickness,
-            foot_height + overlap]);
+            front_foot_height + overlap]);
     }
 
     foot();
-    tx(case_xsize - foot_width) foot();
+    tx(case_xsize - front_foot_width) foot();
   }
 
   translate([
@@ -196,20 +200,16 @@ module backside() {
 }
 
 module frontside() {
-  foot_depth = 2;
-  main_plate_thickness = 4;
-  post_length = pcb_yoffest + pcd_plate_gap;
-
   module interface_feet() {
     foot_xsize = heat_sink_mount_xpad + heat_sink_mount_inset;
     foot_zsize = case_fan_pad + heat_sink_mount_inset;
     module foot() {
       translate([
           -heat_sink_mount_xpad,
-          -foot_depth,
+          -front_foot_depth,
           -case_fan_pad]) cube([
             foot_xsize,
-            foot_depth,
+            front_foot_depth,
             foot_zsize]);
     }
 
@@ -222,18 +222,18 @@ module frontside() {
   module main_plate() {
     translate([
         -heat_sink_mount_xpad,
-        -foot_depth - main_plate_thickness + overlap,
+        -front_foot_depth - front_interface_thickness + overlap,
         -case_fan_pad]) difference() {
       cube([
           case_xsize,
-          main_plate_thickness + overlap,
+          front_interface_thickness + overlap,
           case_zsize]);
       translate([
           main_plate_width,
           -overlap * 6,
           -overlap]) cube([
             case_xsize - main_plate_width * 2,
-            main_plate_thickness + overlap * 12,
+            front_interface_thickness + overlap * 12,
             case_zsize - main_plate_width + overlap]);
     }
   }
@@ -242,32 +242,32 @@ module frontside() {
     module post() {
       translate([
           -heat_sink_mount_xpad,
-          -foot_depth - main_plate_thickness - post_length + overlap,
+          -front_foot_depth - front_interface_thickness - front_post_length + overlap,
           -case_fan_pad]) cube([
-            foot_width,
-            post_length,
+            front_foot_width,
+            front_post_length,
             main_plate_width]);
     }
 
     post();
-    tx(case_xsize - foot_width) post();
+    tx(case_xsize - front_foot_width) post();
     tz(case_zsize - main_plate_width) post();
-    tx(case_xsize - foot_width) tz(case_zsize - main_plate_width) post();
+    tx(case_xsize - front_foot_width) tz(case_zsize - main_plate_width) post();
   }
 
   module front_feet() {
     module foot() {
       translate([
           -heat_sink_mount_xpad,
-          -foot_depth - main_plate_thickness - post_length,
-          -case_fan_pad - foot_height]) cube([
-            foot_width,
-            post_length + main_plate_thickness + foot_depth,
-            foot_height + overlap]);
+          -front_foot_depth - front_interface_thickness - front_post_length,
+          -case_fan_pad - front_foot_height]) cube([
+            front_foot_width,
+            front_post_length + front_interface_thickness + front_foot_depth,
+            front_foot_height + overlap]);
     }
 
     foot();
-    tx(case_xsize - foot_width) foot();
+    tx(case_xsize - front_foot_width) foot();
   }
 
   module fan_cable_tiedown() {
@@ -278,15 +278,15 @@ module frontside() {
       hole_z_offset = 63;
       translate([
           -heat_sink_mount_xpad + (main_plate_width - hole_width) / 2,
-          -foot_depth - main_plate_thickness,
-          hole_z_offset]) cube([hole_width, main_plate_thickness + overlap * 3, hole_height]);
+          -front_foot_depth - front_interface_thickness,
+          hole_z_offset]) cube([hole_width, front_interface_thickness + overlap * 3, hole_height]);
     }
 
     tz(-hole_span / 2) hole();
     tz(hole_span / 2) hole();
   }
 
-  color("yellow") difference() {
+  color("#f60") difference() {
     union() {
       interface_feet();
       main_plate();
@@ -295,11 +295,114 @@ module frontside() {
     }
     translate([
         -heat_sink_mount_xpad,
-        -main_plate_thickness - foot_depth - post_length - overlap,
+        -front_interface_thickness - front_foot_depth - front_post_length - overlap,
         -case_bottom_pad]) frontside_mounting_holes(
           hole_diameter=3.2,
-          hole_depth=main_plate_thickness + foot_depth + post_length + overlap * 4);
+          hole_depth=front_interface_thickness + front_foot_depth + front_post_length + overlap * 4);
     fan_cable_tiedown();
+  }
+}
+
+module glass_plate() {
+  glass_plate_thickness = 3.175;
+
+  module plate() {
+    cube([case_xsize, glass_plate_thickness, case_zsize]);
+  }
+
+  module bolt_holes() {
+    translate([
+        0,
+        -overlap,
+        -fan_shroud_gap]) frontside_mounting_holes(
+          hole_diameter=3.2,
+          hole_depth=glass_plate_thickness + overlap * 2);
+  }
+
+  module single_button() {
+    diameter = 15;
+    ty(-overlap) rx(-90) cylinder(h=glass_plate_thickness + overlap * 2, d=diameter);
+  }
+
+  module interface_buttons() {
+    iface_length = 29.5;
+    iface_xoffset = 84.5;
+    iface_zoffset = 17.5;
+    translate([
+        iface_xoffset,
+        0,
+        iface_zoffset]) {
+      hull() {
+        single_button();
+        tx(iface_length) single_button();
+      }
+    }
+  }
+
+  module reset_button() {
+    reset_xoffset = 44.5;
+    reset_zoffset = 50.5;
+    translate([
+        reset_xoffset,
+        0,
+        reset_zoffset]) single_button();
+  }
+
+  module boot_button() {
+    boot_xoffset = 29.7;
+    boot_zoffset = 21;
+    translate([
+        boot_xoffset,
+        0,
+        boot_zoffset]) single_button();
+  }
+
+  module fuse_slot() {
+    slot_xoffset = 131.2;
+    slot_zoffset = 35;
+    slot_width = 10;
+    slot_length = 31.7;
+    module end() {
+      rx(-90) cylinder(d=slot_width, h=glass_plate_thickness + overlap * 2);
+    }
+    translate([
+        slot_xoffset,
+        -overlap,
+        slot_zoffset]) hull() {
+      end();
+      tz(slot_length) end();
+    }
+  }
+
+  module xt60_slot() {
+    fillet = 5;
+    slot_zsize = 18;
+    slot_xsize = 20;
+    slot_zoffset = 12.5;
+    module end() {
+      rx(-90) cylinder(r=fillet, h=glass_plate_thickness + overlap * 2);
+    }
+    translate([
+        case_xsize - slot_xsize,
+        -overlap,
+        slot_zoffset]) hull() {
+      translate([fillet, 0, fillet]) end();
+      translate([fillet, 0, slot_zsize - fillet]) end();
+      tx(slot_xsize - 1) cube([1 + overlap, glass_plate_thickness + overlap * 2, slot_zsize]);
+    }
+  }
+
+  color("#f08", 0.25) translate([
+      -heat_sink_mount_xpad,
+      -front_foot_depth - front_interface_thickness - front_post_length - glass_plate_thickness,
+      -case_fan_pad]) difference() {
+    plate();
+    bolt_holes();
+    interface_buttons();
+    reset_button();
+    boot_button();
+    fuse_slot();
+    xt60_slot();
   }
 }
 
@@ -309,3 +412,4 @@ $fs=0.5;
 assembly();
 backside();
 frontside();
+glass_plate();
