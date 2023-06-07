@@ -430,6 +430,10 @@ module bolts() {
   }
 }
 
+module glass_plate_projection() {
+  projection() rx(-90) glass_plate();
+}
+
 
 $fa=2.0;
 $fs=0.5;
@@ -438,4 +442,5 @@ backside();
 frontside();
 bolts();
 glass_plate();
+//glass_plate_projection();
 
