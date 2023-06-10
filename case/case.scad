@@ -439,7 +439,7 @@ $fa=2.0;
 $fs=0.5;
 assembly();
 backside();
-!frontside();
+frontside();
 bolts();
 glass_plate();
 //glass_plate_projection();
