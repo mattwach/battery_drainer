@@ -24,8 +24,8 @@ case_xsize = heat_sink_xsize + heat_sink_mount_xpad * 2;
 case_zsize = heat_sink_zsize + case_bottom_pad + case_fan_pad;
 hole_inset_x = heat_sink_mount_xpad / 2;
 hole_inset_z = (case_fan_pad + heat_sink_mount_inset + heat_sink_mount_ipad) / 2;
-pcb_yoffset = 13;
-pcd_plate_gap = 11.5;
+pcb_yoffset = 7;
+pcd_plate_gap = 11;
 main_plate_width = 9;
 front_interface_thickness = 4;
 front_foot_height = 10;
@@ -247,7 +247,7 @@ module frontside() {
           -front_foot_depth - front_interface_thickness - front_post_length + overlap,
           -case_fan_pad]) cube([
             front_foot_width,
-            front_post_length,
+            front_post_length + front_interface_thickness + overlap,
             main_plate_width]);
     }
 
@@ -439,7 +439,7 @@ $fa=2.0;
 $fs=0.5;
 assembly();
 backside();
-frontside();
+!frontside();
 bolts();
 glass_plate();
 //glass_plate_projection();
