@@ -1,10 +1,25 @@
 # battery_drainer
-This project describes hardware to safely discharge batteries to storage levels
+This project describes hardware to safely discharge batteries to storage levels.
 
-# WARNING
+[Drainer](images/drainer.jpg)
 
-Everything described in this document is preliminary and untested and could be
-hazardous.  Following anything written in this document is at-your-own risk.
+There are three main reasons to do this:
+
+1. If you fully charge a set of batteries and don't use them all, keeping them fully charged
+will cause them to degrade (lose capability and capacity).
+2. If you want to test the capacity of a battery (how many mAh is can deliver, how much
+current).
+3. If you want to fully drain a battery before
+
+# Caution
+
+Batteries are energy storage devices, thus they carry an inherent risk.  Even
+if everything is done properly, there is a risk of fire due to hidden
+manufacturing defects or other subtle damage.  If you are unfamilar with the
+battery type you are working with, take a few moments to educate yourself on
+recommnded handling practives.
+
+Following anything written in this document is at-your-own risk.
 
 ## User Interface
 
@@ -12,19 +27,11 @@ The unit has four UI buttons: On, Off, Select and Start.  Basic usage is
 to use select to pick a discharge profile and start to execute it.  The
 unit will automatically turn off when it has completed its objective.
 
-The display in use is a 128x64 pixel display.  We will be using a 8x16 pixel
-font which allows for a text resolution of 16x4
-
 When the device is initially powered up, it will display the current voltage,
 cell count and the target voltage.  There will also be a scrollable list of
 profiles to choose from.  Here is a basic example:
 
-```
-|6S 25.1V > 22.8V|
-|LIPO XT60 x 6   |
-|LIPO Single     |
-|Settings        |
-```
+[ui power on](images/ui_power_on.jpg)
 
 The lower part of the display will be scrollable and allow the user to choose
 between different profiles.  Not shown above are separation lines and inverse
@@ -32,21 +39,11 @@ text, due to the limitations of "what is easy" in Markdown.
 
 If the user chooses "settings", then an information message will appear:
 
-```
-|                |
-|Please          |
-|connect USB at  |
-|115200 baud     |
-```
+[ui settings](images/ui_settings.jpg)
 
 During discharge, the following status information will be displayed:
 
-```
-|00:05:32   0.5Ah|
-|6S 25.1V > 22.8V|
-|15.7A       394W|
-|55C  P100%  F25%|
-```
+[ui running](images/ui_running.jpg)
 
 Information shown includes:
 
@@ -66,12 +63,7 @@ the power is highlighted as inverse text.
 When the discharge is complete, the unit will show some stats for a configurable
 amount of time before shutting down.  Here is an example:
 
-```
-|00:05:32   0.5Ah|
-|6S 22.8V    496s|
-|15.7A       394W|
-|55C  P100% F100%|
-```
+[ui running](images/ui_finished.jpg)
 
 During this time, the display time (2nd row, 2nd column) will be displayed in
 inverse and will decrement to zero, after which the unit will shut down.  All
@@ -94,8 +86,8 @@ Some settings are always used, no matter what profile is selected.
 #### Current calibration
 
 The `ical` command is used to calibrate the current measurements.  It's
-deault value is 133 milliOhms.  You can measure the resistance across the "Ical"
-test point to find a more accurate value.  Example usage:
+deault value is 133 milliOhms.  By measuring the current with a multimeter,
+you can calibrate this value to match your specific hardware:
 
     ical 0.130
 
