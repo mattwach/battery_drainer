@@ -3,18 +3,18 @@ This project describes hardware to safely discharge batteries to storage levels.
 
 ![Drainer](images/drainer.jpg)
 
-There are three main reasons to do this:
+Here are a few reasons why you would want to do this:
 
 1. If you fully charge a set of batteries and don't use them all, keeping them fully charged
 will cause them to degrade (lose capability and capacity).
-2. If you want to test the capacity of a battery (how many mAh is can deliver, how much
+2. You want to test the current capacities of a battery (how many mAh is can deliver, how much
 current).
-3. If you want to fully drain a battery before
+3. You want to fully drain a battery before disposing/recycling it.
 
 # Caution
 
-Batteries are energy storage devices, thus they carry an inherent risk.  Even
-if everything is done properly, there is a risk of fire due to hidden
+Batteries are energy storage devices and thus carry an inherent risk.  Even
+if you follow all recomended procedures, there are risks due to unknown-to-you
 manufacturing defects or other subtle damage.  If you are unfamilar with the
 battery type you are working with, take a few moments to educate yourself on
 recommnded handling practives.
@@ -23,27 +23,24 @@ Following anything written in this document is at-your-own risk.
 
 ## User Interface
 
-The unit has four UI buttons: On, Off, Select and Start.  Basic usage is
-to use select to pick a discharge profile and start to execute it.  The
-unit will automatically turn off when it has completed its objective.
+The unit has four UI buttons: On, Off, Select and OK.
+
+![four buttons](images/four_buttons.jpg)
 
 When the device is initially powered up, it will display the current voltage,
 cell count and the target voltage.  There will also be a scrollable list of
-profiles to choose from.  Here is a basic example:
+profiles to choose from:
 
-[ui power on](images/ui_power_on.jpg)
+![ui power on](images/ui_power_on.jpg)
 
-The lower part of the display will be scrollable and allow the user to choose
-between different profiles.  Not shown above are separation lines and inverse
-text, due to the limitations of "what is easy" in Markdown.
-
+The user chooses a profile with "Select" and presses "OK" to start discharging.
 If the user chooses "settings", then an information message will appear:
 
-[ui settings](images/ui_settings.jpg)
+![ui settings](images/ui_settings.jpg)
 
 During discharge, the following status information will be displayed:
 
-[ui running](images/ui_running.jpg)
+![ui running](images/ui_running.jpg)
 
 Information shown includes:
 
@@ -61,14 +58,9 @@ If the FET power level is limited < 100%, then the parameter that is limiting
 the power is highlighted as inverse text. 
 
 When the discharge is complete, the unit will show some stats for a configurable
-amount of time before shutting down.  Here is an example:
+amount of time before automatically shutting down.  Here is an example:
 
-[ui running](images/ui_finished.jpg)
-
-During this time, the display time (2nd row, 2nd column) will be displayed in
-inverse and will decrement to zero, after which the unit will shut down.  All
-values shown will represent the maximum value reached during the discharge
-cycle.
+![ui running](images/ui_finished.jpg)
 
 ## Configuration
 
@@ -78,7 +70,7 @@ a termnial program.  On my Linux laptop, I used:
     minicom -b 115200 -P /dev/ttyUSB0
 
 Refer to the [dedicated configuration guide](configuration.md) for details
-about how to configure settings, calibrate the device and setup profiles.
+about how to configure settings, calibrate the device and create/edit profiles.
 
 ## Parts list
 
@@ -113,39 +105,49 @@ This is a set of 4 P-Channel MOSFETs connected in parallel:
 
 ![power fets](images/power_fets.png)
 
-More or less could also work.  More means more overall current and better heat
-dissipation but also additional cost and board space.
+More or less *could *also work.
 
-These are intended to be run in the "Ohmic" region of the FETs which
+**Note** The schematic shows four PFETs in parallel.  The unit I actually built uses
+a single high-power FET instead.  I think that four PFETs would still work but have
+not confirmed it.  The main risk of using 4 is that they will be unevenly loaded to
+the point where one of them is damaged.  I do believe that they will be unevenly loaded
+at lower currents but not after the current ramps up enough to matter.  Again, I have
+not confirmed this.  Using a single FET may be the better option if you want
+guarantees that it will work as expected.
+
+The FETs in this design are (unusually) run in their "Ohmic" region which
 is controlled by the gate-to-source voltage (Vgs) as exampled in the FQP27P06
 datasheet graph below:
 
 ![vgs curve](images/vgs_curve.png)
 
-> Note: The schematic has been updated to use an alternate PFET due to the
-FQP27P06 no longer being produced.
-
 ### Vgs Control
 
 [falstad model](https://tinyurl.com/2bj46fut)
 
-To achieve the target Vgs for the MOSFETs, we use a capacitor as detailed
-below:
+To achieve the target Vgs for the FETs, we the following circuit:
 
 ![rc circuit](images/rc_circuit.png)
 
 The main element here is the 10u capacitor on the right side of the image.  This
-capacitor is filled and emptied to set the Vgs that each MOSFET will see.
+capacitor is filled and emptied to set the Vgs that each FET will see.
 
 Filling the capacitor is the 5k resistor, R16.  If only this resistor and the
 capacitor existed, then the RC constant would be 5000 * 10e-6 = 50ms.  When the
-capacitor is sufficiently charged, the MOSFETs will be turned off.
+capacitor is sufficiently charged, the FETs will be turned off.
 
 The two transistor networks are used to drain the capacitor.  The one on the
 left is a "slow" drain and the one on the right is a "fast" drain.  The size of
 the resistors (R17 and R20) at the collector determines the drain speed.  A
 microcontroller feeds in a PWM signal with a varying duty cycle to control how
 much charge they pull from the capacitor thus determining the Vgs value.
+
+The reason for two drains is to cover the large supported voltage range.  At
+lower voltages (4V), the FAST drain circuit dominates and is needed to get
+the Vgs lower than the SLOW drain can achieve.  For higher voltages (25V),
+the SLOW drain provides better control resolution.  It's quite possible that
+only one drain is needed, but that would come down to testing the performance
+through the desired voltage range.
 
 In the power-on state, we can assume that SLOW and FAST are not driven at all
 (high Z).  In this state the two 50k pulldowns (R14, R18) turn off Q6 and Q9
@@ -239,10 +241,9 @@ for the drop.
 
 ![temperature](images/temperature.png)
 
-A temperature sensor will be placed against the heatsink to get an idea of of
-overall temperature of the FETs and power resistors.  This feedback can be used
-to control a cooling fan (described below) and, if this is inadequate, reduce
-the power dissipation via FAST and SLOW PWM signals (as described earlier).
+A temperature sensor is placed against the heatsink and as-close-as-possible to
+the FET to monitor the FET temperature.  This feedback can be used to control a
+cooling fan (described below) and, if this is inadequate, reduce the current draw.
 
 ### Power cutoff
 
@@ -251,30 +252,29 @@ the power dissipation via FAST and SLOW PWM signals (as described earlier).
 The battery drainer is designed to draw nearly zero power (outside of parasitic
 losses) when it is off, including after the discharging has completed.  Thus the
 user can leave the unit unattended (assuming the needed precautions have been
-taken) without concern of overdraining.
+taken) without concern of parasitic drain.
 
 This is implemented with the following circuit:
 
 ![power cutoff](images/power_cutoff.png)
 
 
-The Q2 FET is key.  It determines if the microcontroller gets any power.  If the
-microcontroller has no power, then the power FETs described earlier naturally
-enter an "off" state.
-
+The Q2 FET is key.  It determines if the microcontroller gets any power.
 Q2 is off by default, turned off by R2.  There are two ways to turn it on:
 
-1. If the user presses SW5, then the FET will be pulled to ground turning on Q2
-2. If the microcontroller activates Q1 via "EN", then the FET will be turned on as well.  The microcontroller does this as soon as it can (in a split second) and holds it high until the microcontroller decides that it is time to power down.
+1. If the user presses SW5
+2. If the microcontroller activates Q1 via "EN".  The microcontroller does
+   this as soon as it can (in a split second) and holds it high until the
+   microcontroller decides that it is time to power down OR the user presses
+   the "OFF" button which forces Q2 off.
 
 ### ADC reference
 
 ![adc reference](images/adc_reference.png)
 
 When using an ADC, one can typically choose from several different sources for
-the ADC max voltage with the internally-generated 3.3V source as the most
-convenient.  The downside of choosing this source is accuracy as the source is
-not optimized for the application.
+the calibration with the internally-generated 3.3V source as the most
+convenient.  The downside of choosing this source is mediocure accuracy.
 
 This design uses the alternate `ADC_VREF` input with a `LM4040` voltage reference
 to allow for more accurate measurements.
@@ -283,9 +283,9 @@ to allow for more accurate measurements.
 
 ![oled](images/oled.png)
 
-The design breaks out an I2C connection that is typical for an I2C OLED.  A
+The design breaks out an I2C 4 pin header that is typical for an I2C OLED.  A
 128x64 design is the intended unit but anything that supports I2C could be
-supported with appropriate firmware.
+supported with appropriate firmware modifications.
 
 ### Fan connection
 
@@ -298,30 +298,17 @@ The circuitry below supports a PWM-based fan controller.
 
 ![fan](images/fan.png)
 
-The circuit is just a 12V linear regulator with supporting capacitors.  The connections support "PWM" style PC case fans which generally acccept a 25Khz PWM
-signal on pin 4.
+The circuit is just a 12V linear regulator with supporting capacitors.  The
+connections support "PWM" style PC case fans which generally acccept a 25Khz
+PWM signal on pin 4.
 
-The flyback diode is needed when powering motors.  In this case it is likely not needed as PC case fans almost always include one in their circuitry.  But I have
-it there as a precaution in case a fan is somehow selected that does not have
-one.
-
-### Control Buttons
-
-Besides the ON and "reset" buttons, we have an OFF, Next and OK button.
-
-OFF is directly connected to the poweron circuit, described above.  It
-cuts power to the microcontroller without any negotiation.
-
-NEXT and OK are used by the microcontroller to implement a simple UI.
-More complex UI functions (mostly setup, calibration, and preferences) can
-be configured using the USB interface of the Pico with associated firmware
-support.
-
-![buttons](images/buttons.png)
+A flyback diode is needed when powering generic motors but is unlikely to be
+needed here as PWM-controlled motors usually already have one in the motor
+control circuit.  You can add one for peace-of-mind if you choose.
 
 ### PI Pico Microcontroller
 
-As is typical, a microcontroller orchestrates the effort.  Here I chose a PI
+As is typical, a microcontroller orchestrates the operation.  Here I chose a PI
 Pico because it is inexpensive and quite capable.  It's main downside is the
 lack of a low-power sleep mode, but the Power cutoff circuit explained above
 compensates for this shortcoming.
@@ -336,7 +323,7 @@ A little bit on the tasks the Pico must attend to:
 4. It measures the battery voltage via an ADC.
 5. It provides an output display via SDA and SCL
 6. It controls the fan speed (if present) via the FAN pin.
-7. It may monitor the buttons B1, B2, B3, B4 and ON to as a part of user control.
+7. It monitors the buttons Select and OK buttons.
 
 ## PCB Layout
 
@@ -349,13 +336,13 @@ The PCB layout is above.  Some notes on the layout:
 * Large traces are used in the higher current areas.
 * Large vias are used to try and distribute current and reduce hotspots. 
 
-It is recommended to use thicker 2oz copper when manufacturing this board to handle the potentially-large current.
+I went with thicker 2oz copper when manufacturing this board to handle the potentially-large current.
 
-Here is an image of the board from the KiCAD image viewer.  Top and bottom:
+Here are some images of the completed board:
 
-![3d top](images/3d_top.png)
+![unpopulated](images/unpopulated_board.png)dd
 
-![3d bottom](images/3d_bottom.png)
+![completed](images/completed_board.png)
 
 Note that the KiCAD rendering has a number of missing components and imperfections due to my not taking the time to address them.  But you should get the basic idea.
 
