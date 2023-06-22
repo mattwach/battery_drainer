@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<CADFile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Version="0.9.8.0" Name="front_plate">
+<CADFile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Version="0.9.8.0" Name="front_plate">
   <layers>
     <layer name="0" color="127,255,0">
       <objects />
@@ -8,7 +8,7 @@
     <layer name="Edge" color="127,255,0">
       <objects>
         <pline id="388" Closed="true">
-          <ModificationCount>889</ModificationCount>
+          <ModificationCount>891</ModificationCount>
           <mat m="Identity" />
           <pts>
             <p>154.9,-114.5,0</p>
@@ -59,7 +59,7 @@
     <layer name="Inside" color="127,255,0">
       <objects>
         <pline id="389" Closed="true">
-          <ModificationCount>889</ModificationCount>
+          <ModificationCount>891</ModificationCount>
           <mat m="Identity" />
           <pts>
             <p>3.64397,-125.30988,0</p>
@@ -86,7 +86,7 @@
           </pts>
         </pline>
         <pline id="395" Closed="true">
-          <ModificationCount>889</ModificationCount>
+          <ModificationCount>891</ModificationCount>
           <mat m="Identity" />
           <pts>
             <p>84.376,-116.99898,0</p>
@@ -189,7 +189,7 @@
           </pts>
         </pline>
         <pline id="390" Closed="true">
-          <ModificationCount>889</ModificationCount>
+          <ModificationCount>891</ModificationCount>
           <mat m="Identity" />
           <pts>
             <p>3.64397,-6.51000000000001,0</p>
@@ -216,7 +216,7 @@
           </pts>
         </pline>
         <pline id="391" Closed="true">
-          <ModificationCount>889</ModificationCount>
+          <ModificationCount>891</ModificationCount>
           <mat m="Identity" />
           <pts>
             <p>150.544,-6.51000000000001,0</p>
@@ -243,7 +243,7 @@
           </pts>
         </pline>
         <pline id="392" Closed="true">
-          <ModificationCount>889</ModificationCount>
+          <ModificationCount>891</ModificationCount>
           <mat m="Identity" />
           <pts>
             <p>150.544,-125.30988,0</p>
@@ -270,7 +270,7 @@
           </pts>
         </pline>
         <pline id="393" Closed="true">
-          <ModificationCount>889</ModificationCount>
+          <ModificationCount>891</ModificationCount>
           <mat m="Identity" />
           <pts>
             <p>43.8864,-80.4527,0</p>
@@ -327,7 +327,7 @@
           </pts>
         </pline>
         <pline id="394" Closed="true">
-          <ModificationCount>889</ModificationCount>
+          <ModificationCount>891</ModificationCount>
           <mat m="Identity" />
           <pts>
             <p>29.0864,-109.9527,0</p>
@@ -384,7 +384,7 @@
           </pts>
         </pline>
         <pline id="396" Closed="true">
-          <ModificationCount>889</ModificationCount>
+          <ModificationCount>891</ModificationCount>
           <mat m="Identity" />
           <pts>
             <p>130.578,-96.9612,0</p>
@@ -470,7 +470,7 @@
       <machineops>
         <profile Enabled="true">
           <TargetDepth state="Value">-3.175</TargetDepth>
-          <DepthIncrement state="Default">0.5</DepthIncrement>
+          <DepthIncrement state="Value">0.5</DepthIncrement>
           <FinalDepthIncrement state="Default">0</FinalDepthIncrement>
           <CutOrdering state="Default">DepthFirst</CutOrdering>
           <CutWidth state="Default">0</CutWidth>
@@ -496,9 +496,9 @@
           <SideProfile state="Default" />
           <StockSurface state="Default">0</StockSurface>
           <RoughingClearance state="Default">0</RoughingClearance>
-          <ClearancePlane state="Default">2</ClearancePlane>
+          <ClearancePlane state="Value">2</ClearancePlane>
           <SpindleDirection state="Default">CW</SpindleDirection>
-          <SpindleSpeed state="Default">10000</SpindleSpeed>
+          <SpindleSpeed state="Value">10000</SpindleSpeed>
           <SpindleRange state="Default">0</SpindleRange>
           <VelocityMode state="Default">Undefined</VelocityMode>
           <primitive>
@@ -510,8 +510,8 @@
           <ToolDiameter state="Value">2</ToolDiameter>
           <ToolNumber state="Default">0</ToolNumber>
           <ToolProfile state="Value">EndMill</ToolProfile>
-          <PlungeFeedrate state="Default">200</PlungeFeedrate>
-          <CutFeedrate state="Default">350</CutFeedrate>
+          <PlungeFeedrate state="Value">200</PlungeFeedrate>
+          <CutFeedrate state="Value">350</CutFeedrate>
           <MaxCrossoverDistance state="Default">0.7</MaxCrossoverDistance>
           <StartPoint state="Default" />
           <CustomMOPHeader state="Default" />
@@ -520,7 +520,7 @@
         </profile>
         <profile Enabled="true">
           <TargetDepth state="Value">-3.175</TargetDepth>
-          <DepthIncrement state="Default">0.5</DepthIncrement>
+          <DepthIncrement state="Value">0.5</DepthIncrement>
           <FinalDepthIncrement state="Default">0</FinalDepthIncrement>
           <CutOrdering state="Default">DepthFirst</CutOrdering>
           <CutWidth state="Default">0</CutWidth>
@@ -546,9 +546,9 @@
           <SideProfile state="Default" />
           <StockSurface state="Default">0</StockSurface>
           <RoughingClearance state="Default">0</RoughingClearance>
-          <ClearancePlane state="Default">2</ClearancePlane>
+          <ClearancePlane state="Value">2</ClearancePlane>
           <SpindleDirection state="Default">CW</SpindleDirection>
-          <SpindleSpeed state="Default">10000</SpindleSpeed>
+          <SpindleSpeed state="Value">10000</SpindleSpeed>
           <SpindleRange state="Default">0</SpindleRange>
           <VelocityMode state="Default">Undefined</VelocityMode>
           <primitive>
@@ -567,8 +567,8 @@
           <ToolDiameter state="Value">2</ToolDiameter>
           <ToolNumber state="Default">0</ToolNumber>
           <ToolProfile state="Value">EndMill</ToolProfile>
-          <PlungeFeedrate state="Default">200</PlungeFeedrate>
-          <CutFeedrate state="Default">350</CutFeedrate>
+          <PlungeFeedrate state="Value">200</PlungeFeedrate>
+          <CutFeedrate state="Value">350</CutFeedrate>
           <MaxCrossoverDistance state="Default">0.7</MaxCrossoverDistance>
           <StartPoint state="Default" />
           <CustomMOPHeader state="Default" />
@@ -581,9 +581,8 @@
         <PMax>0,0</PMax>
         <Color>255,165,0</Color>
       </Stock>
-      <ToolProfile>Unspecified</ToolProfile>
       <Nesting>
-        <BasePoint />
+        <BasePoint>0,0</BasePoint>
         <NestMethod>None</NestMethod>
       </Nesting>
     </part>
