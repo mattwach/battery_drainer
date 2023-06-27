@@ -36,7 +36,8 @@ profiles to choose from:
 The user chooses a profile with "Select" and presses "OK" to start discharging.
 If the user chooses "settings", then an information message will appear:
 
-![ui settings](images/ui_settings.jpg)
+![ui settings 1](images/ui_settings1.jpg)
+![ui settings 2](images/ui_settings2.jpg)
 
 During discharge, the following status information will be displayed:
 
@@ -60,7 +61,7 @@ the power is highlighted as inverse text.
 When the discharge is complete, the unit will show some stats for a configurable
 amount of time before automatically shutting down.  Here is an example:
 
-![ui running](images/ui_finished.jpg)
+![ui finished](images/ui_finished.jpg)
 
 ## Configuration
 
