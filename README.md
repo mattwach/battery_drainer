@@ -1,15 +1,25 @@
 # battery_drainer
-This project describes hardware to safely discharge batteries to storage levels.
+This project describes hardware to safely discharge batteries to a user-chosen level.
 
 ![Drainer](images/drainer.jpg)
 
-Here are a few reasons why you would want to do this:
+# Why?
 
-1. If you fully charge a set of batteries and don't use them all, keeping them fully charged
-will cause them to degrade (lose capability and capacity).
-2. You want to test the current capacities of a battery (how many mAh is can deliver, how much
-current).
-3. You want to fully drain a battery before disposing/recycling it.
+Before I started flying RC models (many years ago), the concept of managing
+batteries was off my radar.  While in the hobby, it became clear that proper
+management makes a big difference in how long batteries last and how much power
+I can extract from them.
+
+Primarily, storing lithium ion batteries at fully charged or drained causes
+them to degrade.  It's much better to store them in a half-charged state.  That
+is why new battries that you buy show up half-charged.
+
+Since lithium battiers are used basically everywhere (phones, tools, laptops,
+    cars, on and on), being aware of these concepts can help you keep more of
+your devices running longer and more healthy.
+
+Other applications for discharging include testing battery capacity and
+preparing it for disposal.
 
 # Caution
 
@@ -46,17 +56,21 @@ During discharge, the following status information will be displayed:
 Information shown includes:
 
 * Time running
-* Number of aH discharged so far
+* Number of mAH discharged so far
 * Battery voltage and cell count
 * Target voltage
 * Discharge Current
 * Power
 * Temperature
-* FET power level
-* Fan power level
+* FET power level %
+* Fan power level %
 
 If the FET power level is limited < 100%, then the parameter that is limiting
-the power is highlighted as inverse text. 
+the power is highlighted as inverse text.  In the example above, this limit
+is overall power draw.  A lower celled battery might hit the max current instead.
+A small battery might be limited by voltage sag.  A hot day might introduce
+a temperature limit.  All limits are user configurable - but you'll need to be aware
+of what your built hardware can handle and test higher limits with due caution.
 
 When the discharge is complete, the unit will show some stats for a configurable
 amount of time before automatically shutting down.  Here is an example:
@@ -108,13 +122,13 @@ This is a set of 4 P-Channel MOSFETs connected in parallel:
 
 More or less *could *also work.
 
-**Note** The schematic shows four PFETs in parallel.  The unit I actually built uses
-a single high-power FET instead.  I think that four PFETs would still work but have
-not confirmed it.  The main risk of using 4 is that they will be unevenly loaded to
-the point where one of them is damaged.  I do believe that they will be unevenly loaded
-at lower currents but not after the current ramps up enough to matter.  Again, I have
-not confirmed this.  Using a single FET may be the better option if you want
-guarantees that it will work as expected.
+**Note** The schematic shows four PFETs in parallel.  The unit *I actually
+built* uses a single high-power FET instead.  I think that four PFETs would
+still work but have not confirmed it.  The main risk of using 4 is that they
+will be unevenly loaded to the point where one of them is damaged.  I do
+believe that they will be unevenly loaded at lower currents but not after the
+current ramps up enough to matter.  Again, I have not confirmed this.  Using a
+single FET may be the better option if you want to play it safer.
 
 The FETs in this design are (unusually) run in their "Ohmic" region which
 is controlled by the gate-to-source voltage (Vgs) as exampled in the FQP27P06
@@ -131,7 +145,8 @@ To achieve the target Vgs for the FETs, we the following circuit:
 ![rc circuit](images/rc_circuit.png)
 
 The main element here is the 10u capacitor on the right side of the image.  This
-capacitor is filled and emptied to set the Vgs that each FET will see.
+capacitor is filled and emptied.  The resulting voltage is the gate voltage that
+each FET will see.
 
 Filling the capacitor is the 5k resistor, R16.  If only this resistor and the
 capacitor existed, then the RC constant would be 5000 * 10e-6 = 50ms.  When the
@@ -139,20 +154,21 @@ capacitor is sufficiently charged, the FETs will be turned off.
 
 The two transistor networks are used to drain the capacitor.  The one on the
 left is a "slow" drain and the one on the right is a "fast" drain.  The size of
-the resistors (R17 and R20) at the collector determines the drain speed.  A
-microcontroller feeds in a PWM signal with a varying duty cycle to control how
-much charge they pull from the capacitor thus determining the Vgs value.
+the resistors (R17 and R20) determines the drain speed.  A microcontroller
+feeds in a PWM to open/close the transistor.  The duty cycle of this PWM
+signal determines how much current is pulled on average and the frequency
+of this PWM signal determines how smooth/stable the voltage will be.
 
-The reason for two drains is to cover the large supported voltage range.  At
-lower voltages (4V), the FAST drain circuit dominates and is needed to get
-the Vgs lower than the SLOW drain can achieve.  For higher voltages (25V),
-the SLOW drain provides better control resolution.  It's quite possible that
-only one drain is needed, but that would come down to testing the performance
-through the desired voltage range.
+The reason for two drains (verses one) is to cover the large supported voltage
+range.  At lower voltages (4V), the FAST drain circuit is needed
+to get the Vgs lower than the SLOW drain can achieve.  For higher voltages
+(25V), the SLOW drain provides better control resolution.  It's quite possible
+that only one drain is needed, but there will be less margin available for
+performance tuning.
 
 In the power-on state, we can assume that SLOW and FAST are not driven at all
 (high Z).  In this state the two 50k pulldowns (R14, R18) turn off Q6 and Q9
-allowing the capacitor to fill up and turn off all MOSFETs.
+allowing the capacitor to fill up and turn off the main power FETs.
 
 The 100K pull down resistor slowly drains the capacitor so that it is in a known
 state (0V) when the unit is unplugged and idle.  Omitting can create a situation
