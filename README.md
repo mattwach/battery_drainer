@@ -38,7 +38,7 @@ The unit has four UI buttons: On, Off, Select and OK.
 ![four buttons](images/four_buttons.jpg)
 
 When the device is initially powered up, it will display the current voltage,
-cell count and the target voltage.  There will also be a scrollable list of
+cell count and the target voltage.  It also shows a scrollable list of
 profiles to choose from:
 
 ![ui power on](images/ui_power_on.jpg)
@@ -49,7 +49,8 @@ If the user chooses "settings", then an information message will appear:
 ![ui settings 1](images/ui_settings1.jpg)
 ![ui settings 2](images/ui_settings2.jpg)
 
-During discharge, the following status information will be displayed:
+During discharge, the following status information is displayed (the ghosting
+in the image is becuase the unit was actively updating during the photo):
 
 ![ui running](images/ui_running.jpg)
 
@@ -60,14 +61,14 @@ Information shown includes:
 * Battery voltage and cell count
 * Target voltage
 * Discharge Current
-* Power
+* Power (Votage * Current)
 * Temperature
 * FET power level %
 * Fan power level %
 
 If the FET power level is limited < 100%, then the parameter that is limiting
 the power is highlighted as inverse text.  In the example above, this limit
-is overall power draw.  A lower celled battery might hit the max current instead.
+is overall power draw.  A lower-cell-count battery might hit the max current instead.
 A small battery might be limited by voltage sag.  A hot day might introduce
 a temperature limit.  All limits are user configurable - but you'll need to be aware
 of what your built hardware can handle and test higher limits with due caution.
@@ -120,7 +121,7 @@ This is a set of 4 P-Channel MOSFETs connected in parallel:
 
 ![power fets](images/power_fets.png)
 
-More or less *could *also work.
+More or less *could* also work.
 
 **Note** The schematic shows four PFETs in parallel.  The unit *I actually
 built* uses a single high-power FET instead.  I think that four PFETs would
@@ -128,7 +129,7 @@ still work but have not confirmed it.  The main risk of using 4 is that they
 will be unevenly loaded to the point where one of them is damaged.  I do
 believe that they will be unevenly loaded at lower currents but not after the
 current ramps up enough to matter.  Again, I have not confirmed this.  Using a
-single FET may be the better option if you want to play it safer.
+single high-power FET is my recommendation if you want to play it safer.
 
 The FETs in this design are (unusually) run in their "Ohmic" region which
 is controlled by the gate-to-source voltage (Vgs) as exampled in the FQP27P06
@@ -159,22 +160,19 @@ feeds in a PWM to open/close the transistor.  The duty cycle of this PWM
 signal determines how much current is pulled on average and the frequency
 of this PWM signal determines how smooth/stable the voltage will be.
 
-The reason for two drains (verses one) is to cover the large supported voltage
+The reason for two drains (verses one) is to support a larger voltage
 range.  At lower voltages (4V), the FAST drain circuit is needed
 to get the Vgs lower than the SLOW drain can achieve.  For higher voltages
-(25V), the SLOW drain provides better control resolution.  It's quite possible
-that only one drain is needed, but there will be less margin available for
-performance tuning.
+(25V), the SLOW drain provides better control resolution.  Depending on the
+FET you go with and voltage range you want to support, a single drain
+may work fine.
 
 In the power-on state, we can assume that SLOW and FAST are not driven at all
 (high Z).  In this state the two 50k pulldowns (R14, R18) turn off Q6 and Q9
 allowing the capacitor to fill up and turn off the main power FETs.
 
-The 100K pull down resistor slowly drains the capacitor so that it is in a known
-state (0V) when the unit is unplugged and idle.  Omitting can create a situation
-where Vgs is temporarily higher than the plugged in battery, which could lead to
-some side effects such as temporary Vgs oscillation as the firmware searches for
-the correct duty cycles for SLOW and FAST.
+The 100K pull down resistor (R25) slowly drains the capacitor so that it at a known
+voltage (0V) when the unit is unplugged and idle.
 
 ## Inrush protection
 
