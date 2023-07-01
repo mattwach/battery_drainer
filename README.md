@@ -353,13 +353,13 @@ The PCB layout is above.  Some notes on the layout:
 
 I went with thicker 2oz copper when manufacturing this board to handle the potentially-large current.
 
-Here are some images of the completed board:
+Here are some images of the board, unpopulated and with most components added:
 
-![unpopulated](images/unpopulated_board.png)dd
+![unpopulated](images/unpopulated_board.jpg)
 
-![completed](images/completed_board.png)
+![completed](images/completed_board.jpg)
 
-Note that the KiCAD rendering has a number of missing components and imperfections due to my not taking the time to address them.  But you should get the basic idea.
+Note that the completed board had a bug where I forgot to add a power-cutoff to the fan.  If not corrected, this could have caused the fan to draw ~5-10 mA even after charging is completed.  The fix was to add a PFET (green wires).  The board design now incorporates the FET on the board.
 
 ## Daughterboard
 
