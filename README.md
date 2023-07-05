@@ -8,11 +8,10 @@ This project describes hardware to safely discharge batteries to a user-chosen l
 Before I started flying RC models (many years ago), the concept of managing
 batteries was off my radar.  While in the hobby, it became clear that proper
 management makes a big difference in how long batteries last and how much power
-I can extract from them.
+they will deliver.
 
-Primarily, storing lithium ion batteries at fully charged or drained causes
-them to degrade.  It's much better to store them in a half-charged state.  That
-is why new battries that you buy show up half-charged.
+Storing lithium ion batteries at fully charged or drained causes them to
+degrade.  It's much better to store them in a half-charged state.
 
 Since lithium battiers are used basically everywhere (phones, tools, laptops,
     cars, on and on), being aware of these concepts can help you keep more of
@@ -27,9 +26,30 @@ Batteries are energy storage devices and thus carry an inherent risk.  Even
 if you follow all recomended procedures, there are risks due to unknown-to-you
 manufacturing defects or other subtle damage.  If you are unfamilar with the
 battery type you are working with, take a few moments to educate yourself on
-recommnded handling practives.
+recommnded handling practices.
 
 Following anything written in this document is at-your-own risk.
+
+# Pre-existing Market Solutions
+
+If you look up "LIPO Battery Discharger" on Amazon or similar, you will find
+a variety of products.  These might work for you but note that this project
+has some advantages over what you can buy:
+
+1. Higher maximum power.  The most powerful unit I could find could dissapate
+200W.  My current-built unit is running great at 350W and has a max limit of
+460W (if I'm feeling lucky enough to try it).  Since you are building it yourself,
+you can choose a transistor/cooling combo that supports the power you need.
+2. Support for "safe" multiboards.  My project has a diode-protected multiboard
+that allows you to safely plug in multiple batteries that are at different discharge levels.
+This requires the discharger account for the voltage drop across the protection
+diodes, which commerical charges do not do.
+3. Support of 1S packs.
+4. Lots of customization.  My project lets you customize voltages and
+create special profiles.  Fro example, I have one that takes packs down to
+4V, which is useful for packs that you want to ready-to-use in tools.
+5. Detailed status.  The OLED of this project gives lots of information
+during the discharge.
 
 ## User Interface
 
