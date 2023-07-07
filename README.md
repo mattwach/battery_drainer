@@ -13,9 +13,11 @@ they will deliver.
 Storing lithium ion batteries at fully charged or drained causes them to
 degrade.  It's much better to store them in a half-charged state.
 
-Since lithium battiers are used basically everywhere (phones, tools, laptops,
+Since lithium batteries are used basically everywhere (phones, tools, laptops,
     cars, on and on), being aware of these concepts can help you keep more of
 your devices running longer and more healthy.
+
+Many non-lithium batteries have "memory effects" and can benefit from a deep discharge now and then.  See your particular battery type for details on how to maintain/restore it.
 
 Other applications for discharging include testing battery capacity and
 preparing it for disposal.
