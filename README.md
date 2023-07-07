@@ -10,8 +10,8 @@ batteries was off my radar.  While in the hobby, it became clear that proper
 management makes a big difference in how long batteries last and how much power
 they will deliver.
 
-Storing lithium ion batteries at fully charged or drained causes them to
-degrade.  It's much better to store them in a half-charged state.
+Storing lithium ion batteries fully-charged or fully-drained causes them to
+degrade permanently.  It's much better to store them in a half-charged state.
 
 Since lithium batteries are used basically everywhere (phones, tools, laptops,
     cars, on and on), being aware of these concepts can help you keep more of
@@ -24,32 +24,30 @@ preparing it for disposal.
 
 # Caution
 
-Batteries are energy storage devices and thus carry an inherent risk.  Even
-if you follow all recomended procedures, there are risks due to unknown-to-you
-manufacturing defects or other subtle damage.  If you are unfamilar with the
-battery type you are working with, take a few moments to educate yourself on
-recommnded handling practices.
-
 Following anything written in this document is at-your-own risk.
+
+Batteries are energy storage devices and thus carry an inherent risk.  If you
+are unfamilar with the battery type you are working with, take a few moments to
+educate yourself on recommnded handling practices.
 
 # Pre-existing Market Solutions
 
-If you look up "LIPO Battery Discharger" on Amazon or similar, you will find
-a variety of products.  These might work for you but note that this project
-has some advantages over what you can buy:
+If you look up "LIPO Battery Discharger" on Amazon or similar, you will find a
+variety of products.  These might work for you but note that the project I am
+describing has some advantages over what you can buy:
 
 1. Higher maximum power.  The most powerful unit I could find could dissapate
-200W.  My current-built unit is running great at 350W and has a max limit of
-460W (if I'm feeling lucky enough to try it).  Since you are building it yourself,
-you can choose a transistor/cooling combo that supports the power you need.
+200W.  The unit I built is running great at 350W and has a max limit of
+460W (which I have not tested).  Since you are building it yourself,
+you can choose a transistor/cooling combo that supports the power dissapation you need.
 2. Support for "safe" multiboards.  My project has a diode-protected multiboard
 that allows you to safely plug in multiple batteries that are at different discharge levels.
-This requires the discharger account for the voltage drop across the protection
+This board requires the discharger account for the voltage drop across the protection
 diodes, which commerical charges do not do.
 3. Support of 1S packs.
 4. Lots of customization.  My project lets you customize voltages and
 create special profiles.  Fro example, I have one that takes packs down to
-4V, which is useful for packs that you want to ready-to-use in tools.
+4V, which is useful for packs that I want ready-to-use in lights and tools.
 5. Detailed status.  The OLED of this project gives lots of information
 during the discharge.
 
@@ -167,8 +165,8 @@ To achieve the target Vgs for the FETs, we the following circuit:
 
 ![rc circuit](images/rc_circuit.png)
 
-The main element here is the 10u capacitor on the right side of the image.  This
-capacitor is filled and emptied.  The resulting voltage is the gate voltage that
+The main element here is the 10u capacitor on the right side of the image.
+The voltage across this capacitor is the gate voltage that
 each FET will see.
 
 Filling the capacitor is the 5k resistor, R16.  If only this resistor and the
@@ -191,7 +189,7 @@ may work fine.
 
 In the power-on state, we can assume that SLOW and FAST are not driven at all
 (high Z).  In this state the two 50k pulldowns (R14, R18) turn off Q6 and Q9
-allowing the capacitor to fill up and turn off the main power FETs.
+causing the capacitor to fill up and turn off the main power FETs.
 
 The 100K pull down resistor (R25) slowly drains the capacitor so that it at a known
 voltage (0V) when the unit is unplugged and idle.
@@ -200,10 +198,9 @@ voltage (0V) when the unit is unplugged and idle.
 
 [falstad model](https://tinyurl.com/2y8c54c8)
 
-There is inrush current potential on initial plugin as the 100ms or so it takes
-the capacitor (C4) to charge via R16 could allow a high current to pass through
-the FETs for that time period.  This is mitigated by the following inrush
-protection circuitry:
+On initial battery plug-in, the 100ms or so it takes the capacitor (C4) to
+charge via R16 could allow a high current to pass through the FETs for that
+time period.  This is mitigated by the following inrush protection circuitry:
 
 ![inrush](images/inrush.png)
 
@@ -213,11 +210,11 @@ basically have another way to fill the capacitor C4 which is "enabled" when the
 battery is plugged in but the user has not pressed the power button yet.  The
 way this works is that the source of the MOSFET (2) is connected to the battery
 and the small 10 ohm R13 allows for a rapid fill.  R8 is connected to the
-microcontroller power and is thus grounded on initial power on, turning "on" the
+microcontroller power and is thus grounded on plug-in, turning "on" the
 FET.
 
 When the user powers on the device (after the battery is plugged in), there is
-voltage near-battery going to R8 which turns off the FET and disables the inrush subcircuit.
+voltage near-battery going to R8 which turns off the FET and cuts off R13.
 
 ### Current Sense 
 
@@ -227,29 +224,28 @@ voltage near-battery going to R8 which turns off the FET and disables the inrush
 
 One of the four ways the microcontroller decides where to set Vgs is by
 monitoring the current flowing through the FETs  (the other three are voltage,
-power, and temperature).  This is done with a low-side sense circuit which is a
-resistor that indicates the current via a voltage drop.  This voltage drop is
-measured with an ADC on the micorcontroller.  
+    power, and temperature).  An ADC within the micorcontroller measures the
+voltage across the resistor then uses Ohm's law (I = V/R) to determine the
+current.
 
-In many cases, minimizing the power loss through this sense resistor is
-desirable so a small resistance will be chosen and the corresponding low voltage
-drop will be amplified in an attempt to get enough ADC resolution.
-
-Because powerloss *is* the goal here, we instead choose power resistors that
-directly provide a full (3V) drop at around 30V input.  To safely get there, I
-chose 3 35W 0.4 ohm resistors connected in parallel for a total dissipation
-capability of ~100W and an equivilent resistance of 0.133 ohm.
+Resistor values were chosen for a full 3V swing at 30A of current, this allows
+us to use the full 12-bits of ADC resolution for good accuracy.  The downside
+is that 3V * 30A = 90W, which is a lot for a resistor to dissapate.  To support
+this, I chose 3 35W 0.4 ohm resistors connected in parallel for a total dissipation
+capability of ~100W and an equivilent resistance of 0.133 ohm.  Potentially
+wasting this much power on a current measurement would normally be frowned upon but
+in this application it's actually helping take some load off the main power FET,
+buying us a little more margin on max power dissapation.
 
 A zener diode (U5) is used to protect the ADC of the microcontroller in the
-event that the divided voltage is too high (> 3V).  The microcontroller firmware
-may have to know that any measurement above 3V translates to >= 3V and not
-exactly that.  In normal use, this case should not occur.
+event that the divided voltage is too high (> 3V).  This is a protection
+feature that serves no function under "normal" operating conditions.
 
 ### Protection Fuse
 
 ![fuse](images/fuse.png)
 
-We also have a protection fuse to help protect against software faults or other
+We also have a protection fuse to help protect against software bugs or other
 unexpected problems.  More protection would be offered if the fuse were right at
 the battery input but this would introduce a further temperature-dependent
 voltage drop that would throw off the voltage measurement.  The "unprotected"
@@ -262,7 +258,8 @@ physical issue with the board (< 100 mA)
 
 ![v sense](images/v_sense.png)
 
-The microcontroller monitors the overall battery voltage to determine a sag value and to determine when the drain process is completed.
+The microcontroller monitors the overall battery voltage to determine a sag
+value and to determine when the drain process is completed.
 
 The circuit is a simple voltage divider with a capacitor to help stabilize the reading.
 
@@ -271,8 +268,8 @@ Sag is determined by periodically turning off the FETs (say for one second every
 used a reference value to determine the sag.
 
 The voltage at R9 is not exactly the battery voltage as it has to pass through a
-a diode and FET.  The micorcontroller calculations will attempt to compensate
-for the drop.
+a diode and FET.  The software provides a calibration value to account for this
+drop.
 
 ### Temperature Sense
 
