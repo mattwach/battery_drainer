@@ -1,5 +1,7 @@
 # battery_drainer
-This project describes hardware to safely discharge batteries to a user-chosen level.
+
+This project describes hardware to safely discharge batteries to a user-chosen
+level.
 
 ![Drainer](images/drainer.jpg)
 
@@ -17,7 +19,9 @@ Since lithium batteries are used basically everywhere (phones, tools, laptops,
     cars, on and on), being aware of these concepts can help you keep more of
 your devices running longer and more healthy.
 
-Many non-lithium batteries have "memory effects" and can benefit from a deep discharge now and then.  See your particular battery type for details on how to maintain/restore it.
+Many non-lithium batteries have "memory effects" and can benefit from a deep
+discharge now and then.  See your particular battery type for details on how to
+maintain/restore it.
 
 Other applications for discharging include testing battery capacity and
 preparing it for disposal.
@@ -27,8 +31,8 @@ preparing it for disposal.
 Following anything written in this document is at-your-own risk.
 
 Batteries are energy storage devices and thus carry an inherent risk.  If you
-are unfamilar with the battery type you are working with, take a few moments to
-educate yourself on recommnded handling practices.
+are not familiar with the battery type you are working with, take a few moments to
+educate yourself on recommended handling practices.
 
 # Pre-existing Market Solutions
 
@@ -36,20 +40,24 @@ If you look up "LIPO Battery Discharger" on Amazon or similar, you will find a
 variety of products.  These might work for you but note that the project I am
 describing has some advantages over what you can buy:
 
-1. Higher maximum power.  The most powerful unit I could find could dissapate
-200W.  The unit I built is running great at 350W and has a max limit of
-460W (which I have not tested).  Since you are building it yourself,
-you can choose a transistor/cooling combo that supports the power dissapation you need.
+1. Higher maximum power.  The most powerful unit I could find could dissipate
+   200W.  The unit I built is running great at 350W and has a max limit of
+   460W (which I have not tested).  Since you are building it yourself,
+   you can choose a transistor/cooling combo that supports the power dissipation
+   you need.
 2. Support for "safe" multiboards.  My project has a diode-protected multiboard
-that allows you to safely plug in multiple batteries that are at different discharge levels.
-This board requires the discharger account for the voltage drop across the protection
-diodes, which commerical charges do not do.
+   that allows you to safely plug in multiple batteries that are at different 
+   discharge levels. This protection requires the discharger account for the 
+   voltage drop across the protection diodes, which commercial charges do not
+   do.
 3. Support of 1S packs.
 4. Lots of customization.  My project lets you customize voltages and
-create special profiles.  Fro example, I have one that takes packs down to
-4V, which is useful for packs that I want ready-to-use in lights and tools.
+   create special profiles.  Fro example, I have one that takes packs down to
+   4V, which is useful for packs that I want ready-to-use in lights and tools.
 5. Detailed status.  The OLED of this project gives lots of information
-during the discharge.
+   during the discharge.
+6. Support for more battery types than just LIPO, due to the extensive 
+   customization ability.
 
 ## User Interface
 
@@ -70,7 +78,7 @@ If the user chooses "settings", then an information message will appear:
 ![ui settings 2](images/ui_settings2.jpg)
 
 During discharge, the following status information is displayed (the ghosting
-in the image is becuase the unit was actively updating during the photo):
+in the image is because the unit was actively updating during the photo):
 
 ![ui running](images/ui_running.jpg)
 
@@ -81,17 +89,18 @@ Information shown includes:
 * Battery voltage and cell count
 * Target voltage
 * Discharge Current
-* Power (Votage * Current)
+* Power (Voltage * Current)
 * Temperature
 * FET power level %
 * Fan power level %
 
 If the FET power level is limited < 100%, then the parameter that is limiting
-the power is highlighted as inverse text.  In the example above, this limit
-is overall power draw.  A lower-cell-count battery might hit the max current instead.
-A small battery might be limited by voltage sag.  A hot day might introduce
-a temperature limit.  All limits are user configurable - but you'll need to be aware
-of what your built hardware can handle and test higher limits with due caution.
+the power is highlighted as inverse text.  In the example above, this limit is
+overall power draw.  A lower-cell-count battery might hit the max current
+instead.  A small battery might be limited by voltage sag.  A hot day might
+introduce a temperature limit.  All limits are user configurable - but you'll
+need to be aware of what your built hardware can handle and test higher limits
+with due caution.
 
 When the discharge is complete, the unit will show some stats for a configurable
 amount of time before automatically shutting down.  Here is an example:
@@ -101,7 +110,7 @@ amount of time before automatically shutting down.  Here is an example:
 ## Configuration
 
 Profiles can be edited by connecting a computer to the unit via USB and starting
-a termnial program.  On my Linux laptop, I used:
+a terminal program.  On my Linux laptop, I used:
 
     minicom -b 115200 -P /dev/ttyUSB0
 
@@ -120,13 +129,14 @@ the list looked like at some point:
 ## Schematic Overview
 
 Note that the images below are a snapshot of the schematic and not fully
-up-tp-date.  See the kicad original for the latest design.
+up-tp-date.  See the KiCad original for the latest design.
 
 Here is the complete design (click to expand):
 
 ![schematic](images/schematic.png)
 
-Here is an early falstad simulation that gives a basic idea of how the cicuit works:
+Here is an early Falstad simulation that gives a basic idea of how the circuit
+works:
 
 https://tinyurl.com/2qg4xwyj
 
@@ -135,11 +145,11 @@ subcircuit at a time.
 
 ### Power Dissipation
 
-[falstad model](https://tinyurl.com/28p9fv3n)
+[Falstad model](https://tinyurl.com/28p9fv3n)
 
 This is a set of 4 P-Channel MOSFETs connected in parallel:
 
-![power fets](images/power_fets.png)
+![power FETs](images/power_fets.png)
 
 More or less *could* also work.
 
@@ -159,7 +169,7 @@ datasheet graph below:
 
 ### Vgs Control
 
-[falstad model](https://tinyurl.com/2bj46fut)
+[Falstad model](https://tinyurl.com/2bj46fut)
 
 To achieve the target Vgs for the FETs, we the following circuit:
 
@@ -188,15 +198,15 @@ FET you go with and voltage range you want to support, a single drain
 may work fine.
 
 In the power-on state, we can assume that SLOW and FAST are not driven at all
-(high Z).  In this state the two 50k pulldowns (R14, R18) turn off Q6 and Q9
-causing the capacitor to fill up and turn off the main power FETs.
+(high Z).  In this state the two 50k pulldown resistors (R14, R18) turn off Q6
+and Q9 causing the capacitor to fill up and turn off the main power FETs.
 
 The 100K pull down resistor (R25) slowly drains the capacitor so that it at a known
 voltage (0V) when the unit is unplugged and idle.
 
 ## Inrush protection
 
-[falstad model](https://tinyurl.com/2y8c54c8)
+[Falstad model](https://tinyurl.com/2y8c54c8)
 
 On initial battery plug-in, the 100ms or so it takes the capacitor (C4) to
 charge via R16 could allow a high current to pass through the FETs for that
@@ -205,7 +215,7 @@ time period.  This is mitigated by the following inrush protection circuitry:
 ![inrush](images/inrush.png)
 
 Fully understanding this block will require studying the full schematic.  A
-partial understand can be gained from the image above and the falstad model.  We
+partial understand can be gained from the image above and the Falstad model.  We
 basically have another way to fill the capacitor C4 which is "enabled" when the
 battery is plugged in but the user has not pressed the power button yet.  The
 way this works is that the source of the MOSFET (2) is connected to the battery
@@ -218,26 +228,25 @@ voltage near-battery going to R8 which turns off the FET and cuts off R13.
 
 ### Current Sense 
 
-[falstad model](https://tinyurl.com/253e6aln)
+[Falstad model](https://tinyurl.com/253e6aln)
 
 ![i sense](images/i_sense.png)
 
 One of the four ways the microcontroller decides where to set Vgs is by
 monitoring the current flowing through the FETs  (the other three are voltage,
-    power, and temperature).  An ADC within the micorcontroller measures the
-voltage across the resistor then uses Ohm's law (I = V/R) to determine the
-current.
+power, and temperature).  An ADC within the microcontroller measures the voltage
+across the resistor then uses Ohm's law (I = V/R) to determine the current.
 
 Resistor values were chosen for a full 3V swing at 30A of current, this allows
 us to use the full 12-bits of ADC resolution for good accuracy.  The downside
-is that 3V * 30A = 90W, which is a lot for a resistor to dissapate.  To support
+is that 3V * 30A = 90W, which is a lot for a resistor to dissipate.  To support
 this, I chose 3 35W 0.4 ohm resistors connected in parallel for a total dissipation
-capability of ~100W and an equivilent resistance of 0.133 ohm.  Potentially
+capability of ~100W and an equivalent resistance of 0.133 ohm.  Potentially
 wasting this much power on a current measurement would normally be frowned upon but
 in this application it's actually helping take some load off the main power FET,
-buying us a little more margin on max power dissapation.
+buying us a little more margin on max power dissipation.
 
-A zener diode (U5) is used to protect the ADC of the microcontroller in the
+A Zener diode (U5) is used to protect the ADC of the microcontroller in the
 event that the divided voltage is too high (> 3V).  This is a protection
 feature that serves no function under "normal" operating conditions.
 
@@ -254,14 +263,15 @@ physical issue with the board (< 100 mA)
 
 ### Voltage Sense
 
-[falstad model](https://tinyurl.com/2aavu5hb)
+[Falstad model](https://tinyurl.com/2aavu5hb)
 
 ![v sense](images/v_sense.png)
 
 The microcontroller monitors the overall battery voltage to determine a sag
 value and to determine when the drain process is completed.
 
-The circuit is a simple voltage divider with a capacitor to help stabilize the reading.
+The circuit is a simple voltage divider with a capacitor to help stabilize the
+reading.
 
 Sag is determined by periodically turning off the FETs (say for one second every
 15 seconds) and measuring the "unloaded" voltage of the pack.  This can then be
@@ -281,7 +291,7 @@ cooling fan (described below) and, if this is inadequate, reduce the current dra
 
 ### Power cutoff
 
-[falstad model](https://tinyurl.com/22wuu5mp)
+[Falstad model](https://tinyurl.com/22wuu5mp)
 
 The battery drainer is designed to draw nearly zero power (outside of parasitic
 losses) when it is off, including after the discharging has completed.  Thus the
@@ -308,14 +318,14 @@ Q2 is off by default, turned off by R2.  There are two ways to turn it on:
 
 When using an ADC, one can typically choose from several different sources for
 the calibration with the internally-generated 3.3V source as the most
-convenient.  The downside of choosing this source is mediocure accuracy.
+convenient.  The downside of choosing this source is mediocre accuracy.
 
 This design uses the alternate `ADC_VREF` input with a `LM4040` voltage reference
 to allow for more accurate measurements.
 
 ### OLED connection
 
-![oled](images/oled.png)
+![OLED](images/oled.png)
 
 The design breaks out an I2C 4 pin header that is typical for an I2C OLED.  A
 128x64 design is the intended unit but anything that supports I2C could be
@@ -333,7 +343,7 @@ The circuitry below supports a PWM-based fan controller.
 ![fan](images/fan.png)
 
 The circuit is just a 12V linear regulator with supporting capacitors.  The
-connections support "PWM" style PC case fans which generally acccept a 25Khz
+connections support "PWM" style PC case fans which generally accept a 25Khz
 PWM signal on pin 4.
 
 A flyback diode is needed when powering generic motors but is unlikely to be
@@ -347,12 +357,14 @@ Pico because it is inexpensive and quite capable.  It's main downside is the
 lack of a low-power sleep mode, but the Power cutoff circuit explained above
 compensates for this shortcoming.
 
-![pico](images/pico.png)
+![Pico](images/pico.png)
 
 A little bit on the tasks the Pico must attend to:
 
-1. When the unit is powered-up, the Pico must raise the EN pin to keep the power active.  It must lower the EN pin when it is time to shutdown.
-2. It controls the dissapation rate of the main FETs via PWM signals on the SLOW and FAST pins.
+1. When the unit is powered-up, the Pico must raise the EN pin to keep the power  
+   active.  It must lower the EN pin when it is time to shutdown.
+2. It controls the dissipation rate of the main FETs via PWM signals on the SLOW 
+   and FAST pins.
 3. It measures current by ADC decoding the voltage at the CUR pin.
 4. It measures the battery voltage via an ADC.
 5. It provides an output display via SDA and SCL
@@ -378,14 +390,18 @@ Here are some images of the board, unpopulated and with most components added:
 
 ![completed](images/completed_board.jpg)
 
-Note that the completed board had a bug where I forgot to add a power-cutoff to the fan.  If not corrected, this could have caused the fan to draw ~5-10 mA even after charging is completed.  The fix was to add a PFET (green wires).  The board design now incorporates the FET on the board.
+Note that the completed board had a bug where I forgot to add a power-cutoff to
+the fan.  If not corrected, this could have caused the fan to draw ~5-10 mA even
+after charging is completed.  The fix was to add a PFET (green wires).  The
+board design now incorporates the FET on the board.
 
 ## Daughterboard
 
-You could plug a single battery into the unit or use a parallel adapter.  Safer than
-a parallel adapter would be a board with integrated diodes.  This will allow batteries of different charge levels to be plugged in without the concern of large
-current flows due to unequal discharge levels.  The firmware can account for the
-drop across the diodes after the user calibrates the board.  
+You could plug a single battery into the unit or use a parallel adapter.  Safer
+than a parallel adapter would be a board with integrated diodes.  This will
+allow batteries of different charge levels to be plugged in without the concern
+of large current flows due to unequal discharge levels.  The firmware can
+account for the drop across the diodes after the user calibrates the board.  
 
 A bundled example provides connection for 6 XT-60 packs.  Changing the number of
 packs or the connector type is of course doable:
