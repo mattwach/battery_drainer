@@ -40,24 +40,25 @@ If you look up "LIPO Battery Discharger" on Amazon or similar, you will find a
 variety of products.  These might work for you but note that the project I am
 describing has some advantages over what you can buy:
 
-1. Higher maximum power.  The most powerful unit I could find could dissipate
-   200W.  The unit I built is running great at 350W and has a max limit of
-   460W (which I have not tested).  Since you are building it yourself,
+1. Higher maximum power.  The unit I built is running great at 350W.  The components
+   I chose are speced to 460W and 30A.  Since you are building it yourself,
    you can choose a transistor/cooling combo that supports the power dissipation
    you need.
 2. Support for "safe" multiboards.  My project has a diode-protected multiboard
    that allows you to safely plug in multiple batteries that are at different 
    discharge levels. This protection requires the discharger account for the 
    voltage drop across the protection diodes, which commercial charges do not
-   do.
-3. Support of 1S packs.
+   typically do.
+3. Support of 1S packs.  Many chargers have a 2S minimum.
 4. Lots of customization.  My project lets you customize voltages and
-   create special profiles.  Fro example, I have one that takes packs down to
-   4V, which is useful for packs that I want ready-to-use in lights and tools.
+   create special profiles.  For example, I have one that takes packs down to
+   4V, which is useful for packs that I want ready-to-use in worklights and tools.
 5. Detailed status.  The OLED of this project gives lots of information
-   during the discharge.
+   during the discharge which can help you guage the health of the pack.
 6. Support for more battery types than just LIPO, due to the extensive 
    customization ability.
+
+# Using
 
 ## User Interface
 
@@ -72,11 +73,6 @@ profiles to choose from:
 ![ui power on](images/ui_power_on.jpg)
 
 The user chooses a profile with "Select" and presses "OK" to start discharging.
-If the user chooses "settings", then an information message will appear:
-
-![ui settings 1](images/ui_settings1.jpg)
-![ui settings 2](images/ui_settings2.jpg)
-
 During discharge, the following status information is displayed (the ghosting
 in the image is because the unit was actively updating during the photo):
 
@@ -107,6 +103,9 @@ amount of time before automatically shutting down.  Here is an example:
 
 ![ui finished](images/ui_finished.jpg)
 
+After shutdown, the unit takes very little power (a few microamps) to avoid
+further unintended drainage of smaller packs.
+
 ## Configuration
 
 Profiles can be edited by connecting a computer to the unit via USB and starting
@@ -116,6 +115,8 @@ a terminal program.  On my Linux laptop, I used:
 
 Refer to the [dedicated configuration guide](configuration.md) for details
 about how to configure settings, calibrate the device and create/edit profiles.
+
+# Building
 
 ## Parts list
 
