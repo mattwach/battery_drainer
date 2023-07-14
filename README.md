@@ -52,7 +52,7 @@ describing has some advantages over what you can buy:
 3. Support of 1S packs.  Many chargers have a 2S minimum.
 4. Lots of customization.  My project lets you customize voltages and
    create special profiles.  For example, I have one that takes packs down to
-   4V, which is useful for packs that I want ready-to-use in worklights and tools.
+   4V/Cell, which is useful for packs that I want ready-to-use in worklights and tools.
 5. Detailed status.  The OLED of this project gives lots of information
    during the discharge which can help you guage the health of the pack.
 6. Support for more battery types than just LIPO, due to the extensive 
@@ -184,7 +184,7 @@ Filling the capacitor is the 5k resistor, R16.  If only this resistor and the
 capacitor existed, then the RC constant would be 5000 * 10e-6 = 50ms.  When the
 capacitor is sufficiently charged, the FETs will be turned off.
 
-The two transistor networks are used to drain the capacitor.  The one on the
+The two transistors (Q6, Q9) are used to drain the capacitor.  The one on the
 left is a "slow" drain and the one on the right is a "fast" drain.  The size of
 the resistors (R17 and R20) determines the drain speed.  A microcontroller
 feeds in a PWM to open/close the transistor.  The duty cycle of this PWM
@@ -219,7 +219,7 @@ Fully understanding this block will require studying the full schematic.  A
 partial understand can be gained from the image above and the Falstad model.  We
 basically have another way to fill the capacitor C4 which is "enabled" when the
 battery is plugged in but the user has not pressed the power button yet.  The
-way this works is that the source of the MOSFET (2) is connected to the battery
+way this works is that the source of the FET Q5 is connected to the battery
 and the small 10 ohm R13 allows for a rapid fill.  R8 is connected to the
 microcontroller power and is thus grounded on plug-in, turning "on" the
 FET.
@@ -236,7 +236,8 @@ voltage near-battery going to R8 which turns off the FET and cuts off R13.
 One of the four ways the microcontroller decides where to set Vgs is by
 monitoring the current flowing through the FETs  (the other three are voltage,
 power, and temperature).  An ADC within the microcontroller measures the voltage
-across the resistor then uses Ohm's law (I = V/R) to determine the current.
+across the resistors (R22-R24) then uses Ohm's law (I = V/R) to determine the
+current.
 
 Resistor values were chosen for a full 3V swing at 30A of current, this allows
 us to use the full 12-bits of ADC resolution for good accuracy.  The downside
@@ -244,8 +245,7 @@ is that 3V * 30A = 90W, which is a lot for a resistor to dissipate.  To support
 this, I chose 3 35W 0.4 ohm resistors connected in parallel for a total dissipation
 capability of ~100W and an equivalent resistance of 0.133 ohm.  Potentially
 wasting this much power on a current measurement would normally be frowned upon but
-in this application it's actually helping take some load off the main power FET,
-buying us a little more margin on max power dissipation.
+in this application it's actually helping take some load off the main power FET.
 
 A Zener diode (U5) is used to protect the ADC of the microcontroller in the
 event that the divided voltage is too high (> 3V).  This is a protection
@@ -413,3 +413,76 @@ packs or the connector type is of course doable:
 
 ![daughter 3d](images/daughter_3d.png)
 
+# Firmware
+
+If you don't want to build the firmware yourself, there is a prebuilt
+version [here](https://github.com/mattwach/battery_drainer/tree/main/firmware).
+
+The firmware, `battery_drainer.uf2` is in a standard PI Pico format.  One
+way to download it is to mount the Pico as a USB drive and copy over the file.
+Refer to beginner PI Pico tutorials for more information, such as
+[this one](https://datasheets.raspberrypi.com/pico/getting-started-with-pico.pdf).
+
+If you do not wish to build the firmware yourself, feel free to skip to the
+next section.
+
+The firmware is build using a script that wraps the official pico build
+system.  To run it, you execute `bootstrap.sh` which exists in [the src/ directory](https://github.com/mattwach/battery_drainer/tree/main/src).
+
+    ./bootstrap.sh
+    cd build
+    make -j
+
+Let's take a look inside the file:
+
+```
+$ cat bootstrap.sh 
+#!/bin/bash
+
+if [ ! -f lib/pico_uart_console/CMakeLists.txt ]; then
+  git submodule init
+  git submodule update
+fi
+
+rm -rf build
+mkdir build
+cd build
+cmake ..
+```
+
+All standard git and cmake operations which you can execute individually
+if you prefer (or are running in an environment where executing `bootstrap.sh`
+directory will not work).
+
+
+# Case Design
+
+For cooling, I ended up going with [2 120x69x36 mm finned alunimum heatsinks](https://www.amazon.com/gp/product/B07TJY3GKP) which cost me $13 each for a
+total of $26.  These work great but having to use two is a bit inconvenient, due
+to the vertical seam in the center.  I tapped holes in these heatsinks, both
+for mounting the board and for holding the FETs, resistors, and temperature
+sensors securely to the heat sink (with the aid of thermal paste to complete
+the thermal connection).
+
+![finished unit](images/finished_unit.jpg)
+
+On the backside of the heatsink, I have a 120mm fan which blows air into the
+fins.  The microcontroller controls fan speed based on current temperature
+and power dissipation.
+
+At first everything was held together with wires.  I wan't sure if a 3D printed
+solution would be able to tolerate the dissipated heat.  But after experiencing
+with the unit and doing official (temperature probe, IR camera) and non official measurements (finger touch), I determined it would probably be ok.
+
+I ended up designing a case using Open SCAD:
+
+![3d printed case](images/case_design.png)
+
+Design files are included with the project [here](https://github.com/mattwach/battery_drainer/tree/main/case).  Ready to print models
+are [here](https://github.com/mattwach/battery_drainer/tree/main/case/export).
+
+After many uses, the case is holding up fine with no signs of warping.  Note that I used PETG for the case as PLA has a tendency to "creep" over time, even
+at slightly elevated temperatures.
+
+The front plate is acrylic.  I used a 3018 CNC machine to cut it out.  Printing
+a cover or making something by hand are of course other options,
