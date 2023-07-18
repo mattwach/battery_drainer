@@ -34,6 +34,9 @@ Batteries are energy storage devices and thus carry an inherent risk.  If you
 are not familiar with the battery type you are working with, take a few moments to
 educate yourself on recommended handling practices.
 
+When working with an untested unit or new batteries, I suggest extra caution.
+For example doing initial testing outside on concrete or in a fire pit.
+
 # Pre-existing Market Solutions
 
 If you look up "LIPO Battery Discharger" on Amazon or similar, you will find a
