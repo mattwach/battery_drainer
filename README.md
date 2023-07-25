@@ -37,6 +37,12 @@ educate yourself on recommended handling practices.
 When working with an untested unit or new batteries, I suggest extra caution.
 For example doing initial testing outside on concrete or in a fire pit.
 
+This design incorporates a protection fuse.  I recommend using the
+*smallest-sized fuse* that meets your requirements.  If anything goes wrong
+with the firmware, a hardware component, or the hardware build, the fuse will
+limit the maximum current that can flow.  Starting with a small fuse and
+upgrading it later could be a good verification strategy.
+
 # Pre-existing Market Solutions
 
 If you look up "LIPO Battery Discharger" on Amazon or similar, you will find a
